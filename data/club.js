@@ -109,19 +109,19 @@ window.CLUB = {
 
   /* Board of directors (club officers), from the 2026-2027 Club Officers directory.
      Names and roles only: never add phone numbers or emails to this file, it is public.
-     Photos: save 4:5 portraits (about 900x1125, WebP) under images/board/ and set `photo`,
-     e.g. photo: 'images/board/vaishnavi-mainkar.webp'. A null photo shows the initials. */
+     Photos: 4:5 portraits (900x1125 WebP, metadata removed) under images/board/.
+     A null photo shows the initials. */
   board: [
-    { name: 'Leo Vaishnavi Mainkar',   role: 'Joint Secretary',              photo: null },
-    { name: 'Leo Kaushal Shah',        role: 'Joint Treasurer',              photo: null },
-    { name: 'Leo Harshil Parikh',      role: 'Global Action Team Director',   photo: null },
-    { name: 'Leo Rucha Bodhankar',     role: 'Global Service Team',           photo: null },
-    { name: 'Leo Sakshi Gawade',       role: 'Global Leadership Team',        photo: null },
-    { name: 'Leo Soham Badole',        role: 'Global Membership Team',        photo: null },
-    { name: 'Leo Shashank Ballaya',    role: 'Chief Innovation Officer',     photo: null },
-    { name: 'Leo Divya Ramakrishnan',  role: 'Chief Innovation Coordinator', photo: null },
-    { name: 'Leo Rahul Dadheech',      role: 'Sponsorship & CSR Director',   photo: null },
-    { name: 'Leo Mahima Pal',          role: 'Media Outreach Director',      photo: null },
-    { name: 'Leo Aryan Lakde',         role: 'Club Merchandise Officer',     photo: null }
+    { name: 'Leo Vaishnavi Mainkar',   role: 'Joint Secretary',              photo: 'images/board/vaishnavi-mainkar.webp' },
+    { name: 'Leo Kaushal Shah',        role: 'Joint Treasurer',              photo: 'images/board/kaushal-shah.webp' },
+    { name: 'Leo Harshil Parikh',      role: 'Global Action Team Director',   photo: 'images/board/harshil-parikh.webp' },
+    { name: 'Leo Rucha Bodhankar',     role: 'Global Service Team',           photo: 'images/board/rucha-bodhankar.webp' },
+    { name: 'Leo Sakshi Gawade',       role: 'Global Leadership Team',        photo: 'images/board/sakshi-gawade.webp' },
+    { name: 'Leo Soham Badole',        role: 'Global Membership Team',        photo: 'images/board/soham-badole.webp' },
+    { name: 'Leo Shashank Ballaya',    role: 'Chief Innovation Officer',     photo: 'images/board/shashank-ballaya.webp' },
+    { name: 'Leo Divya Ramakrishnan',  role: 'Chief Innovation Coordinator', photo: 'images/board/divya-ramakrishnan.webp' },
+    { name: 'Leo Rahul Dadheech',      role: 'Sponsorship & CSR Director',   photo: 'images/board/rahul-dadheech.webp' },
+    { name: 'Leo Mahima Pal',          role: 'Media Outreach Director',      photo: 'images/board/mahima-pal.webp' },
+    { name: 'Leo Aryan Lakde',         role: 'Club Merchandise Officer',     photo: 'images/board/aryan-lakde.webp' }
   ]
 };
