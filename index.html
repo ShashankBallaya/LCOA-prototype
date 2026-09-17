@@ -422,6 +422,13 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
 .card figure.no-photo .ico{position:absolute;top:1rem;right:1rem;width:2.4rem;height:2.4rem;stroke-width:1.2}
 .nf-day{font-family:var(--f-display);font-weight:300;font-size:4.6rem;line-height:.8;color:var(--rose-ink);font-variant-numeric:lining-nums}
 .nf-mon{font-family:var(--f-display);font-style:italic;font-size:1.3rem;color:var(--ink);margin-top:.5rem}
+/* screenshots (Google Meet) shown whole: the image is letterboxed on its own dark background, no hover zoom */
+.card figure.fit-whole{background:#131313}
+.card figure.fit-whole img{object-fit:contain}
+@media (hover:hover) and (pointer:fine){.card:hover figure.fit-whole img{transform:none}}
+.card figure.fit-whole.blur-bg{position:relative;isolation:isolate;background:var(--paper-2)}
+.card figure.fit-whole.blur-bg::before{content:"";position:absolute;inset:-24px;z-index:-1;background:var(--photo) center / cover no-repeat;filter:blur(16px) saturate(1.05);opacity:.85}
+.card figure.fit-whole.blur-bg img{position:relative}
 /* instagram strip before the form: gold hairlines like the stats strip under the hero */
 .ig-strip{padding:0 0 clamp(3rem,7vh,4.5rem)}
 .ig-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1.4rem;padding:1.6rem .5rem;border-top:1px solid var(--gold-line);border-bottom:1px solid var(--gold-line);color:var(--ink)}
@@ -585,7 +592,7 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
     <p class="recap-lede reveal">From one first meeting to <span data-count="events">fifteen</span> events so far. Here are five of them.</p>
     <div class="recap-grid" id="recapGrid">
       <article class="card">
-        <figure class="reveal-img"><img src="images/recap/bethanys-visit.webp" alt="Leo Club members and children posing together at Bethany's Children's Home" loading="lazy"></figure>
+        <figure class="reveal-img fit-whole blur-bg" style="--photo:url('images/recap/bethanys-visit.webp')"><img src="images/recap/bethanys-visit.webp" alt="Leo Club members and children posing together at Bethany's Children's Home" loading="lazy"></figure>
         <div class="card-body">
           <span class="pill service">Service</span>
           <h3>Aanchal: Chapter 1</h3>
@@ -617,7 +624,7 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
         </div>
       </article>
       <article class="card">
-        <figure class="reveal-img"><img src="images/recap/bod-meet.webp" alt="Club board members on a video call planning the term" loading="lazy"></figure>
+        <figure class="reveal-img fit-whole"><img src="images/recap/bod-meet.webp" alt="Club board members on a video call planning the term" loading="lazy"></figure>
         <div class="card-body">
           <span class="pill leadership">Leadership</span>
           <h3>1st BOD Meet</h3>
@@ -703,7 +710,7 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
         <a class="btn btn-ink" href="events.html">All events</a>
       </div>
     </div>
-    <div class="events-grid">
+    <div class="events-grid" id="eventsGrid">
       <a class="event wide seal reveal" href="#join"><div class="top"><div><h3>Installation Ceremony</h3><p>The very first installation of Leo Club of Aurelian. Invitations are on their way.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot"><span class="dot"></span>Next up<span>20 September 2026</span><span class="soon" data-countdown="2026-09-20"></span></div></a>
       <a class="event reveal" href="https://www.instagram.com/lco_aurelian/" target="_blank" rel="noopener"><div class="top"><div><h3>To be announced</h3><p>Follow @lco_aurelian on Instagram for the date.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot">Coming soon</div></a>
       <a class="event reveal" href="https://www.instagram.com/lco_aurelian/" target="_blank" rel="noopener"><div class="top"><div><h3>To be announced</h3><p>Follow @lco_aurelian on Instagram for the date.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot">Coming soon</div></a>
@@ -785,7 +792,7 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
     var html=list.map(function(e){
       var dp=e.date?e.date.split('-').map(Number):null;
       var fig=e.photo
-        ? '<figure class="reveal-img"><img src="'+esc(e.photo)+'" alt="'+esc(e.alt||'')+'" loading="lazy"></figure>'
+        ? '<figure class="reveal-img'+(e.fit==='contain'?' fit-whole'+(e.backdrop==='blur'?' blur-bg':''):'')+'"'+(e.backdrop==='blur'?' style="--photo:url('+esc(e.photo)+')"':'')+'><img src="'+esc(e.photo)+'" alt="'+esc(e.alt||'')+'" loading="lazy"></figure>'
         : '<figure class="reveal-img no-photo '+e.category+'" aria-hidden="true"><svg class="ico"><use href="#i-'+e.category+'"/></svg>'+
             (dp?'<span class="nf-day">'+dp[2]+'</span><span class="nf-mon">'+MONTHS[dp[1]-1]+'</span>':'')+'</figure>';
       var when=dp?'<time datetime="'+e.date+'">'+dp[2]+' '+MONTHS[dp[1]-1].slice(0,3)+'</time>':'';
@@ -807,6 +814,40 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
     if(e.propertyName!=='opacity'||!el.classList||!el.classList.contains('reveal')||!el.classList.contains('in')) return;
     el.style.transitionDelay=''; el.classList.add('settled');
   });
+
+  /* Upcoming: the next event (wide), a series such as the OSW week as one card, then the next one.
+     Past dates drop off by themselves. The static cards in the markup are the no-JavaScript fallback. */
+  var evGrid=document.getElementById('eventsGrid');
+  if(evGrid && C.upcoming){
+    var FULL=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var now0=new Date();
+    var todayIso=now0.getFullYear()+'-'+String(now0.getMonth()+1).padStart(2,'0')+'-'+String(now0.getDate()).padStart(2,'0');
+    var longDate=function(iso){ var p=iso.split('-'); return +p[2]+' '+FULL[+p[1]-1]+' '+p[0]; };
+    var ARROW='<span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span>';
+    var items=[], series={};
+    C.upcoming.filter(function(e){ return e.date>=todayIso; }).forEach(function(e){
+      if(!e.series){ items.push(e); return; }
+      if(series[e.series]){ series[e.series].list.push(e); return; }
+      series[e.series]={ series:e.series, list:[e] }; items.push(series[e.series]);
+    });
+    var cards=items.slice(0,3).map(function(it,i){
+      var cls='event reveal'+(i===0?' wide':'')+(i===0&&it.photo?' seal':'');
+      if(it.series){
+        var first=it.list[0], last=it.list[it.list.length-1], f=first.date.split('-'), l=last.date.split('-');
+        var span=(f[1]===l[1]) ? (+f[2]+' to '+longDate(last.date)) : (longDate(first.date)+' to '+longDate(last.date));
+        var names=it.list.filter(function(e){ return !/finale/i.test(e.title); }).slice(0,3).map(function(e){ return e.title; });
+        var count=['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten'][it.list.length]||it.list.length;
+        return '<a class="'+cls+'" href="events.html#calendar"><div class="top"><div><h3>'+esc(it.series)+' week</h3>'+
+          '<p>'+count+' days of service: '+esc(names.join(', '))+' and more.</p></div>'+ARROW+'</div>'+
+          '<div class="foot">'+(i===0?'<span class="dot"></span>Next up':'')+'<span>'+span+'</span>'+(first.tentative?'<span>Tentative</span>':'')+'</div></a>';
+      }
+      return '<a class="'+cls+'" href="events.html#calendar"><div class="top"><div><h3>'+esc(it.title)+'</h3>'+
+        '<p>'+esc(it.text||it.focus||'Details to follow.')+'</p></div>'+ARROW+'</div>'+
+        '<div class="foot">'+(i===0?'<span class="dot"></span>Next up':'')+'<span>'+longDate(it.date)+'</span>'+
+        (i===0?'<span class="soon" data-countdown="'+it.date+'"></span>':'')+(it.tentative?'<span>Tentative</span>':'')+'</div></a>';
+    });
+    if(cards.length) evGrid.innerHTML=cards.join('');
+  }
 
   /* countdown pill on upcoming events: "In 3 days", "Tomorrow", "Today" */
   document.querySelectorAll('[data-countdown]').forEach(function(el){

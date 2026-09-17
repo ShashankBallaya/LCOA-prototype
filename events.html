@@ -134,6 +134,37 @@ p{max-width:58ch}
 .card p{font-size:.92rem}
 .card .place{font-size:.8rem;color:var(--gold-ink);margin-top:auto;padding-top:.4rem}
 .empty{padding:3rem 0;text-align:center;font-family:var(--f-display);font-size:1.5rem;color:var(--ink)}
+
+/* screenshots (Google Meet) shown whole: the image is letterboxed on its own dark background, no hover zoom */
+.card figure.fit-whole{background:#131313}
+.card figure.fit-whole img{object-fit:contain}
+@media (hover:hover) and (pointer:fine){.card:hover figure.fit-whole img{transform:none}}
+.card figure.fit-whole.blur-bg{position:relative;isolation:isolate;background:var(--paper-2)}
+.card figure.fit-whole.blur-bg::before{content:"";position:absolute;inset:-24px;z-index:-1;background:var(--photo) center / cover no-repeat;filter:blur(16px) saturate(1.05);opacity:.85}
+.card figure.fit-whole.blur-bg img{position:relative}
+
+/* coming up: calendar of upcoming dates, a series (OSW) as its own block */
+.calendar{padding-top:clamp(3rem,7vh,4.5rem)}
+.cal-head{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem 2rem;flex-wrap:wrap;margin-bottom:1.6rem}
+.cal-head h2{font-size:clamp(2.3rem,4.4vw,3.2rem)}
+.cal-head p{font-size:.92rem;max-width:36ch}
+.cal-month + .cal-month{margin-top:2.4rem}
+.cal-month h3{font-size:1.6rem;padding-bottom:.7rem;border-bottom:1px solid var(--gold-line)}
+.cal-month h3 em{font-style:italic;font-weight:300;color:var(--rose-ink)}
+.cal-list{list-style:none}
+.cal-row{display:grid;grid-template-columns:4.2rem 1fr auto;gap:1.2rem;align-items:center;padding:.95rem .2rem;border-bottom:1px solid var(--gold-line)}
+.cal-date b{display:block;font-family:var(--f-display);font-weight:400;font-size:2rem;line-height:1;color:var(--ink);font-variant-numeric:lining-nums tabular-nums}
+.cal-date span{display:block;margin-top:.2rem;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink)}
+.cal-what b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.35rem;line-height:1.2;color:var(--ink)}
+.cal-what span{display:block;font-size:.88rem;color:var(--ink-2);margin-top:.1rem}
+.cal-tag{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);white-space:nowrap}
+.cal-series{margin:1rem 0 .2rem;border-radius:16px;background:var(--blush-soft);padding:.4rem 1.1rem .3rem}
+.cal-series-head{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;padding:.8rem .2rem .7rem;border-bottom:1px solid var(--blush-line)}
+.cal-series-head b{font-family:var(--f-display);font-weight:400;font-size:1.45rem;color:var(--ink)}
+.cal-series-head span{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rose-ink);white-space:nowrap}
+.cal-series .cal-row{border-bottom-color:var(--blush-line)}
+.cal-series .cal-row:last-child{border-bottom:0}
+.cal-series .cal-date b{color:var(--rose-ink)}
 .empty[hidden],.card[hidden],.month[hidden]{display:none}
 
 /* closing band: image runs into the bottom edge */
@@ -177,6 +208,12 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
   body{font-size:1rem}
   .brand span{font-size:1.1rem}
   .next{grid-template-columns:1fr}
+  .cal-row{grid-template-columns:3.4rem 1fr;gap:.9rem}
+  .cal-tag{grid-column:2;margin-top:-.4rem}
+  .cal-date b{font-size:1.7rem}
+  .cal-what b{font-size:1.2rem}
+  .cal-series{padding:.3rem .8rem .2rem}
+  .cal-series-head{flex-direction:column;gap:.2rem}
   .next-img{order:-1;min-height:0;aspect-ratio:16/10}
   .grid{grid-template-columns:1fr}
   .closing{padding:0 .5rem}
@@ -251,6 +288,8 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
 
   <section class="wrap" id="next" aria-labelledby="nextTitle"></section>
 
+  <section class="wrap calendar" id="calendar" aria-labelledby="calTitle" hidden></section>
+
   <section class="section" aria-label="Past events">
     <div class="wrap">
       <div id="months"></div>
@@ -311,8 +350,11 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
   var since=dated.length ? ' since '+MONTHS[parts(dated[0]).m]+' '+parts(dated[0]).y : '';
   document.getElementById('pageLede').textContent=(WORDS[n]||n)+' events'+since+', across service, fellowship and leadership. Newest first.';
 
-  /* coming up */
-  var up=(C.upcoming||[])[0], next=document.getElementById('next');
+  /* coming up: only dates from today on */
+  var now0=new Date();
+  var todayIso=now0.getFullYear()+'-'+String(now0.getMonth()+1).padStart(2,'0')+'-'+String(now0.getDate()).padStart(2,'0');
+  var future=(C.upcoming||[]).filter(function(e){ return e.date>=todayIso; });
+  var up=future[0], next=document.getElementById('next');
   if(up){
     var p=parts(up.date), today=new Date(); today.setHours(0,0,0,0);
     var days=Math.round((new Date(p.y,p.m,p.d)-today)/864e5);
@@ -329,6 +371,36 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
         (up.photo ? '<div class="next-img"><img src="'+esc(up.photo)+'" alt="" fetchpriority="high"></div>' : '')+
       '</article>';
   }else{ next.remove(); }
+
+  /* calendar: every upcoming date by month; consecutive dates of a series (OSW) share one block */
+  var cal=document.getElementById('calendar');
+  if(future.length){
+    var DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    var row=function(e){
+      var p=parts(e.date), wd=DAYS[new Date(p.y,p.m,p.d).getDay()];
+      return '<li class="cal-row"><div class="cal-date"><b>'+p.d+'</b><span>'+wd+'</span></div>'+
+        '<div class="cal-what"><b>'+esc(e.title)+'</b>'+(e.focus?'<span>'+esc(e.focus)+'</span>':'')+'</div>'+
+        '<span class="cal-tag">'+(e.tentative?'Tentative':'')+'</span></li>';
+    };
+    var months={}, order=[];
+    future.forEach(function(e){ var k=e.date.slice(0,7); if(!months[k]){ months[k]=[]; order.push(k); } months[k].push(e); });
+    var body=order.map(function(k){
+      var list=months[k], html='', i=0;
+      while(i<list.length){
+        if(!list[i].series){ html+='<ul class="cal-list">'+row(list[i])+'</ul>'; i++; continue; }
+        var s=list[i].series, block=[];
+        while(i<list.length && list[i].series===s){ block.push(list[i]); i++; }
+        var a=parts(block[0].date), z=parts(block[block.length-1].date);
+        html+='<div class="cal-series"><div class="cal-series-head"><b>'+esc(s)+' week</b><span>'+a.d+' to '+z.d+' '+MONTHS[z.m]+' · '+block.length+' days</span></div>'+
+          '<ul class="cal-list">'+block.map(row).join('')+'</ul></div>';
+      }
+      return '<section class="cal-month reveal"><h3>'+MONTHS[+k.slice(5,7)-1]+' <em>'+k.slice(0,4)+'</em></h3>'+html.replace(/<\/ul><ul class="cal-list">/g,'')+'</section>';
+    }).join('');
+    var anyTentative=future.some(function(e){ return e.tentative; });
+    cal.innerHTML='<div class="cal-head reveal"><h2 id="calTitle">Coming <em>up.</em></h2>'+
+      (anyTentative?'<p>Dates marked tentative can still change. Follow @lco_aurelian for confirmations.</p>':'')+'</div>'+body;
+    cal.hidden=false;
+  }
 
   /* filters */
   var counts={all:n}; C.events.forEach(function(e){ counts[e.category]=(counts[e.category]||0)+1; });
@@ -348,7 +420,7 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
 
   function card(e){
     var fig = e.photo
-      ? '<figure><img src="'+esc(e.photo)+'" alt="'+esc(e.alt||'')+'" loading="lazy"></figure>'
+      ? '<figure'+(e.fit==='contain'?' class="fit-whole'+(e.backdrop==='blur'?' blur-bg':'')+'"':'')+(e.backdrop==='blur'?' style="--photo:url('+esc(e.photo)+')"':'')+'><img src="'+esc(e.photo)+'" alt="'+esc(e.alt||'')+'" loading="lazy"></figure>'
       : '<figure class="no-photo '+e.category+'" aria-hidden="true"><svg class="ico"><use href="#i-'+e.category+'"/></svg>'+
           (e.date ? '<span class="nf-day">'+parts(e.date).d+'</span><span class="nf-mon">'+MONTHS[parts(e.date).m]+'</span>'
                   : '<span class="nf-mon">'+(e.month ? MONTHS[+e.month.slice(5,7)-1] : 'Photos soon')+'</span>')+

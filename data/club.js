@@ -7,7 +7,11 @@
    - An upcoming event is announced: add it to `upcoming`. Move it into `events`
      once it has happened.
    - `photo` is a path under images/, or null. Cards without a photo show the
-     category mark instead of an empty box.
+     category mark instead of an empty box. Add `fit: 'contain'` to show a photo whole
+     instead of cropped to the card: screenshots (Google Meet) get a dark background;
+     add `backdrop: 'blur'` too for real photos, which fills the space with a blurred copy.
+   - When you replace a photo but keep its file name, add or raise `?v=2` at the end of
+     the path, so browsers that saw the old picture fetch the new one.
    - `date` is YYYY-MM-DD. Use `month` (YYYY-MM) when only the month is known,
      and leave both null when neither is known.
    - Anything marked `standin: true` is NOT real yet. Replace it before sharing.
@@ -32,67 +36,77 @@ window.CLUB = {
     { title: 'Aanchal: Chapter 3', category: 'service', date: '2026-09-05',
       place: null, cause: 'Childhood cancer',
       text: 'A Janmashtami-special colouring activity with the kids at a cancer home, and a day filled with smiles.',
-      photo: null },
+      photo: 'images/recap/aanchal-chapter-3.webp',
+      alt: 'Leos and children holding up their colouring sheets at the cancer home' },
     { title: '2nd Regular Meet', category: 'leadership', date: '2026-09-01',
       place: null, cause: 'Club administration',
       text: "The club's regular meeting for the month of September.",
-      photo: null },
+      photo: 'images/recap/regular-meet-2.webp', fit: 'contain',
+      alt: 'Club members on a video call for the September regular meeting' },
     { title: 'Aanchal: Chapter 2', category: 'service', date: '2026-08-29',
       place: "Bethany's Children's Home, Nerul", cause: 'Youth',
       text: 'An afternoon of laughter, creativity and games, run together with the Leo Clubs of Airoli and ÆQUINOX.',
-      photo: null },
+      photo: 'images/recap/aanchal-chapter-2.webp',
+      alt: 'Leos and children together at Bethany\'s Children\'s Home' },
     { title: 'Jashn-e A4', category: 'fellowship', date: '2026-08-23',
       place: null, cause: 'Club administration',
       text: 'The Leo District 3231 A4 Installation Ceremony.',
-      photo: null },
+      photo: 'images/recap/jashn-e-a4.webp?v=2',
+      alt: 'Club members together in front of the district banner at the Jashn-e A4 installation ceremony' },
     { title: 'Tees Maar Khan: Online Watch Party', category: 'service', date: '2026-08-22',
       place: 'Online', cause: 'Disaster relief',
       text: 'A movie night for a cause. ₹25 from every viewer went to the Assam Relief Fund.',
-      photo: null },
+      photo: 'images/recap/watch-party.webp',
+      alt: 'A laptop playing Tees Maar Khan during the online watch party' },
     { title: 'Zone Chairperson Visit', category: 'leadership', date: '2026-08-16',
       place: null, cause: 'Club administration',
       text: 'The Zone Chairperson visited the club together with the GLT Director.',
-      photo: null },
+      photo: 'images/recap/zone-chairperson-visit.webp', fit: 'contain',
+      alt: 'Club members on a video call during the Zone Chairperson visit' },
     { title: 'Virsa: Old Age Home Visit', category: 'service', date: '2026-08-15',
       place: null, cause: 'Initiatives for the elderly',
       text: 'Games, stories and long conversations with the people who came before us.',
-      photo: null },
+      photo: 'images/recap/virsa.webp',
+      alt: 'Leos standing together during the Virsa visit' },
     { title: '2nd BOD Meet', category: 'leadership', date: '2026-08-14',
       place: null, cause: 'Club administration',
       text: 'The board plans the month of August.',
-      photo: null },
+      photo: 'images/recap/bod-meet-2.webp', fit: 'contain',
+      alt: 'Board members on a video call for the 2nd BOD meet' },
     { title: 'YCE Camp Finale', category: 'service', date: '2026-08-09',
       place: null, cause: 'Youth Camps and Exchange',
       text: 'The closing day of the Youth Camps and Exchange camp.',
-      photo: null },
+      photo: 'images/recap/yce-finale.webp',
+      alt: 'A panel on stage at the Youth Camps and Exchange camp finale' },
     { title: 'YCE Day', category: 'service', date: '2026-08-08',
       place: null, cause: 'Youth Camps and Exchange',
       text: 'Creativity, chaos and connections with the Youth Exchange students.',
-      photo: null },
+      photo: 'images/recap/yce-day.webp',
+      alt: 'Leos with Youth Exchange students holding cards on YCE Day' },
     { title: 'Friendship Day Distribution', category: 'service', date: '2026-08-02',
       place: 'Thane', cause: 'Hunger',
       text: "Cakes and cold drinks for Thane's rickshaw drivers and delivery partners.",
-      photo: 'images/recap/friendship-day.webp',
-      alt: 'Leo Club members handing out cakes and drinks to rickshaw drivers on Friendship Day' },
+      photo: 'images/recap/friendship-day.webp?v=2',
+      alt: 'Leos with rickshaw drivers during the Friendship Day distribution' },
     { title: 'Club Photoshoot & 1st Regular Meeting', category: 'fellowship', date: '2026-08-02',
       place: 'Meadows', cause: 'Club administration',
       text: 'Capturing memories and aligning on roles for the year ahead.',
-      photo: 'images/recap/club-photoshoot.webp',
+      photo: 'images/recap/club-photoshoot.webp?v=2',
       alt: 'Club members posing together at their photoshoot at Meadows' },
     { title: 'Lions District Installation Ceremony', category: 'fellowship', date: '2026-07-26',
       place: 'Lions District 3231 A4', cause: 'Club administration',
       text: 'We attended the installation of Lion Pravin Sarnaik and his team, with Youth Exchange students and PID Lion Sangeeta Jatia.',
-      photo: 'images/recap/installation-ceremony.webp',
+      photo: 'images/recap/installation-ceremony.webp?v=2',
       alt: 'Club members at the Lions District 3231 A4 Installation Ceremony' },
     { title: '1st BOD Meet', category: 'leadership', date: '2026-07-23',
       place: 'Online', cause: 'Club administration',
       text: "Planning the term's celebrations, fellowship events, and service initiatives.",
-      photo: 'images/recap/bod-meet.webp',
+      photo: 'images/recap/bod-meet.webp', fit: 'contain',
       alt: 'Club board members on a video call planning the term' },
     { title: 'Aanchal: Chapter 1', category: 'service', date: '2026-07-18',
       place: "Bethany's Children's Home", cause: 'Youth',
       text: "Finger painting, games, and a birthday celebration at Bethany's Children's Home.",
-      photo: 'images/recap/bethanys-visit.webp',
+      photo: 'images/recap/bethanys-visit.webp', fit: 'contain', backdrop: 'blur',
       alt: "Leo Club members and children posing together at Bethany's Children's Home" }
   ],
 
@@ -101,10 +115,28 @@ window.CLUB = {
      true skips events that have no photo yet. */
   recap: { count: 5, photosOnly: false },
 
+  /* Upcoming, in date order. Events drop off both pages on their own once their date has passed.
+     Source for October and November: OSW_and_Upcoming_Events_2026.csv (tentative, 17 Sep 2026).
+     `series: 'OSW'` groups the 2 to 9 October run into one block. `focus` is a short label. */
   upcoming: [
     { title: 'Installation Ceremony', date: '2026-09-20',
       text: 'The very first installation of Leo Club of Aurelian. Invitations are on their way.',
-      photo: 'images/seal-tile.webp' }
+      photo: 'images/seal-tile.webp' },
+
+    { title: 'Pahal / Anna Daan',                  date: '2026-10-02', focus: 'Hunger relief',                   series: 'OSW', tentative: true },
+    { title: 'Aanchal: Chapter 4',                 date: '2026-10-03', focus: 'Sports event',                    series: 'OSW', tentative: true },
+    { title: 'Senior Citizen / Childhood Cancer',  date: '2026-10-04', focus: 'Community service',               series: 'OSW', tentative: true },
+    { title: 'Meter Down',                         date: '2026-10-05', focus: 'Hunger relief',                   series: 'OSW', tentative: true },
+    { title: 'Sanitary Pad Drive',                 date: '2026-10-06', focus: 'Donation and awareness session',  series: 'OSW', tentative: true },
+    { title: 'Peace Poster',                       date: '2026-10-07', focus: 'With EuroKids',                   series: 'OSW', tentative: true },
+    { title: 'Stationery Kits / Animal Feeding',   date: '2026-10-08', focus: 'Underprivileged children and stray animals', series: 'OSW', tentative: true },
+    { title: 'OSW Finale',                         date: '2026-10-09', focus: 'Closing event',                   series: 'OSW', tentative: true },
+
+    { title: 'Blood Donation: Leo Club of Kandivali Lokhandwala', date: '2026-10-18', focus: 'Blood donation',                  tentative: true },
+    { title: 'After Hours',                        date: '2026-10-23', focus: 'GLT event and twinning',          tentative: true },
+    { title: 'Umeed',                              date: '2026-11-01', focus: null,                              tentative: true },
+    { title: 'Aanchal: Chapter 5',                 date: '2026-11-14', focus: 'Party and celebration',           tentative: true },
+    { title: 'Empowerment × Side Quest',           date: '2026-11-29', focus: 'Women empowerment',               tentative: true }
   ],
 
   /* Board of directors (club officers), from the 2026-2027 Club Officers directory.
