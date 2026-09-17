@@ -445,6 +445,26 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
 .card figure.fit-whole.blur-bg{position:relative;isolation:isolate;background:var(--paper-2)}
 .card figure.fit-whole.blur-bg::before{content:"";position:absolute;inset:-24px;z-index:-1;background:var(--photo) center / cover no-repeat;filter:blur(16px) saturate(1.05);opacity:.85}
 .card figure.fit-whole.blur-bg img{position:relative}
+/* membership form: interest choice and the sent state */
+.interest{border:0;padding:0;margin:.1rem 0 0;min-width:0}
+.interest legend{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);margin:0 auto .45rem;padding:0}
+.interest-options{display:grid;grid-template-columns:repeat(3,1fr);gap:.35rem}
+.interest-options label{position:relative;cursor:pointer}
+.interest-options input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.interest-options span{display:block;padding:.55rem .3rem;border-radius:999px;border:1px solid rgba(30,51,36,.25);background:rgba(255,255,255,.7);font-size:.8rem;color:var(--ink);text-align:center;transition:background .15s ease,color .15s ease,border-color .15s ease,transform .16s var(--ease-out)}
+.interest-options label:active span{transform:scale(.97)}
+.interest-options input:checked + span{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.interest-options input:focus-visible + span{outline:2px solid var(--gold);outline-offset:2px}
+@media (hover:hover) and (pointer:fine){.interest-options label:hover input:not(:checked) + span{border-color:var(--ink);background:#fff}}
+.form.tried .interest-options input:invalid + span{border-color:#B5525F;background:#FFF6F7}
+.joined{display:grid;justify-items:center;gap:.7rem;max-width:36ch;margin:0 auto;text-align:center;outline:none}
+.joined[hidden],.form[hidden]{display:none}
+.joined-mark{width:3rem;height:3rem;border-radius:50%;display:grid;place-items:center;background:var(--sage-soft);color:var(--ink)}
+.joined-mark svg{width:1.4rem;height:1.4rem}
+.joined h3{font-size:clamp(1.8rem,3vw,2.3rem)}
+.joined h3 em{font-style:italic;font-weight:300;color:var(--rose-ink)}
+.joined p{font-size:.95rem}
+@media (prefers-reduced-motion:no-preference){.joined:not([hidden]){animation:rise .5s var(--ease-out) both}}
 /* instagram strip before the form: gold hairlines like the stats strip under the hero */
 .ig-strip{padding:0 0 clamp(3rem,7vh,4.5rem)}
 .ig-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1.4rem;padding:1.6rem .5rem;border-top:1px solid var(--gold-line);border-bottom:1px solid var(--gold-line);color:var(--ink)}
@@ -758,9 +778,23 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
           <div class="field"><label for="n" class="sr-only">Full name</label><input id="n" name="name" type="text" autocomplete="name" placeholder="Full name" required></div>
           <div class="field"><label for="e" class="sr-only">Email</label><input id="e" name="email" type="email" autocomplete="email" placeholder="Email" required></div>
           <div class="field"><label for="w" class="sr-only">WhatsApp number</label><input id="w" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" placeholder="WhatsApp number" required></div>
-          <button class="btn btn-ink" type="submit">Become a member</button>
+          <fieldset class="interest">
+            <legend>What interests you?</legend>
+            <div class="interest-options">
+              <label><input type="radio" name="interest" value="Social Service" required><span>Service</span></label>
+              <label><input type="radio" name="interest" value="Leadership"><span>Leadership</span></label>
+              <label><input type="radio" name="interest" value="Fellowship"><span>Fellowship</span></label>
+            </div>
+          </fieldset>
+          <button class="btn btn-ink" type="submit" id="joinSubmit">Become a member</button>
           <p class="form-note" id="formNote" aria-live="polite"></p>
         </form>
+        <div class="joined" id="joined" hidden tabindex="-1">
+          <span class="joined-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+          <h3>Welcome to the <em>circle.</em></h3>
+          <p>Thank you for joining us. A board member will reach you on WhatsApp soon.</p>
+          <a class="btn btn-line" href="https://www.instagram.com/lco_aurelian/" target="_blank" rel="noopener">Say hi on Instagram</a>
+        </div>
       </div>
     </div>
     </section>
@@ -976,20 +1010,51 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
     }else{ visible=true; start(); }
   }
 
-  /* The form has no backend yet. It validates and tells the visitor so. */
+  /* Membership form: posts to the same Google Form as lcoaurelian.in ("Leo Club of Aurelian Membership Form").
+     All four questions are required there, and "What Interests You" only accepts these exact answers:
+     Social Service, Leadership, Fellowship. Google does not let the page read its reply (no-cors),
+     so a network failure is the only error we can show. */
+  var GFORM='https://docs.google.com/forms/d/e/1FAIpQLSds1ZCFZTSq__-3C_O9qXhkvHQMnNbf27NJpMSdCbgnxtydEQ/formResponse';
+  var FIELD={ name:'entry.509309478', email:'entry.178411864', phone:'entry.1212270218', interest:'entry.817201475' };
   var form=document.getElementById('joinForm');
   var note=document.getElementById('formNote');
+  var submitBtn=document.getElementById('joinSubmit');
+  var joined=document.getElementById('joined');
+  var sending=false;
   form.addEventListener('submit',function(e){
     e.preventDefault();
+    if(sending) return;
     form.classList.add('tried');
+    /* a WhatsApp number needs at least 10 digits; spaces, +, - and brackets are allowed */
+    var wa=form.elements.whatsapp, digits=wa.value.replace(/[^0-9]/g,'');
+    wa.setCustomValidity(wa.value && (digits.length<10 || /[^0-9+()\s-]/.test(wa.value)) ? 'short' : '');
     if(!form.checkValidity()){
+      var bad=form.querySelector('input:invalid');   /* not the fieldset, which also matches :invalid */
       note.classList.add('err');
-      note.textContent='Please fill in your name, email and WhatsApp number.';
-      form.querySelector(':invalid').focus();
+      note.textContent= bad.name==='interest' ? 'Pick what interests you most.'
+        : bad.name==='whatsapp' && bad.value ? 'Please check the WhatsApp number (at least 10 digits).'
+        : bad.name==='email' && bad.value ? 'Please check the email address.'
+        : 'Please fill in your name, email and WhatsApp number.';
+      bad.focus();
       return;
     }
     note.classList.remove('err');
-    note.textContent='Sign-ups open soon. The form is not connected yet.';
+    sending=true; submitBtn.disabled=true; submitBtn.textContent='Sending…';
+    var body=new URLSearchParams();
+    body.append(FIELD.name, form.elements.name.value.trim());
+    body.append(FIELD.email, form.elements.email.value.trim());
+    body.append(FIELD.phone, form.elements.whatsapp.value.trim());
+    body.append(FIELD.interest, form.querySelector('input[name="interest"]:checked').value);
+    fetch(GFORM,{method:'POST',mode:'no-cors',body:body})
+      .then(function(){
+        form.hidden=true; joined.hidden=false; joined.focus({preventScroll:true});
+        [].forEach.call(form.parentElement.querySelectorAll(':scope > h2, :scope > .lede'),function(el){ el.hidden=true; });
+      })
+      .catch(function(){
+        note.classList.add('err');
+        note.textContent='That did not send. Check your connection and try again, or message us on Instagram.';
+      })
+      .then(function(){ sending=false; submitBtn.disabled=false; submitBtn.textContent='Become a member'; });
   });
 })();
 </script>
