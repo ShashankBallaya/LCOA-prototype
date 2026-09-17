@@ -9,7 +9,7 @@
 <link rel="icon" href="images/logo-700.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#FBF0E3;
@@ -310,8 +310,167 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
   .stat span{font-size:.6rem;letter-spacing:.12em}
 }
 </style>
+<style>
+/* ================= additions, 17 Sep 2026 =================
+   Everything below adds to the styles above; nothing above was rewritten. */
+:root{
+  --blush-soft:#F6D9DD;
+  --blush-line:#EBC3CA;
+  --rose-ink:#8E4255;   /* rose for small text: 6.1:1 on paper, 5.2:1 on blush-soft */
+}
+::selection{background:var(--blush-soft);color:var(--ink)}
+h2 em,.big-em{font-style:italic;font-weight:300;color:var(--rose-ink)}
+
+/* custom icon set: 24px grid, 1.5 stroke, blush fills */
+.ico{width:1.35rem;height:1.35rem;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.ico .fill{fill:var(--blush)}
+.ico .soft{fill:var(--blush-soft)}
+.pillar .mark{background:var(--blush-soft);color:var(--ink);width:3rem;height:3rem}
+
+/* stats: counted up on open */
+.stat b{display:inline-block}
+.stat span{display:flex;align-items:center;justify-content:center;gap:.55em;margin-top:.35rem}
+.stat span::before{content:"";width:.38rem;height:.38rem;border-radius:50%;background:var(--blush);flex:none}
+
+/* recap: sixth tile opens the events page */
+.card.more{position:relative;background:var(--blush-soft);border-color:var(--blush-line);padding:1.6rem 1.5rem 1.4rem;justify-content:space-between;gap:1.5rem;color:var(--ink);min-height:320px}
+.more-marks{display:flex;gap:.5rem}
+.more-marks span{width:2.6rem;height:2.6rem;border-radius:50%;display:grid;place-items:center;background:var(--paper);color:var(--ink)}
+.more-marks .ico{width:1.2rem;height:1.2rem}
+.card.more h3{font-size:clamp(2rem,3vw,2.5rem);line-height:1.05;margin:0}
+.card.more h3 em{color:var(--rose-ink)}
+.card.more p{font-size:.95rem;color:var(--ink-2);margin-top:.6rem;max-width:28ch}
+.more-foot{display:flex;align-items:center;justify-content:space-between;font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;font-weight:500;color:var(--rose-ink)}
+.card.more .arrow{border-color:var(--rose-ink);color:var(--rose-ink);transition:background .2s ease,color .2s ease,border-color .2s ease}
+.card.more .arrow svg{transition:transform .2s var(--ease-out)}
+.card.more:active{transform:scale(.985)}
+@media (hover:hover) and (pointer:fine){
+  .card.more:hover{border-color:var(--rose-ink)}
+  .card.more:hover .arrow{background:var(--rose-ink);color:var(--paper)}
+  .card.more:hover .arrow svg{transform:translate(1px,-1px)}
+}
+
+/* the wider circle: micro team + board of directors, after the core team */
+.circle{background:var(--paper-2);padding-top:0}
+.circle-group{border-top:1px solid var(--gold-line);padding-top:clamp(3rem,7vh,4.5rem)}
+.circle-group + .circle-group{margin-top:clamp(4rem,9vh,6rem)}
+.circle-group .head-row{margin-bottom:2.6rem}
+.circle-group .head-row .lede{max-width:34ch}
+.mini-face,.director-frame{display:grid}
+.mini-face > *,.director-frame > *{grid-area:1/1;min-height:0}
+.initials{display:grid;place-items:center;background:var(--blush-soft);color:var(--rose-ink);font-family:var(--f-display);font-size:1.9rem;font-weight:400;letter-spacing:.02em}
+
+/* micro team: round faces in a blush ring */
+.mini-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:2rem 1.25rem;list-style:none}
+.mini{text-align:center}
+.mini-face{width:min(100%,132px);aspect-ratio:1;margin:0 auto .9rem;border-radius:50%;padding:5px;border:1px solid var(--blush-line);background:var(--paper);transition:border-color .2s ease}
+.mini-face > *{border-radius:50%;overflow:hidden}
+.mini-face img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.mini > b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.15rem;line-height:1.2;color:var(--ink)}
+.mini > span{display:block;margin-top:.25rem;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-ink)}
+@media (hover:hover) and (pointer:fine){.mini:hover .mini-face{border-color:var(--rose-ink)}}
+
+/* board of directors: framed portrait cards with a rose role line */
+.board-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;list-style:none}
+.director{background:var(--paper);border:1px solid var(--gold-line);border-radius:16px;padding:.45rem .45rem 1.1rem;transition:border-color .2s ease}
+.director-frame{aspect-ratio:4/5;border-radius:11px;overflow:hidden;background:var(--blush-soft)}
+.director-frame img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.director .initials{font-size:2.6rem}
+.director > b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.3rem;line-height:1.2;color:var(--ink);margin:.9rem .65rem 0}
+.director > span{display:block;margin:.3rem .65rem 0;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rose-ink)}
+@media (hover:hover) and (pointer:fine){.director:hover{border-color:var(--blush-line)}}
+
+/* events: upcoming card carries its own image and a countdown */
+.head-actions{display:flex;flex-wrap:wrap;gap:.6rem}
+.event.wide.seal::before{inset:0 0 0 44%;background:url("images/seal-tile.webp") center 45% / cover no-repeat;opacity:1;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 42%);mask-image:linear-gradient(90deg,transparent 0,#000 42%)}
+.event.wide.seal::after{background:linear-gradient(90deg,rgba(30,51,36,1) 30%,rgba(30,51,36,.35) 62%,rgba(30,51,36,0) 100%)}
+.event.wide.seal h3{max-width:none}
+.event.wide.seal p{max-width:24ch}
+.event.wide.seal .arrow{background:rgba(30,51,36,.62);border-color:transparent;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.event .foot .soon{padding:.3rem .65rem;border-radius:999px;background:var(--blush-soft);color:var(--ink);letter-spacing:.12em}
+.event .foot .soon:empty{display:none}
+.event.seal .foot{flex-wrap:wrap;row-gap:.7rem}
+.event.seal .foot > *{white-space:nowrap}
+
+/* footer: the image band runs into the bottom edge, no gap and no lower corners */
+.closing{padding-bottom:0}
+.closing .band{border-bottom-left-radius:0;border-bottom-right-radius:0}
+.closing .band::before{background:linear-gradient(180deg,rgba(30,51,36,.05) 0%,rgba(30,51,36,.18) 45%,rgba(30,51,36,.8) 76%,#1E3324 94%)}
+footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
+
+/* hero legibility: heavier sentence; district line in ink at 500 (was 3.9:1 on the photo, now above 7:1) */
+.hero .lede{font-weight:400}
+.hero-meta{color:var(--ink);font-weight:500}
+@media (max-width:760px){.hero-meta{font-size:1rem}}
+
+@media (prefers-reduced-motion:reduce){.card.more,.card.more .arrow,.mini-face,.director{transition:none}}
+@media (max-width:960px){
+  .mini-grid{grid-template-columns:repeat(3,1fr)}
+  .board-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width:760px){
+  .closing{padding-bottom:0}
+  .card.more{min-height:0}
+  .mini-grid{gap:1.6rem .8rem}
+  .mini > b{font-size:1rem}
+  .mini > span{font-size:.58rem;letter-spacing:.1em}
+  .board-grid{grid-template-columns:repeat(2,1fr);gap:.7rem}
+  .director-frame{aspect-ratio:1}
+  .director > b{font-size:1.1rem;margin:.75rem .45rem 0}
+  .director > span{font-size:.58rem;letter-spacing:.1em;margin:.3rem .45rem 0}
+  .event.wide.seal::before{inset:0;-webkit-mask-image:none;mask-image:none}
+  .event.wide.seal::after{background:linear-gradient(180deg,rgba(30,51,36,.92) 0%,rgba(30,51,36,.55) 55%,rgba(30,51,36,.92) 100%)}
+  .event.wide.seal{min-height:300px}
+  .head-actions{width:100%}
+}
+/* micro team at equal weight to the board: same columns, faces fill the column, same name and role sizes */
+.mini-grid{grid-template-columns:repeat(4,1fr);gap:2.4rem 1.1rem}
+.mini-face{width:100%;padding:7px;margin-bottom:1rem}
+.mini-face .initials{font-size:clamp(2.2rem,4vw,3.2rem)}
+.mini > b{font-size:1.3rem}
+.mini > span{font-size:.68rem;letter-spacing:.14em}
+@media (max-width:960px){.mini-grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:760px){
+  .mini-grid{grid-template-columns:repeat(2,1fr);gap:1.8rem .7rem}
+  .mini-face{padding:5px;margin-bottom:.8rem}
+  .mini-face .initials{font-size:2.6rem}
+  .mini > b{font-size:1.1rem}
+  .mini > span{font-size:.58rem;letter-spacing:.1em}
+}
+</style>
 </head>
 <body>
+
+<!-- custom icon set, drawn from the emblem: camellia (service), linked rings (fellowship), dragonfly (leadership) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-service" viewBox="0 0 24 24">
+    <g class="soft">
+      <path d="M12 12C9.2 10.2 8.6 6.2 12 3.4 15.4 6.2 14.8 10.2 12 12Z"/>
+      <path d="M12 12C9.2 10.2 8.6 6.2 12 3.4 15.4 6.2 14.8 10.2 12 12Z" transform="rotate(72 12 12)"/>
+      <path d="M12 12C9.2 10.2 8.6 6.2 12 3.4 15.4 6.2 14.8 10.2 12 12Z" transform="rotate(144 12 12)"/>
+      <path d="M12 12C9.2 10.2 8.6 6.2 12 3.4 15.4 6.2 14.8 10.2 12 12Z" transform="rotate(216 12 12)"/>
+      <path d="M12 12C9.2 10.2 8.6 6.2 12 3.4 15.4 6.2 14.8 10.2 12 12Z" transform="rotate(288 12 12)"/>
+    </g>
+    <circle class="fill" cx="12" cy="12" r="2.1"/>
+  </symbol>
+  <symbol id="i-fellowship" viewBox="0 0 24 24">
+    <path class="fill" d="M12 7.39A5.5 5.5 0 0 1 12 16.61 5.5 5.5 0 0 1 12 7.39Z" stroke="none"/>
+    <circle cx="9" cy="12" r="5.5"/>
+    <circle cx="15" cy="12" r="5.5"/>
+  </symbol>
+  <symbol id="i-leadership" viewBox="0 0 24 24">
+    <g class="soft">
+      <ellipse cx="7.1" cy="9.4" rx="4.6" ry="1.7" transform="rotate(-14 7.1 9.4)"/>
+      <ellipse cx="16.9" cy="9.4" rx="4.6" ry="1.7" transform="rotate(14 16.9 9.4)"/>
+      <ellipse cx="7.7" cy="12.6" rx="3.9" ry="1.45" transform="rotate(14 7.7 12.6)"/>
+      <ellipse cx="16.3" cy="12.6" rx="3.9" ry="1.45" transform="rotate(-14 16.3 12.6)"/>
+    </g>
+    <path d="M12 7.2V20.6"/>
+    <circle class="fill" cx="12" cy="5.3" r="1.6"/>
+  </symbol>
+  <symbol id="i-arrow" viewBox="0 0 16 16"><path d="M3 13L13 3M5 3h8v8" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
+</svg>
 
 <header class="nav" id="nav">
   <div class="wrap">
@@ -353,9 +512,9 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
 
 <div class="stats">
   <div class="wrap">
-    <div class="stat"><b>6</b><span>Events held</span></div>
-    <div class="stat"><b>120+</b><span>People reached</span></div>
-    <div class="stat"><b>3</b><span>Causes served</span></div>
+    <div class="stat"><b data-stat="events">8</b><span>Events held</span></div>
+    <div class="stat"><b data-stat="hours">240</b><span>Leo hours</span></div>
+    <div class="stat"><b data-stat="members">24</b><span>Members</span></div>
   </div>
 </div>
 
@@ -373,17 +532,17 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
     </div>
     <div class="pillars">
       <article class="pillar reveal">
-        <div class="mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg></div>
+        <div class="mark" aria-hidden="true"><svg class="ico"><use href="#i-service"/></svg></div>
         <h3>Service</h3>
         <p>Visits, drives and distributions for people in Thane who need a hand. Children's homes, workers on the road, and causes we choose as a club.</p>
       </article>
       <article class="pillar reveal">
-        <div class="mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2 20c0-3 3-5 6-5s6 2 6 5M10 20c0-3 3-5 6-5s6 2 6 5"/></svg></div>
+        <div class="mark" aria-hidden="true"><svg class="ico"><use href="#i-fellowship"/></svg></div>
         <h3>Fellowship</h3>
         <p>Photoshoots, district ceremonies, meetings that run long because nobody wants to leave. The friendships are the point, not a side effect.</p>
       </article>
       <article class="pillar reveal">
-        <div class="mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg></div>
+        <div class="mark" aria-hidden="true"><svg class="ico"><use href="#i-leadership"/></svg></div>
         <h3>Leadership</h3>
         <p>Every member runs something. Board meets, event ownership and district roles teach us to lead while we are still young enough to make mistakes.</p>
       </article>
@@ -397,7 +556,7 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
       <h2>Recap</h2>
       <a class="btn btn-ink" href="#events">What's next</a>
     </div>
-    <p class="recap-lede reveal">From one first meeting to six events in one term. Here are five of them.</p>
+    <p class="recap-lede reveal">From one first meeting to <span data-count="events">eight</span> events so far. Here are five of them.</p>
     <div class="recap-grid">
       <article class="card">
         <figure class="reveal-img"><img src="images/recap/bethanys-visit.webp" alt="Leo Club members and children posing together at Bethany's Children's Home" loading="lazy"></figure>
@@ -439,6 +598,18 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
           <p>Planning the term's celebrations, fellowship events, and service initiatives.</p>
         </div>
       </article>
+      <a class="card more reveal" href="events.html">
+        <div class="more-marks" aria-hidden="true">
+          <span><svg class="ico"><use href="#i-service"/></svg></span>
+          <span><svg class="ico"><use href="#i-fellowship"/></svg></span>
+          <span><svg class="ico"><use href="#i-leadership"/></svg></span>
+        </div>
+        <div>
+          <h3>All <em data-count-num="events">8</em> events</h3>
+          <p>Every drive, ceremony and meeting so far, month by month.</p>
+        </div>
+        <div class="more-foot">View more<span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-arrow"/></svg></span></div>
+      </a>
     </div>
   </div>
 </section>
@@ -482,16 +653,38 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
   </div>
 </section>
 
+<section class="section circle" id="circle" aria-label="Micro team and board of directors">
+  <div class="wrap">
+    <div class="circle-group">
+      <div class="head-row reveal">
+        <h2>The micro <em>team</em></h2>
+        <p class="lede">The hands behind every event: planning, posting, shooting and showing up.</p>
+      </div>
+      <ul class="mini-grid" id="microTeam"></ul>
+    </div>
+    <div class="circle-group">
+      <div class="head-row reveal">
+        <h2>Board of <em>directors</em></h2>
+        <p class="lede">Each director owns one part of the club's year.</p>
+      </div>
+      <ul class="board-grid" id="boardGrid"></ul>
+    </div>
+  </div>
+</section>
+
 <section class="section" id="events">
   <div class="wrap">
     <div class="head-row reveal">
       <h2>Upcoming events</h2>
-      <a class="btn btn-line" href="#join">Get notified</a>
+      <div class="head-actions">
+        <a class="btn btn-line" href="#join">Get notified</a>
+        <a class="btn btn-ink" href="events.html">All events</a>
+      </div>
     </div>
     <div class="events-grid">
-      <a class="event wide reveal" href="#join"><div class="top"><div><h3>The Unveiling</h3><p>Details to follow.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot"><span class="dot"></span>Next up<span>Date to be announced</span></div></a>
-      <a class="event reveal" href="#join"><div class="top"><div><h3>Placeholder event</h3><p>Details to follow.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot">Coming soon</div></a>
-      <a class="event reveal" href="#join"><div class="top"><div><h3>Placeholder event</h3><p>Details to follow.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot">Coming soon</div></a>
+      <a class="event wide seal reveal" href="#join"><div class="top"><div><h3>Installation Ceremony</h3><p>The very first installation of Leo Club of Aurelian. Invitations are on their way.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot"><span class="dot"></span>Next up<span>20 September 2026</span><span class="soon" data-countdown="2026-09-20"></span></div></a>
+      <a class="event reveal" href="https://www.instagram.com/lco_aurelian/" target="_blank" rel="noopener"><div class="top"><div><h3>To be announced</h3><p>Follow @lco_aurelian on Instagram for the date.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot">Coming soon</div></a>
+      <a class="event reveal" href="https://www.instagram.com/lco_aurelian/" target="_blank" rel="noopener"><div class="top"><div><h3>To be announced</h3><p>Follow @lco_aurelian on Instagram for the date.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot">Coming soon</div></a>
     </div>
   </div>
 </section>
@@ -519,7 +712,7 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
   <div class="top">
     <p class="big">Built on <em>bonds.</em></p>
     <nav class="foot-links" aria-label="Footer">
-      <a href="#motto">The promise</a><a href="#recap">Recap</a><a href="#team">Team</a><a href="#events">What's on</a><a href="#join">Join</a>
+      <a href="#motto">The promise</a><a href="#recap">Recap</a><a href="#team">Team</a><a href="#events">What's on</a><a href="events.html">All events</a><a href="#join">Join</a>
     </nav>
   </div>
   <div class="bottom">
@@ -530,6 +723,56 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
   </div>
 </div>
 
+<script src="data/club.js"></script>
+<script>
+/* additions, 17 Sep 2026: fill counts, rosters and the countdown from data/club.js.
+   Runs before the main script so its reveal observer picks up the new cards. */
+(function(){
+  var C=window.CLUB; if(!C) return;
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var WORDS=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve'];
+  var totals={events:C.events.length, hours:C.stats.hours.value, members:C.stats.members.value};
+
+  document.querySelectorAll('[data-count]').forEach(function(el){ var n=totals[el.dataset.count]; el.textContent=WORDS[n]||n; });
+  document.querySelectorAll('[data-count-num]').forEach(function(el){ el.textContent=totals[el.dataset.countNum]; });
+
+  function esc(t){ var d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+  function initials(name){ return name.replace(/^(Leo|MJF|Lion)\s+/g,'').split(/\s+/).map(function(w){return w[0];}).join('').slice(0,2).toUpperCase(); }
+  function face(p){ return p.photo ? '<img src="'+esc(p.photo)+'" alt="" loading="lazy">' : '<span class="initials" aria-hidden="true">'+initials(p.name)+'</span>'; }
+  var micro=document.getElementById('microTeam'), board=document.getElementById('boardGrid');
+  if(micro) micro.innerHTML=C.microTeam.map(function(p){
+    return '<li class="mini reveal"><div class="mini-face">'+face(p)+'</div><b>'+esc(p.name)+'</b><span>'+esc(p.role)+'</span></li>';
+  }).join('');
+  if(board) board.innerHTML=C.board.map(function(p){
+    return '<li class="director reveal"><div class="director-frame">'+face(p)+'</div><b>'+esc(p.name)+'</b><span>'+esc(p.role)+'</span></li>';
+  }).join('');
+
+  /* countdown pill on upcoming events: "In 3 days", "Tomorrow", "Today" */
+  document.querySelectorAll('[data-countdown]').forEach(function(el){
+    var d=new Date(el.dataset.countdown+'T00:00:00'), now=new Date(); now.setHours(0,0,0,0);
+    var days=Math.round((d-now)/864e5);
+    el.textContent= days>1 ? 'In '+days+' days' : days===1 ? 'Tomorrow' : days===0 ? 'Today' : '';
+  });
+
+  /* stats count up once the page opens (or once the strip scrolls into view on a phone).
+     Width is reserved first so the numbers do not shift while they climb. */
+  var nums=[].slice.call(document.querySelectorAll('[data-stat]'));
+  nums.forEach(function(el){ var v=totals[el.dataset.stat]; var txt=v.toLocaleString('en-IN'); el.textContent=txt; el.style.minWidth=txt.length+'ch'; });
+  if(reduce||!nums.length||!('IntersectionObserver' in window)) return;
+  nums.forEach(function(el){ el.textContent='0'; });
+  function run(){
+    var t0=performance.now(), DUR=1600;
+    (function frame(t){
+      var p=Math.min(1,(t-t0)/DUR), e=p===1?1:1-Math.pow(2,-10*p);
+      nums.forEach(function(el){ el.textContent=Math.round(totals[el.dataset.stat]*e).toLocaleString('en-IN'); });
+      if(p<1) requestAnimationFrame(frame);
+    })(t0);
+  }
+  var strip=nums[0].closest('.stats');
+  var io=new IntersectionObserver(function(en){ if(en[0].isIntersecting){ io.disconnect(); setTimeout(run,350); } },{threshold:0});
+  io.observe(strip);
+})();
+</script>
 <script>
 (function(){
   var nav=document.getElementById('nav');
