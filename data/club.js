@@ -192,7 +192,7 @@ window.CLUB = {
      `cover` is the volume's cover (4:5 WebP under images/minutes/); it sticks out of the folder.
      Leave it null to show plain pages instead. */
   minutes: [
-    { title: 'Volume 1', note: null, link: null, cover: 'images/minutes/volume-1.webp' },
-    { title: 'Volume 2', note: null, link: null, cover: 'images/minutes/volume-2.webp' }
+    { title: 'Volume 1', note: 'July 2026', link: 'https://drive.google.com/file/d/1-gnBaE9AJXYd8N4V_Fb37sNTbVkAv22m/view', cover: 'images/minutes/volume-1.webp' },
+    { title: 'Volume 2', note: 'August 2026', link: 'https://drive.google.com/file/d/1sWsAqMY4Vax4gRAvr_mG7bkdvUMKAJoa/view', cover: 'images/minutes/volume-2.webp' }
   ]
 };
