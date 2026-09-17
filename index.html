@@ -502,6 +502,126 @@ footer .bottom-end a{text-decoration:underline;text-decoration-color:rgba(251,24
 footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
 /* green accent on Upcoming events: the hero's sage, one step deeper so it passes 3:1 on paper (3.6:1) */
 #events h2 em{color:#6E8562}
+
+/* OSW, the flagship week: a curved wall of photos (the viewer stands inside the curve,
+   so the middle card is the farthest and the edge cards the nearest) */
+@property --osw-step{syntax:'<angle>';inherits:true;initial-value:0deg}
+.osw{padding-bottom:clamp(3.5rem,8vh,5.5rem);overflow:hidden}
+.osw-head{text-align:center;display:grid;justify-items:center}
+.osw-head h2{display:grid;gap:.1rem;font-size:clamp(2.2rem,4.6vw,3.6rem);line-height:1.02}
+.osw-l1{font-weight:400;letter-spacing:-.015em}
+.osw-l2{font-family:var(--f-sans);font-weight:500;font-size:.8em;letter-spacing:-.03em;color:var(--ink)}
+.osw-head .lede{margin:1.1rem auto 1.6rem;max-width:48ch;font-size:1.02rem}
+.osw-btn{padding:.45rem .45rem .45rem 1.35rem;gap:.9rem}
+.osw-go{width:2.1rem;height:2.1rem;border-radius:50%;display:grid;place-items:center;background:rgba(251,240,227,.14);transition:transform .2s var(--ease-out)}
+.osw-go svg{width:.8rem;height:.8rem}
+@media (hover:hover) and (pointer:fine){.osw-btn:hover .osw-go{transform:translate(1px,-1px)}}
+
+.osw-stage{--w:170px;--h:240px;--r:700px;--back:420px;--persp:600px;--to:16deg;
+  position:relative;height:calc(var(--h)*1.12);margin:clamp(2.5rem,6vh,3.5rem) 0 clamp(2.5rem,6vh,3.5rem);
+  perspective:var(--persp);perspective-origin:50% 50%;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%);
+          mask-image:linear-gradient(90deg,transparent 0,#000 22%,#000 78%,transparent 100%)}
+.osw-ring{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;list-style:none;
+  transform:translateZ(calc(var(--r) - var(--back)))}
+.osw-ring li{position:absolute;left:calc(var(--w)/-2);top:calc(var(--h)/-2);width:var(--w);height:var(--h);
+  border-radius:22px;overflow:hidden;background:var(--paper-2);backface-visibility:hidden;
+  box-shadow:0 18px 40px -22px rgba(30,51,36,.45);
+  transform:rotateY(calc(var(--i) * var(--osw-step))) translateZ(calc(-1 * var(--r)))}
+.osw-ring img{width:100%;height:100%;object-fit:cover}
+.osw-stage{--osw-step:var(--to)}
+@media (prefers-reduced-motion:no-preference){
+  .osw-stage.reveal{--osw-step:calc(var(--to) * .55);opacity:0;transform:none;transition:--osw-step .9s var(--ease-out),opacity .4s ease}
+  .osw-stage.reveal.in{--osw-step:var(--to);opacity:1}
+}
+
+.osw-days{display:grid;grid-template-columns:repeat(3,1fr);list-style:none;max-width:980px;margin:0 auto}
+.osw-days > li{padding:.4rem 2rem;text-align:center}
+.osw-days > li + li{border-left:1px solid var(--gold-line)}
+.osw-days h3{font-family:var(--f-sans);font-weight:500;font-size:1.12rem;letter-spacing:-.01em;margin-bottom:.7rem}
+.osw-days ul{list-style:none;display:grid;gap:.45rem;font-size:.9rem;line-height:1.35;text-wrap:balance}
+.osw-days ul b{font-weight:400;color:var(--ink)}
+.osw-days ul span{display:block;font-size:.76rem;color:var(--gold-ink)}
+.osw-note{text-align:center;font-size:.8rem;color:var(--gold-ink);margin:1.6rem auto 0}
+@media (max-width:760px){
+  .osw-stage{--w:96px;--h:134px;--r:400px;--back:240px;--persp:340px;--to:17deg;margin:2rem 0}
+  .osw-ring li{border-radius:16px}
+  .osw-ring li:first-child,.osw-ring li:last-child{display:none}
+  .osw-days{grid-template-columns:1fr;max-width:340px}
+  .osw-days > li{padding:1.1rem 0}
+  .osw-days > li + li{border-left:0;border-top:1px solid var(--gold-line)}
+}
+
+/* Main Character of the month: capsules on a dark panel */
+.lotm-panel{background:var(--ink);border-radius:28px;padding:clamp(2rem,5vw,3.5rem) clamp(1rem,4vw,3rem)}
+.lotm-list{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(1rem,3vw,2.2rem);list-style:none}
+.lotm{--tint:var(--sage-soft);width:clamp(150px,17vw,196px);border-radius:999px;background:var(--tint);
+  display:flex;flex-direction:column;align-items:center;overflow:hidden;text-align:center}
+.lotm:nth-child(4n+2){--tint:var(--blush-soft)}
+.lotm:nth-child(4n+3){--tint:var(--paper-2)}
+.lotm:nth-child(4n+4){--tint:#F4DCC4}
+/* the label area reserves room for a two-line role, so every photo starts at the same height */
+.lotm-text{padding:2.4rem .9rem .9rem;display:grid;align-content:start;gap:.2rem;min-height:9.4rem;width:100%}
+.lotm-text b{font-weight:500;color:var(--ink);font-size:.98rem;line-height:1.2;text-wrap:balance}
+.lotm-text span{font-size:.78rem;color:var(--ink-2);line-height:1.3;text-wrap:balance}
+.lotm-text i{font-style:normal;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-ink);margin-top:.3rem}
+.lotm-photo{width:100%;aspect-ratio:116/158;border-radius:999px;overflow:hidden;background:rgba(30,51,36,.12);display:grid;place-items:center}
+.lotm-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+.lotm-photo .initials{font-family:var(--f-display);font-size:2.4rem;color:var(--ink);background:none;width:auto;height:auto}
+#minutes .head-row h2,#leo-of-the-month .head-row h2{max-width:none}
+@media (max-width:760px){.lotm{width:calc(50% - .5rem);max-width:176px}.lotm-text{padding:2rem .7rem .8rem;min-height:8.6rem}}
+
+/* Minutes and Mayhem: one folder per edition */
+.mm-list{display:flex;flex-wrap:wrap;justify-content:center;gap:5.5rem clamp(2rem,6vw,5rem);list-style:none;margin-top:4.5rem}
+.folder{--c:#C9707F;--c2:#E3A0AB;position:relative;display:block;width:280px;height:262px;color:#fff;
+  transition:transform .16s var(--ease-out)}
+.folder.sage{--c:#6E8562;--c2:#A9BE98}
+.folder::after{content:"";position:absolute;left:12%;right:12%;bottom:-34px;height:60px;border-radius:50%;
+  background:var(--c2);filter:blur(26px);opacity:.55;z-index:-1}
+.folder-back{position:absolute;inset:0 0 auto;height:100%;border-radius:20px;background:var(--c)}
+.folder-paper{position:absolute;top:26px;width:140px;height:130px;border-radius:8px;background:#FFFDF9;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);transition:transform .25s var(--ease-out)}
+.folder-paper::before{content:"";position:absolute;left:14px;right:18px;top:18px;height:40px;
+  background:repeating-linear-gradient(#E4DCD2 0 5px,transparent 5px 14px)}
+.folder-paper.p1{left:50px;transform:rotate(-7deg)}
+.folder-paper.p2{left:118px;top:36px;width:92px;transform:rotate(4deg)}
+.folder-paper.p3{left:170px;top:46px;width:64px;transform:rotate(9deg)}
+.folder-front{position:absolute;left:4px;right:4px;bottom:0;height:214px;
+  clip-path:path('M0 18Q0 0 18 0L96 0C112 0 112 56 132 56L254 56Q272 56 272 74L272 196Q272 214 254 214L18 214Q0 214 0 196Z');
+  background:linear-gradient(170deg,rgba(255,255,255,.55),rgba(255,255,255,.12) 55%,rgba(255,255,255,0)),var(--c2);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  display:flex;align-items:flex-end;justify-content:space-between;padding:0 20px 22px 24px;
+  transform-origin:50% 100%;transition:transform .25s var(--ease-out)}
+.folder-front b{display:block;font-family:var(--f-sans);font-weight:500;font-size:1.5rem;line-height:1.1;letter-spacing:-.01em;text-shadow:0 1px 8px rgba(0,0,0,.12)}
+.folder-front small{display:block;font-size:.74rem;opacity:.95;margin-top:.2rem}
+.folder-go{width:2rem;height:2rem;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.25);flex:none}
+.folder-go svg{width:.75rem;height:.75rem;transition:transform .2s var(--ease-out)}
+a.folder:focus-visible{outline-offset:6px;border-radius:22px}
+a.folder:active{transform:scale(.97)}
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+  a.folder:hover .p1{transform:translateY(-14px) rotate(-9deg)}
+  a.folder:hover .p2{transform:translateY(-10px) rotate(5deg)}
+  a.folder:hover .p3{transform:translateY(-6px) rotate(12deg)}
+  a.folder:hover .folder-front{transform:perspective(700px) rotateX(-9deg)}
+  a.folder:hover .folder-go svg{transform:translate(1px,-1px)}
+}
+.folder-cover{position:absolute;left:34px;top:-46px;width:152px;height:190px;object-fit:cover;border-radius:6px;
+  box-shadow:0 4px 14px rgba(0,0,0,.18);transform:rotate(-6deg);transition:transform .25s var(--ease-out)}
+@media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){a.folder:hover .folder-cover{transform:translateY(-22px) rotate(-8deg)}}
+.folder.soon{cursor:default}
+/* a folder that is keyboard-focused opens the same way it does under the pointer */
+@media (prefers-reduced-motion:no-preference){
+  a.folder:focus-visible .folder-cover{transform:translateY(-22px) rotate(-8deg)}
+  a.folder:focus-visible .folder-front{transform:perspective(700px) rotateX(-9deg)}
+}
+/* capsules settle in one after another once the panel is on screen */
+.lotm-panel .lotm{opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .5s var(--ease-out);transition-delay:calc(var(--n,0) * 60ms)}
+.lotm-panel.in .lotm{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .lotm-panel .lotm{transform:none;transition:opacity .2s ease;transition-delay:0s}
+  .folder,.folder-paper,.folder-front,.folder-cover,.folder-go svg,.osw-go{transition:none}
+}
+.folder.soon .folder-front small{opacity:.85}
 </style>
 </head>
 <body>
@@ -735,6 +855,29 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
   </div>
 </section>
 
+<section class="section lotm-section" id="leo-of-the-month" aria-labelledby="lotmTitle" hidden>
+  <div class="wrap">
+    <div class="head-row reveal">
+      <h2 id="lotmTitle">Main Character of the <em>month</em></h2>
+      <p class="lede">The Leos who went beyond their role, one month at a time.</p>
+    </div>
+    <div class="lotm-panel reveal"><ul class="lotm-list" id="lotmList"></ul></div>
+  </div>
+</section>
+
+<section class="section osw" id="osw" aria-labelledby="oswTitle">
+  <div class="wrap osw-head reveal">
+    <h2 id="oswTitle"><span class="osw-l1" id="oswLine1">Eight days of service,</span><span class="osw-l2">one flagship week.</span></h2>
+    <p class="lede" id="oswLede">October Service Week is the week our tenure is built around: a different cause every day, from 2 to 9 October 2026.</p>
+    <a class="btn btn-ink osw-btn" href="events.html#calendar">See the week<span class="osw-go" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-arrow"/></svg></span></a>
+  </div>
+  <div class="osw-stage reveal" aria-hidden="true"><ul class="osw-ring" id="oswRing"></ul></div>
+  <div class="wrap">
+    <ol class="osw-days reveal" id="oswDays"></ol>
+    <p class="osw-note" id="oswNote">Dates are tentative until the board confirms them.</p>
+  </div>
+</section>
+
 <section class="section" id="events">
   <div class="wrap">
     <div class="head-row reveal">
@@ -749,6 +892,16 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
       <a class="event reveal" href="https://www.instagram.com/lco_aurelian/" target="_blank" rel="noopener"><div class="top"><div><h3>To be announced</h3><p>Follow @lco_aurelian on Instagram for the date.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot">Coming soon</div></a>
       <a class="event reveal" href="https://www.instagram.com/lco_aurelian/" target="_blank" rel="noopener"><div class="top"><div><h3>To be announced</h3><p>Follow @lco_aurelian on Instagram for the date.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot">Coming soon</div></a>
     </div>
+  </div>
+</section>
+
+<section class="section mm" id="minutes" aria-labelledby="mmTitle">
+  <div class="wrap">
+    <div class="head-row reveal">
+      <h2 id="mmTitle">Minutes and <em>Mayhem</em></h2>
+      <p class="lede">Our newsletter: what the club did, said and laughed about. Open a volume to read it.</p>
+    </div>
+    <ul class="mm-list" id="mmList"></ul>
   </div>
 </section>
 
@@ -874,6 +1027,7 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
     var items=[], series={};
     C.upcoming.filter(function(e){ return e.date>=todayIso; }).forEach(function(e){
       if(!e.series){ items.push(e); return; }
+      if(C.osw && e.series===C.osw.series && document.getElementById('osw')) return;   /* the week has its own section */
       if(series[e.series]){ series[e.series].list.push(e); return; }
       series[e.series]={ series:e.series, list:[e] }; items.push(series[e.series]);
     });
@@ -894,6 +1048,63 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
         (i===0?'<span class="soon" data-countdown="'+it.date+'"></span>':'')+(it.tentative?'<span>Tentative</span>':'')+'</div></a>';
     });
     if(cards.length) evGrid.innerHTML=cards.join('');
+  }
+
+  var MONTH_NAMES=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var ARROW_USE='<svg viewBox="0 0 16 16" aria-hidden="true"><use href="#i-arrow"/></svg>';
+
+  /* OSW: the curved wall of photos and the days in three columns */
+  var oswSec=document.getElementById('osw');
+  if(oswSec && C.osw){
+    var days=(C.upcoming||[]).filter(function(e){ return e.series===C.osw.series; });
+    var todayOsw=new Date().toISOString().slice(0,10);
+    if(!days.length || days[days.length-1].date<todayOsw){ oswSec.remove(); }
+    else{
+      var ring=document.getElementById('oswRing'), ph=C.osw.photos||[], mid=(ph.length-1)/2;
+      ring.innerHTML=ph.map(function(src,i){ return '<li style="--i:'+(mid-i)+'"><img src="'+esc(src)+'" alt="" loading="lazy" decoding="async"></li>'; }).join('');
+      var NUM=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve'];
+      var n=NUM[days.length]||days.length;
+      document.getElementById('oswLine1').textContent=n.charAt(0).toUpperCase()+n.slice(1)+' days of service,';
+      var f=days[0].date.split('-'), l=days[days.length-1].date.split('-');
+      var span=(f[1]===l[1]?+f[2]:+f[2]+' '+MONTH_NAMES[+f[1]-1])+' to '+(+l[2])+' '+MONTH_NAMES[+l[1]-1]+' '+l[0];
+      document.getElementById('oswLede').textContent=(C.osw.name||C.osw.series)+' is the week our tenure is built around: a different cause every day, from '+span+'.';
+      var per=Math.ceil(days.length/3), cols=[];
+      for(var c=0;c<days.length;c+=per) cols.push(days.slice(c,c+per));
+      document.getElementById('oswDays').innerHTML=cols.map(function(col){
+        var a=col[0].date.split('-'), b=col[col.length-1].date.split('-');
+        var head=col.length===1 ? +a[2]+' '+MONTH_NAMES[+a[1]-1] : +a[2]+' to '+(+b[2])+' '+MONTH_NAMES[+b[1]-1];
+        return '<li><h3>'+head+'</h3><ul>'+col.map(function(e){
+          return '<li><b>'+esc(e.title)+'</b>'+(e.focus?'<span>'+esc(e.focus)+'</span>':'')+'</li>';
+        }).join('')+'</ul></li>';
+      }).join('');
+      if(!days.some(function(e){ return e.tentative; })) document.getElementById('oswNote').remove();
+    }
+  }
+
+  /* Main Character of the month: hidden until the list in data/club.js has someone in it */
+  var lotm=document.getElementById('leo-of-the-month');
+  if(lotm && C.leoOfTheMonth && C.leoOfTheMonth.length){
+    document.getElementById('lotmList').innerHTML=C.leoOfTheMonth.map(function(p,i){
+      var m=p.month?p.month.split('-'):null;
+      return '<li class="lotm" style="--n:'+i+'"><div class="lotm-text"><b>'+esc(p.name.replace(/^Leo\s+/,''))+'</b>'+(p.role?'<span>'+esc(p.role)+'</span>':'')+
+        (m?'<i>'+MONTH_NAMES[+m[1]-1].slice(0,3)+' '+m[0]+'</i>':'')+'</div>'+
+        '<div class="lotm-photo">'+(p.photo?'<img src="'+esc(p.photo)+'" alt="" loading="lazy">':'<span class="initials" aria-hidden="true">'+initials(p.name)+'</span>')+'</div></li>';
+    }).join('');
+    lotm.hidden=false;
+  }
+
+  /* Minutes and Mayhem: one folder per edition, linked to its PDF */
+  var mm=document.getElementById('mmList');
+  if(mm && C.minutes){
+    var PAPERS='<span class="folder-back"></span><span class="folder-paper p1"></span><span class="folder-paper p2"></span><span class="folder-paper p3"></span>';
+    mm.innerHTML=C.minutes.map(function(ed,i){
+      var tone=i%2?' sage':'';
+      var PAPERS_=ed.cover ? '<span class="folder-back"></span><span class="folder-paper p2"></span><img class="folder-cover" src="'+esc(ed.cover)+'" alt="" loading="lazy" decoding="async">' : PAPERS;
+      var label='<b>'+esc(ed.title)+'</b><small>'+esc(ed.link?(ed.note||'Read the PDF'):'Coming soon')+'</small>';
+      return ed.link
+        ? '<li><a class="folder'+tone+'" href="'+esc(ed.link)+'" target="_blank" rel="noopener">'+PAPERS_+'<span class="folder-front"><span>'+label+'</span><span class="folder-go">'+ARROW_USE+'</span></span></a></li>'
+        : '<li><div class="folder soon'+tone+'">'+PAPERS_+'<span class="folder-front"><span>'+label+'</span></span></div></li>';
+    }).join('');
   }
 
   /* countdown pill on upcoming events: "In 3 days", "Tomorrow", "Today" */

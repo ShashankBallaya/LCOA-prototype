@@ -403,7 +403,7 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
         var s=list[i].series, block=[];
         while(i<list.length && list[i].series===s){ block.push(list[i]); i++; }
         var a=parts(block[0].date), z=parts(block[block.length-1].date);
-        html+='<div class="cal-series"><div class="cal-series-head"><b>'+esc(s)+' week</b><span>'+a.d+' to '+z.d+' '+MONTHS[z.m]+' · '+block.length+' days</span></div>'+
+        html+='<div class="cal-series"><div class="cal-series-head"><b>'+esc(C.osw && C.osw.series===s && C.osw.name ? C.osw.name : s+' week')+'</b><span>'+a.d+' to '+z.d+' '+MONTHS[z.m]+' · '+block.length+' days</span></div>'+
           '<ul class="cal-list">'+block.map(row).join('')+'</ul></div>';
       }
       return '<section class="cal-month reveal"><h3>'+MONTHS[+k.slice(5,7)-1]+' <em>'+k.slice(0,4)+'</em></h3>'+html.replace(/<\/ul><ul class="cal-list">/g,'')+'</section>';

@@ -155,5 +155,44 @@ window.CLUB = {
     { name: 'Leo Rahul Dadheech',      role: 'Sponsorship & CSR Director',   photo: 'images/board/rahul-dadheech.webp' },
     { name: 'Leo Mahima Pal',          role: 'Media Outreach Director',      photo: 'images/board/mahima-pal.webp' },
     { name: 'Leo Aryan Lakde',         role: 'Club Merchandise Officer',     photo: 'images/board/aryan-lakde.webp' }
+  ],
+
+  /* OSW, the flagship week (home page, above Upcoming events). The days come from `upcoming`
+     (every entry with series: 'OSW'). `photos` fill the curved wall of cards, left to right,
+     with a generated dragonfly still life (from the crest's motifs) in the middle. The day images are
+     generated still lifes too (no people), one per day in date order; swap in real OSW photos once the week has happened. */
+  osw: {
+    series: 'OSW',
+    name: 'October Service Week',
+    photos: [
+      'images/osw/pahal-anna-daan.webp',
+      'images/osw/aanchal-chapter-4.webp',
+      'images/osw/senior-citizen-childhood-cancer.webp',
+      'images/osw/meter-down.webp',
+      'images/osw/centre-dragonfly.webp',
+      'images/osw/sanitary-pad-drive.webp',
+      'images/osw/peace-poster.webp',
+      'images/osw/stationery-animal-feeding.webp',
+      'images/osw/osw-finale.webp'
+    ]
+  },
+
+  /* Main Character of the month, newest first. The section stays hidden while this list is empty.
+     { name: 'Leo ...', role: '...', month: 'YYYY-MM', photo: 'images/leo-of-the-month/....webp' or null } */
+  leoOfTheMonth: [
+    { name: 'Leo Sakshi Gawade',      role: 'Global Leadership Team',   month: '2026-09', photo: 'images/board/sakshi-gawade.webp' },
+    { name: 'Leo Shashank Ballaya',   role: 'Chief Innovation Officer', month: '2026-08', photo: 'images/board/shashank-ballaya.webp' },
+    { name: 'Leo Rahul Dadheech',     role: 'Sponsorship & CSR Director', month: '2026-08', photo: 'images/board/rahul-dadheech.webp' },
+    { name: 'Leo Mahima Pal',         role: 'Media Outreach Director',  month: '2026-07', photo: 'images/board/mahima-pal.webp' }
+  ],
+
+  /* Minutes and Mayhem, the club newsletter. One folder per volume.
+     `link` is the Google Drive link to the PDF (sharing: anyone with the link can view).
+     A null link shows the folder as "Coming soon".
+     `cover` is the volume's cover (4:5 WebP under images/minutes/); it sticks out of the folder.
+     Leave it null to show plain pages instead. */
+  minutes: [
+    { title: 'Volume 1', note: null, link: null, cover: 'images/minutes/volume-1.webp' },
+    { title: 'Volume 2', note: null, link: null, cover: 'images/minutes/volume-2.webp' }
   ]
 };
