@@ -413,6 +413,15 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
 }
 /* "Meet the micro team" is longer than the 14ch head-row cap; let it sit on one line where it fits */
 #team .head-row h2{max-width:none}
+/* recap cards rendered from data: date beside the pill, and a date tile when there is no photo yet */
+.card-meta{display:flex;align-items:center;justify-content:space-between;gap:.8rem}
+.card-meta time{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-ink);white-space:nowrap}
+.card figure.no-photo{position:relative;display:flex;flex-direction:column;justify-content:flex-end;padding:1.1rem 1.2rem;background:var(--blush-soft);color:var(--ink)}
+.card figure.no-photo.fellowship{background:#EFE0C6}
+.card figure.no-photo.leadership{background:var(--sage-soft)}
+.card figure.no-photo .ico{position:absolute;top:1rem;right:1rem;width:2.4rem;height:2.4rem;stroke-width:1.2}
+.nf-day{font-family:var(--f-display);font-weight:300;font-size:4.6rem;line-height:.8;color:var(--rose-ink);font-variant-numeric:lining-nums}
+.nf-mon{font-family:var(--f-display);font-style:italic;font-size:1.3rem;color:var(--ink);margin-top:.5rem}
 /* instagram strip before the form: gold hairlines like the stats strip under the hero */
 .ig-strip{padding:0 0 clamp(3rem,7vh,4.5rem)}
 .ig-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1.4rem;padding:1.6rem .5rem;border-top:1px solid var(--gold-line);border-bottom:1px solid var(--gold-line);color:var(--ink)}
@@ -574,7 +583,7 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
       <a class="btn btn-ink" href="#events">What's next</a>
     </div>
     <p class="recap-lede reveal">From one first meeting to <span data-count="events">fifteen</span> events so far. Here are five of them.</p>
-    <div class="recap-grid">
+    <div class="recap-grid" id="recapGrid">
       <article class="card">
         <figure class="reveal-img"><img src="images/recap/bethanys-visit.webp" alt="Leo Club members and children posing together at Bethany's Children's Home" loading="lazy"></figure>
         <div class="card-body">
@@ -766,6 +775,28 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
   function initials(name){ return name.replace(/^(Leo|MJF|Lion)\s+/g,'').split(/\s+/).map(function(w){return w[0];}).join('').slice(0,2).toUpperCase(); }
   function face(p){ return p.photo ? '<img src="'+esc(p.photo)+'" alt="" loading="lazy">' : '<span class="initials" aria-hidden="true">'+initials(p.name)+'</span>'; }
   var board=document.getElementById('boardGrid');
+  /* Recap: newest events first. The static cards in the markup are the no-JavaScript fallback. */
+  var grid=document.getElementById('recapGrid'), R=C.recap||{count:5,photosOnly:false};
+  if(grid){
+    var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    var LABEL={service:'Service',fellowship:'Fellowship',leadership:'Leadership'};
+    var list=C.events.slice().sort(function(a,b){ return (b.date||'').localeCompare(a.date||''); })
+      .filter(function(e){ return !R.photosOnly || e.photo; }).slice(0,R.count);
+    var html=list.map(function(e){
+      var dp=e.date?e.date.split('-').map(Number):null;
+      var fig=e.photo
+        ? '<figure class="reveal-img"><img src="'+esc(e.photo)+'" alt="'+esc(e.alt||'')+'" loading="lazy"></figure>'
+        : '<figure class="reveal-img no-photo '+e.category+'" aria-hidden="true"><svg class="ico"><use href="#i-'+e.category+'"/></svg>'+
+            (dp?'<span class="nf-day">'+dp[2]+'</span><span class="nf-mon">'+MONTHS[dp[1]-1]+'</span>':'')+'</figure>';
+      var when=dp?'<time datetime="'+e.date+'">'+dp[2]+' '+MONTHS[dp[1]-1].slice(0,3)+'</time>':'';
+      return '<article class="card">'+fig+'<div class="card-body"><div class="card-meta"><span class="pill '+e.category+'">'+LABEL[e.category]+'</span>'+when+'</div>'+
+        '<h3>'+esc(e.title)+'</h3><p>'+esc(e.text)+'</p></div></article>';
+    }).join('');
+    var more=grid.querySelector('.card.more');
+    [].slice.call(grid.children).forEach(function(c){ if(c!==more) c.remove(); });
+    more.insertAdjacentHTML('beforebegin',html);
+  }
+
   if(board) board.innerHTML=C.board.map(function(p){
     return '<li class="director reveal"><div class="director-frame">'+face(p)+'</div><b>'+esc(p.name)+'</b><span>'+esc(p.role)+'</span></li>';
   }).join('');

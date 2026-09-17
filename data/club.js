@@ -96,6 +96,11 @@ window.CLUB = {
       alt: "Leo Club members and children posing together at Bethany's Children's Home" }
   ],
 
+  /* Home page Recap: the newest events first.
+     photosOnly: false shows the latest events even without a photo (they get a date tile);
+     true skips events that have no photo yet. */
+  recap: { count: 5, photosOnly: false },
+
   upcoming: [
     { title: 'Installation Ceremony', date: '2026-09-20',
       text: 'The very first installation of Leo Club of Aurelian. Invitations are on their way.',
