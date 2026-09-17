@@ -553,15 +553,18 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
 }
 
 /* Main Character of the month: capsules on a dark panel */
-.lotm-panel{background:var(--ink);border-radius:28px;padding:clamp(2rem,5vw,3.5rem) clamp(1rem,4vw,3rem)}
-.lotm-list{display:flex;flex-wrap:wrap;justify-content:center;gap:clamp(1rem,3vw,2.2rem);list-style:none}
-.lotm{--tint:var(--sage-soft);width:clamp(150px,17vw,196px);border-radius:999px;background:var(--tint);
-  display:flex;flex-direction:column;align-items:center;overflow:hidden;text-align:center}
+.lotm-panel{background:var(--ink) center/cover no-repeat;border-radius:28px;padding:clamp(2rem,5vw,3.5rem) clamp(1rem,4vw,3rem)}
+/* the stage: velvet curtain under the capsules (generated image), fetched only once the panel is near */
+.lotm-panel.in{background-image:linear-gradient(rgba(20,34,25,.18),rgba(20,34,25,.18)),url(images/stage-wide.webp)}
+@media (max-width:760px){.lotm-panel.in{background-image:linear-gradient(rgba(20,34,25,.12),rgba(20,34,25,.12)),url(images/stage-tall.webp);background-position:50% 100%}}
+/* subgrid: capsules side by side share row heights, so a name or role that wraps never pushes one photo lower than its neighbour */
+.lotm-list{display:grid;grid-template-columns:repeat(auto-fit,clamp(150px,17vw,196px));justify-content:center;gap:clamp(1rem,3vw,2.2rem);list-style:none}
+.lotm{--tint:var(--sage-soft);border-radius:999px;background:var(--tint);
+  display:grid;grid-template-rows:subgrid;grid-row:span 2;row-gap:0;overflow:hidden;text-align:center}
 .lotm:nth-child(4n+2){--tint:var(--blush-soft)}
 .lotm:nth-child(4n+3){--tint:var(--paper-2)}
 .lotm:nth-child(4n+4){--tint:#F4DCC4}
-/* the label area reserves room for a two-line role, so every photo starts at the same height */
-.lotm-text{padding:2.4rem .9rem .9rem;display:grid;align-content:start;gap:.2rem;min-height:9.4rem;width:100%}
+.lotm-text{padding:2.4rem .9rem .9rem;display:grid;align-content:start;gap:.2rem;width:100%}
 .lotm-text b{font-weight:500;color:var(--ink);font-size:.98rem;line-height:1.2;text-wrap:balance}
 .lotm-text span{font-size:.78rem;color:var(--ink-2);line-height:1.3;text-wrap:balance}
 .lotm-text i{font-style:normal;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-ink);margin-top:.3rem}
@@ -569,7 +572,7 @@ footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
 .lotm-photo img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
 .lotm-photo .initials{font-family:var(--f-display);font-size:2.4rem;color:var(--ink);background:none;width:auto;height:auto}
 #minutes .head-row h2,#leo-of-the-month .head-row h2{max-width:none}
-@media (max-width:760px){.lotm{width:calc(50% - .5rem);max-width:176px}.lotm-text{padding:2rem .7rem .8rem;min-height:8.6rem}}
+@media (max-width:760px){.lotm-list{grid-template-columns:repeat(2,minmax(0,176px))}.lotm-text{padding:2rem .7rem .8rem}}
 
 /* Minutes and Mayhem: one folder per edition */
 .mm-list{display:flex;flex-wrap:wrap;justify-content:center;gap:5.5rem clamp(2rem,6vw,5rem);list-style:none;margin-top:4.5rem}
@@ -687,7 +690,7 @@ a.folder:active{transform:scale(.97)}
     <div class="hero-inner">
       <img class="crest" src="images/logo-340.webp" width="340" height="322" alt="Leo Club of Aurelian emblem: a dragonfly above two peonies, with the words Built on Bonds" fetchpriority="high">
       <h1>Built on <em>bonds.</em></h1>
-      <p class="lede">A club of young leaders in Thane. We serve our city, look after each other, and learn to lead by doing it together.</p>
+      <p class="lede">More than a club, we’re a community built through shared moments, genuine friendships, and a common desire to make a difference.</p>
       <div class="hero-actions">
         <a class="btn btn-ink" href="#join">Become a member</a>
         <a class="btn btn-line" href="#recap">See what we've done</a>
@@ -710,7 +713,7 @@ a.folder:active{transform:scale(.97)}
     <div class="section-head promise-head">
       <div class="reveal">
         <h2>A club stands on the bonds between its people.</h2>
-        <p class="lede">Just as a building stands firm because of its foundation, our club stands strong because of the bonds that bring us together. Everything we do falls under three kinds of work.</p>
+        <p class="lede">What brings us together may be a club, but what keeps us here are the bonds we build along the way. From shared laughter to shared responsibility, from first meetings to lasting friendships, every experience becomes part of our story. Together, we learn, serve, celebrate, and grow.</p>
       </div>
       <div class="promise-photo reveal-img">
         <img src="images/hero-group.webp" width="840" height="1120" alt="Members of Leo Club of Aurelian at their first regular meeting at Meadows" loading="lazy" decoding="async">
@@ -721,17 +724,17 @@ a.folder:active{transform:scale(.97)}
       <article class="pillar reveal">
         <div class="mark" aria-hidden="true"><svg class="ico"><use href="#i-service"/></svg></div>
         <h3>Service</h3>
-        <p>Visits, drives and distributions for people in Thane who need a hand. Children's homes, workers on the road, and causes we choose as a club.</p>
+        <p>We believe in showing up. For our community, for those who need a hand, and for causes that matter to us. Every visit, drive, and initiative is a small step towards leaving our corner of the world a little better.</p>
       </article>
       <article class="pillar reveal">
         <div class="mark" aria-hidden="true"><svg class="ico"><use href="#i-fellowship"/></svg></div>
         <h3>Fellowship</h3>
-        <p>Photoshoots, district ceremonies, meetings that run long because nobody wants to leave. The friendships are the point, not a side effect.</p>
+        <p>The best memories often happen between the plans, over long conversations, shared laughs, spontaneous outings, and moments that make us stay a little longer. Because the friendships we build are at the heart of Aurelian.</p>
       </article>
       <article class="pillar reveal">
         <div class="mark" aria-hidden="true"><svg class="ico"><use href="#i-leadership"/></svg></div>
         <h3>Leadership</h3>
-        <p>Every member runs something. Board meets, event ownership and district roles teach us to lead while we are still young enough to make mistakes.</p>
+        <p>Leadership grows through experience. Every event, idea, responsibility, and challenge gives us a chance to step forward, learn from one another, and discover the leader we can become.</p>
       </article>
     </div>
   </div>
@@ -743,7 +746,7 @@ a.folder:active{transform:scale(.97)}
       <h2>Recap</h2>
       <a class="btn btn-ink" href="#events">What's next</a>
     </div>
-    <p class="recap-lede reveal">From one first meeting to <span data-count="events">fifteen</span> events so far. Here are five of them.</p>
+    <p class="recap-lede reveal">A glimpse into what we’ve been building together. From service projects and leadership experiences to the little moments that brought us closer, here are a few chapters from our journey so far.</p>
     <div class="recap-grid" id="recapGrid">
       <article class="card">
         <figure class="reveal-img fit-whole blur-bg" style="--photo:url('images/recap/bethanys-visit.webp')"><img src="images/recap/bethanys-visit.webp" alt="Leo Club members and children posing together at Bethany's Children's Home" loading="lazy"></figure>
