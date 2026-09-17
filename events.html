@@ -6,10 +6,23 @@
 <title>Events · Leo Club of Aurelian</title>
 <meta name="description" content="Every event Leo Club of Aurelian has run so far: service drives, fellowship and leadership, month by month, plus what is coming next.">
 <meta name="theme-color" content="#FBF0E3">
-<link rel="icon" href="images/logo-700.webp">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="icon" href="images/logo-96.webp">
+<!-- self-hosted fonts (SIL Open Font License, see fonts/OFL-*.txt): one variable file per style, preloaded -->
+<!-- site data, loaded before the body so the first paint already includes the rendered cards (no layout jump) -->
+<script src="data/club.js"></script>
+<link rel="preload" href="fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/cormorant-garamond-italic.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 500;font-display:swap;src:url(fonts/cormorant-garamond.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:300 500;font-display:swap;src:url(fonts/cormorant-garamond-italic.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Jost';font-style:normal;font-weight:300 500;font-display:swap;src:url(fonts/jost.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
+@font-face{font-family:'Jost';font-style:normal;font-weight:300 500;font-display:swap;src:url(fonts/jost-latin-ext.woff2) format('woff2');unicode-range:U+20B9}
+/* metric-matched fallbacks: until the web fonts arrive, Georgia and Arial take up the same space, so nothing jumps when they swap */
+@font-face{font-family:'Cormorant Fallback';font-style:normal;src:local('Georgia');size-adjust:88.37%;ascent-override:104.11%;descent-override:32.82%;line-gap-override:0%}
+@font-face{font-family:'Cormorant Fallback';font-style:italic;src:local('Georgia Italic'),local('Georgia-Italic');size-adjust:79.1%;ascent-override:116.31%;descent-override:36.66%;line-gap-override:0%}
+@font-face{font-family:'Jost Fallback';font-style:normal;src:local('Arial'),local('ArialMT');size-adjust:92.21%;ascent-override:116.04%;descent-override:41.21%;line-gap-override:0%}
+</style>
 <style>
 /* Same tokens and components as index.html. Keep the two in step. */
 :root{
@@ -17,7 +30,7 @@
   --ink:#1E3324;--ink-2:#4F5F4F;--gold:#967349;--gold-line:#DCC3A3;--gold-ink:#7E5F3A;
   --blush:#E6A4AE;--blush-soft:#F6D9DD;--blush-line:#EBC3CA;--rose-ink:#8E4255;
   --ease-out:cubic-bezier(.23,1,.32,1);--ease-in-out:cubic-bezier(.77,0,.175,1);
-  --f-display:'Cormorant Garamond',Georgia,serif;--f-sans:'Jost',system-ui,sans-serif;
+  --f-display:'Cormorant Garamond','Cormorant Fallback',Georgia,serif;--f-sans:'Jost','Jost Fallback',system-ui,sans-serif;
   --wrap:1120px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
@@ -255,7 +268,7 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
 <header class="nav" id="nav">
   <div class="wrap">
     <a class="brand" href="index.html" aria-label="Leo Club of Aurelian, home">
-      <img src="images/logo-700.webp" alt="">
+      <img src="images/logo-96.webp" alt="" width="96" height="91">
       <span>Leo Club of Aurelian</span>
     </a>
     <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
@@ -321,7 +334,6 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
   </div>
 </div>
 
-<script src="data/club.js"></script>
 <script>
 (function(){
   var C=window.CLUB;
@@ -463,7 +475,15 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
   var io=new IntersectionObserver(function(en){
     en.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add('in'); io.unobserve(x.target); } });
   },{rootMargin:'0px 0px -6% 0px',threshold:.1});
-  els.forEach(function(el,i){ el.style.transitionDelay=(i%3)*50+'ms'; io.observe(el); });
+  els.forEach(function(el,i){
+    /* already on the first screen: show at once, so the page paints immediately (no fade to wait for) */
+    if(!reduce && el.getBoundingClientRect().top < window.innerHeight){
+      el.style.transition='none'; el.classList.add('in');
+      requestAnimationFrame(function(){ requestAnimationFrame(function(){ el.style.transition=''; }); });
+      return;
+    }
+    el.style.transitionDelay=(i%3)*50+'ms'; io.observe(el);
+  });
 })();
 </script>
 </body>
