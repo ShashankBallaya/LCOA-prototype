@@ -350,25 +350,16 @@ h2 em,.big-em{font-style:italic;font-weight:300;color:var(--rose-ink)}
   .card.more:hover .arrow svg{transform:translate(1px,-1px)}
 }
 
-/* the wider circle: micro team + board of directors, after the core team */
+/* board of directors, after the micro team roster */
 .circle{background:var(--paper-2);padding-top:0}
 .circle-group{border-top:1px solid var(--gold-line);padding-top:clamp(3rem,7vh,4.5rem)}
 .circle-group + .circle-group{margin-top:clamp(4rem,9vh,6rem)}
 .circle-group .head-row{margin-bottom:2.6rem}
 .circle-group .head-row .lede{max-width:34ch}
-.mini-face,.director-frame{display:grid}
-.mini-face > *,.director-frame > *{grid-area:1/1;min-height:0}
+.director-frame{display:grid}
+.director-frame > *{grid-area:1/1;min-height:0}
 .initials{display:grid;place-items:center;background:var(--blush-soft);color:var(--rose-ink);font-family:var(--f-display);font-size:1.9rem;font-weight:400;letter-spacing:.02em}
 
-/* micro team: round faces in a blush ring */
-.mini-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:2rem 1.25rem;list-style:none}
-.mini{text-align:center}
-.mini-face{width:min(100%,132px);aspect-ratio:1;margin:0 auto .9rem;border-radius:50%;padding:5px;border:1px solid var(--blush-line);background:var(--paper);transition:border-color .2s ease}
-.mini-face > *{border-radius:50%;overflow:hidden}
-.mini-face img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
-.mini > b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.15rem;line-height:1.2;color:var(--ink)}
-.mini > span{display:block;margin-top:.25rem;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-ink)}
-@media (hover:hover) and (pointer:fine){.mini:hover .mini-face{border-color:var(--rose-ink)}}
 
 /* board of directors: framed portrait cards with a rose role line */
 .board-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;list-style:none}
@@ -404,17 +395,13 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
 .hero-meta{color:var(--ink);font-weight:500}
 @media (max-width:760px){.hero-meta{font-size:1rem}}
 
-@media (prefers-reduced-motion:reduce){.card.more,.card.more .arrow,.mini-face,.director{transition:none}}
+@media (prefers-reduced-motion:reduce){.card.more,.card.more .arrow,.director{transition:none}}
 @media (max-width:960px){
-  .mini-grid{grid-template-columns:repeat(3,1fr)}
   .board-grid{grid-template-columns:repeat(3,1fr)}
 }
 @media (max-width:760px){
   .closing{padding-bottom:0}
   .card.more{min-height:0}
-  .mini-grid{gap:1.6rem .8rem}
-  .mini > b{font-size:1rem}
-  .mini > span{font-size:.58rem;letter-spacing:.1em}
   .board-grid{grid-template-columns:repeat(2,1fr);gap:.7rem}
   .director-frame{aspect-ratio:1}
   .director > b{font-size:1.1rem;margin:.75rem .45rem 0}
@@ -424,20 +411,45 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
   .event.wide.seal{min-height:300px}
   .head-actions{width:100%}
 }
-/* micro team at equal weight to the board: same columns, faces fill the column, same name and role sizes */
-.mini-grid{grid-template-columns:repeat(4,1fr);gap:2.4rem 1.1rem}
-.mini-face{width:100%;padding:7px;margin-bottom:1rem}
-.mini-face .initials{font-size:clamp(2.2rem,4vw,3.2rem)}
-.mini > b{font-size:1.3rem}
-.mini > span{font-size:.68rem;letter-spacing:.14em}
-@media (max-width:960px){.mini-grid{grid-template-columns:repeat(3,1fr)}}
-@media (max-width:760px){
-  .mini-grid{grid-template-columns:repeat(2,1fr);gap:1.8rem .7rem}
-  .mini-face{padding:5px;margin-bottom:.8rem}
-  .mini-face .initials{font-size:2.6rem}
-  .mini > b{font-size:1.1rem}
-  .mini > span{font-size:.58rem;letter-spacing:.1em}
+/* "Meet the micro team" is longer than the 14ch head-row cap; let it sit on one line where it fits */
+#team .head-row h2{max-width:none}
+/* instagram strip before the form: gold hairlines like the stats strip under the hero */
+.ig-strip{padding:0 0 clamp(3rem,7vh,4.5rem)}
+.ig-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:1.4rem;padding:1.6rem .5rem;border-top:1px solid var(--gold-line);border-bottom:1px solid var(--gold-line);color:var(--ink)}
+.ig-mark{width:3.4rem;height:3.4rem;border-radius:50%;display:grid;place-items:center;background:var(--blush-soft);color:var(--ink);transition:transform .25s var(--ease-out)}
+.ig-mark .ico{width:1.5rem;height:1.5rem}
+.ig-text{display:flex;flex-direction:column;gap:.15rem;min-width:0}
+.ig-text b{font-family:var(--f-display);font-weight:400;font-size:clamp(1.7rem,2.8vw,2.3rem);line-height:1.1;color:var(--ink)}
+.ig-text b em{color:var(--rose-ink)}
+.ig-text > span{font-size:.95rem;color:var(--ink-2)}
+.ig-btn svg{width:.8rem;height:.8rem;transition:transform .2s var(--ease-out)}
+.ig-row:active .ig-btn{transform:scale(.97)}
+@media (hover:hover) and (pointer:fine){
+  .ig-row:hover .ig-mark{transform:rotate(-8deg)}
+  .ig-row:hover .ig-btn{background:#2B4634}
+  .ig-row:hover .ig-btn svg{transform:translate(1px,-1px)}
 }
+footer .bottom-end{display:flex;flex-wrap:wrap;gap:.4rem 1.4rem}
+footer .bottom-end a{text-decoration:underline;text-decoration-color:rgba(251,240,227,.35)}
+@media (hover:hover) and (pointer:fine){footer .bottom-end a:hover{color:var(--paper);text-decoration-color:var(--paper)}}
+@media (prefers-reduced-motion:reduce){.ig-mark,.ig-btn svg{transition:none}}
+@media (max-width:760px){
+  .ig-row{grid-template-columns:1fr;justify-items:center;text-align:center;gap:1rem;padding:2rem .25rem}
+  .ig-btn{width:100%;max-width:320px;justify-content:center}
+}
+/* motion review (emil-design-eng), 17 Sep 2026.
+   .reveal owns `transition` while a card fades in (.5s, staggered). Once it has settled, the card
+   gets its own fast interaction timing back, with no stagger delay, so press and hover answer at once. */
+.director.reveal{transition:opacity .5s var(--ease-out),transform .5s var(--ease-out),border-color .2s ease}
+.card.more.settled{transition:transform .2s var(--ease-out),border-color .2s ease}
+.event.settled{transition:transform .2s var(--ease-out)}
+.director.settled{transition:border-color .2s ease}
+/* the whole Instagram row is the target, so the button lifts wherever the pointer is on it */
+@media (hover:hover) and (pointer:fine){.ig-row:hover .ig-btn{transform:translateY(-1px)}.ig-row:hover:active .ig-btn{transform:scale(.97)}}
+.ig-mark{transition:transform .2s var(--ease-out)}
+footer .bottom-end a{transition:color .2s ease,text-decoration-color .2s ease}
+/* green accent on Upcoming events: the hero's sage, one step deeper so it passes 3:1 on paper (3.6:1) */
+#events h2 em{color:#6E8562}
 </style>
 </head>
 <body>
@@ -468,6 +480,11 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
     </g>
     <path d="M12 7.2V20.6"/>
     <circle class="fill" cx="12" cy="5.3" r="1.6"/>
+  </symbol>
+  <symbol id="i-instagram" viewBox="0 0 24 24">
+    <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="5.2"/>
+    <circle cx="12" cy="12" r="4.1"/>
+    <circle class="fill" cx="17.1" cy="6.9" r="1.1" stroke="none"/>
   </symbol>
   <symbol id="i-arrow" viewBox="0 0 16 16"><path d="M3 13L13 3M5 3h8v8" fill="none" stroke="currentColor" stroke-width="1.5"/></symbol>
 </svg>
@@ -512,9 +529,9 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
 
 <div class="stats">
   <div class="wrap">
-    <div class="stat"><b data-stat="events">8</b><span>Events held</span></div>
-    <div class="stat"><b data-stat="hours">240</b><span>Leo hours</span></div>
-    <div class="stat"><b data-stat="members">24</b><span>Members</span></div>
+    <div class="stat"><b data-stat="events">15</b><span>Events held</span></div>
+    <div class="stat"><b data-stat="hours">336</b><span>Leo hours</span></div>
+    <div class="stat"><b data-stat="people">188</b><span>People served</span></div>
   </div>
 </div>
 
@@ -556,7 +573,7 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
       <h2>Recap</h2>
       <a class="btn btn-ink" href="#events">What's next</a>
     </div>
-    <p class="recap-lede reveal">From one first meeting to <span data-count="events">eight</span> events so far. Here are five of them.</p>
+    <p class="recap-lede reveal">From one first meeting to <span data-count="events">fifteen</span> events so far. Here are five of them.</p>
     <div class="recap-grid">
       <article class="card">
         <figure class="reveal-img"><img src="images/recap/bethanys-visit.webp" alt="Leo Club members and children posing together at Bethany's Children's Home" loading="lazy"></figure>
@@ -605,7 +622,7 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
           <span><svg class="ico"><use href="#i-leadership"/></svg></span>
         </div>
         <div>
-          <h3>All <em data-count-num="events">8</em> events</h3>
+          <h3>All <em data-count-num="events">15</em> events</h3>
           <p>Every drive, ceremony and meeting so far, month by month.</p>
         </div>
         <div class="more-foot">View more<span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16"><use href="#i-arrow"/></svg></span></div>
@@ -617,8 +634,8 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
 <section class="section team" id="team">
   <div class="wrap">
     <div class="head-row reveal">
-      <h2>Meet the team</h2>
-      <p class="lede" style="max-width:30ch">Six people, one term, and a promise to keep.</p>
+      <h2>Meet the micro <em>team</em></h2>
+      <p class="lede" style="max-width:30ch">Seven people, one term, and a promise to keep.</p>
     </div>
     <div class="team-layout">
       <div class="portrait">
@@ -628,7 +645,8 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
         <img src="images/team/secretary.webp" alt="Leo Khushboo Patel, Secretary" data-i="2" loading="lazy">
         <img src="images/team/treasurer.webp" alt="Leo Khushi Sonawane, Treasurer" data-i="3" loading="lazy">
         <img src="images/team/marketing.webp" alt="Leo Dhruti Ajmera, Marketing Director" data-i="4" loading="lazy">
-        <img src="images/team/advisor.webp" alt="MJF Lion Dhirendra Sinha, Advisor" data-i="5" loading="lazy">
+        <img src="images/team/leo-advisor.webp" alt="Lion Sabitri Nag, Leo Advisor" data-i="5" loading="lazy">
+        <img src="images/team/advisor.webp" alt="MJF Lion Dhirendra Sinha, Leo Coordinator" data-i="6" loading="lazy">
         </div>
         <div class="portrait-cap"><b id="portraitName">Leo Drishti Sinha</b><span id="portraitRole">President</span></div>
         <div class="rot-bar" id="rotBar" aria-hidden="true"><i></i></div>
@@ -639,7 +657,8 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
         <button class="person" type="button" data-i="2"><b>Leo Khushboo Patel</b><span class="role">Secretary</span></button>
         <button class="person" type="button" data-i="3"><b>Leo Khushi Sonawane</b><span class="role">Treasurer</span></button>
         <button class="person" type="button" data-i="4"><b>Leo Dhruti Ajmera</b><span class="role">Marketing Director</span></button>
-        <button class="person" type="button" data-i="5"><b>MJF Lion Dhirendra Sinha</b><span class="role">Advisor</span></button>
+        <button class="person" type="button" data-i="5"><b>Lion Sabitri Nag</b><span class="role">Leo Advisor</span></button>
+        <button class="person" type="button" data-i="6"><b>MJF Lion Dhirendra Sinha</b><span class="role">Leo Coordinator</span></button>
       </div>
     </div>
     <div class="team-cards">
@@ -648,24 +667,18 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
       <div class="tcard"><div class="tcard-frame reveal-img"><img src="images/team/secretary.webp" alt="Leo Khushboo Patel, Secretary" loading="lazy"></div><b>Leo Khushboo Patel</b><span>Secretary</span></div>
       <div class="tcard"><div class="tcard-frame reveal-img"><img src="images/team/treasurer.webp" alt="Leo Khushi Sonawane, Treasurer" loading="lazy"></div><b>Leo Khushi Sonawane</b><span>Treasurer</span></div>
       <div class="tcard"><div class="tcard-frame reveal-img"><img src="images/team/marketing.webp" alt="Leo Dhruti Ajmera, Marketing Director" loading="lazy"></div><b>Leo Dhruti Ajmera</b><span>Marketing Director</span></div>
-      <div class="tcard"><div class="tcard-frame reveal-img"><img src="images/team/advisor.webp" alt="MJF Lion Dhirendra Sinha, Advisor" loading="lazy"></div><b>MJF Lion Dhirendra Sinha</b><span>Advisor</span></div>
+      <div class="tcard"><div class="tcard-frame reveal-img"><img src="images/team/leo-advisor.webp" alt="Lion Sabitri Nag, Leo Advisor" loading="lazy"></div><b>Lion Sabitri Nag</b><span>Leo Advisor</span></div>
+      <div class="tcard"><div class="tcard-frame reveal-img"><img src="images/team/advisor.webp" alt="MJF Lion Dhirendra Sinha, Leo Coordinator" loading="lazy"></div><b>MJF Lion Dhirendra Sinha</b><span>Leo Coordinator</span></div>
     </div>
   </div>
 </section>
 
-<section class="section circle" id="circle" aria-label="Micro team and board of directors">
+<section class="section circle" id="circle" aria-label="Board of directors">
   <div class="wrap">
     <div class="circle-group">
       <div class="head-row reveal">
-        <h2>The micro <em>team</em></h2>
-        <p class="lede">The hands behind every event: planning, posting, shooting and showing up.</p>
-      </div>
-      <ul class="mini-grid" id="microTeam"></ul>
-    </div>
-    <div class="circle-group">
-      <div class="head-row reveal">
         <h2>Board of <em>directors</em></h2>
-        <p class="lede">Each director owns one part of the club's year.</p>
+        <p class="lede">Eleven officers, each owning one part of the club's year.</p>
       </div>
       <ul class="board-grid" id="boardGrid"></ul>
     </div>
@@ -675,7 +688,7 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
 <section class="section" id="events">
   <div class="wrap">
     <div class="head-row reveal">
-      <h2>Upcoming events</h2>
+      <h2>Upcoming <em>events</em></h2>
       <div class="head-actions">
         <a class="btn btn-line" href="#join">Get notified</a>
         <a class="btn btn-ink" href="events.html">All events</a>
@@ -686,6 +699,19 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
       <a class="event reveal" href="https://www.instagram.com/lco_aurelian/" target="_blank" rel="noopener"><div class="top"><div><h3>To be announced</h3><p>Follow @lco_aurelian on Instagram for the date.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot">Coming soon</div></a>
       <a class="event reveal" href="https://www.instagram.com/lco_aurelian/" target="_blank" rel="noopener"><div class="top"><div><h3>To be announced</h3><p>Follow @lco_aurelian on Instagram for the date.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot">Coming soon</div></a>
     </div>
+  </div>
+</section>
+
+<section class="ig-strip" aria-label="Follow us on Instagram">
+  <div class="wrap">
+    <a class="ig-row reveal" href="https://www.instagram.com/lco_aurelian/" target="_blank" rel="noopener">
+      <span class="ig-mark" aria-hidden="true"><svg class="ico"><use href="#i-instagram"/></svg></span>
+      <span class="ig-text">
+        <b>Follow us on <em>Instagram</em></b>
+        <span>Reels, recaps and first looks at what comes next.</span>
+      </span>
+      <span class="btn btn-ink ig-btn">@lco_aurelian<svg viewBox="0 0 16 16" aria-hidden="true"><use href="#i-arrow"/></svg></span>
+    </a>
   </div>
 </section>
 
@@ -717,7 +743,7 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
   </div>
   <div class="bottom">
     <span>Leo Club of Aurelian · MD 3231 A4 · India</span>
-    <span>Leo Club International</span>
+    <span class="bottom-end"><a href="https://www.instagram.com/lco_aurelian/" target="_blank" rel="noopener">@lco_aurelian on Instagram</a><span>Leo Club International</span></span>
   </div>
 </footer>
   </div>
@@ -730,8 +756,8 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
 (function(){
   var C=window.CLUB; if(!C) return;
   var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var WORDS=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve'];
-  var totals={events:C.events.length, hours:C.stats.hours.value, members:C.stats.members.value};
+  var WORDS=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'];
+  var totals={events:C.events.length, hours:C.stats.hours.value, people:C.stats.people.value};
 
   document.querySelectorAll('[data-count]').forEach(function(el){ var n=totals[el.dataset.count]; el.textContent=WORDS[n]||n; });
   document.querySelectorAll('[data-count-num]').forEach(function(el){ el.textContent=totals[el.dataset.countNum]; });
@@ -739,13 +765,17 @@ footer{padding-bottom:max(2rem,env(safe-area-inset-bottom))}
   function esc(t){ var d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
   function initials(name){ return name.replace(/^(Leo|MJF|Lion)\s+/g,'').split(/\s+/).map(function(w){return w[0];}).join('').slice(0,2).toUpperCase(); }
   function face(p){ return p.photo ? '<img src="'+esc(p.photo)+'" alt="" loading="lazy">' : '<span class="initials" aria-hidden="true">'+initials(p.name)+'</span>'; }
-  var micro=document.getElementById('microTeam'), board=document.getElementById('boardGrid');
-  if(micro) micro.innerHTML=C.microTeam.map(function(p){
-    return '<li class="mini reveal"><div class="mini-face">'+face(p)+'</div><b>'+esc(p.name)+'</b><span>'+esc(p.role)+'</span></li>';
-  }).join('');
+  var board=document.getElementById('boardGrid');
   if(board) board.innerHTML=C.board.map(function(p){
     return '<li class="director reveal"><div class="director-frame">'+face(p)+'</div><b>'+esc(p.name)+'</b><span>'+esc(p.role)+'</span></li>';
   }).join('');
+
+  /* a revealed element drops its stagger delay and switches to its own interaction timing */
+  document.addEventListener('transitionend',function(e){
+    var el=e.target;
+    if(e.propertyName!=='opacity'||!el.classList||!el.classList.contains('reveal')||!el.classList.contains('in')) return;
+    el.style.transitionDelay=''; el.classList.add('settled');
+  });
 
   /* countdown pill on upcoming events: "In 3 days", "Tomorrow", "Today" */
   document.querySelectorAll('[data-countdown]').forEach(function(el){

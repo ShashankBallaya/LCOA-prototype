@@ -69,9 +69,16 @@ p{max-width:58ch}
 .ico .soft{fill:var(--blush-soft)}
 
 /* page head */
-.page-head{padding:clamp(3.5rem,9vh,6rem) 0 clamp(2.5rem,6vh,4rem);display:grid;grid-template-columns:1.1fr .9fr;gap:2rem 4rem;align-items:end}
+.page-head{padding:clamp(1.75rem,5vh,3rem) 0 clamp(2.5rem,6vh,4rem);display:grid;grid-template-columns:1.1fr .9fr;gap:2rem 4rem;align-items:end}
 .page-head h1{font-size:clamp(3rem,6.4vw,5.4rem);font-weight:300;text-wrap:wrap}
 .page-head h1 em{white-space:nowrap}
+.crumbs{grid-column:1/-1;margin-bottom:-.5rem}
+.crumbs ol{display:flex;flex-wrap:wrap;align-items:center;list-style:none;font-size:.85rem;letter-spacing:.02em}
+.crumbs li{display:flex;align-items:center}
+.crumbs li + li::before{content:"";width:.4rem;height:.4rem;margin:0 .8rem 0 .55rem;border-top:1px solid var(--gold);border-right:1px solid var(--gold);transform:rotate(45deg)}
+.crumbs a{color:var(--ink-2);padding:.4rem 0;text-decoration:underline;text-decoration-color:transparent;transition:color .2s ease,text-decoration-color .2s ease}
+@media (hover:hover) and (pointer:fine){.crumbs a:hover{color:var(--ink);text-decoration-color:var(--gold)}}
+.crumbs [aria-current]{color:var(--rose-ink);font-weight:400}
 .page-head .lede{font-size:1.1rem;margin-bottom:1.6rem}
 .filters{display:flex;flex-wrap:wrap;gap:.5rem}
 .chip{font:inherit;font-size:.8rem;font-weight:400;letter-spacing:.04em;padding:.5rem .95rem;border-radius:999px;border:1px solid var(--gold-line);background:transparent;color:var(--ink);cursor:pointer;display:inline-flex;gap:.45rem;align-items:center;transition:background .15s ease,border-color .15s ease,color .15s ease,transform .16s var(--ease-out)}
@@ -229,6 +236,12 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
 
 <main>
   <div class="wrap page-head">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="index.html">Home</a></li>
+        <li><span aria-current="page">Events</span></li>
+      </ol>
+    </nav>
     <h1 class="reveal">Every event, <em>so far.</em></h1>
     <div class="reveal">
       <p class="lede" id="pageLede">Service drives, ceremonies and meetings, newest first.</p>
@@ -276,7 +289,7 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
   var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
   var LABEL={service:'Service',fellowship:'Fellowship',leadership:'Leadership'};
-  var WORDS=['No','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve'];
+  var WORDS=['No','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen','Twenty'];
 
   /* nav */
   var nav=document.getElementById('nav'), burger=document.getElementById('burger');
@@ -346,7 +359,7 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
     return '<li class="card reveal" data-cat="'+e.category+'">'+fig+
       '<div class="card-body"><div class="card-meta"><span class="pill '+e.category+'">'+LABEL[e.category]+'</span>'+when+'</div>'+
       '<h3>'+esc(e.title)+'</h3><p>'+esc(e.text)+'</p>'+
-      (e.place ? '<span class="place">'+esc(e.place)+'</span>' : '')+
+      ((e.place||e.cause) ? '<span class="place">'+esc(e.place||e.cause)+'</span>' : '')+
       '</div></li>';
   }
   var months=document.getElementById('months');
