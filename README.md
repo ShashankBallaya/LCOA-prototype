@@ -1,69 +1,59 @@
-# LCOA — dragonfly scroll guide (prototype)
+# LCOA redesign prototype
 
 Live: **https://shashankballaya.github.io/LCOA-prototype/?ref=team**
 
-A prototype of a 3D dragonfly that flies through the page as a guide,
-introducing each section as you scroll. This is a **feature prototype**, not a
-draft of the new site — the copy, imagery and layout are deliberately
-placeholder. What is being reviewed is the flight mechanic and the per-section
-mood shifts.
+A simple, whitespace-led redesign of the Leo Club of Aurelian site in the
+club's emblem palette (cream paper, sage, deep green, gold, one blush accent).
+This replaced the 3D dragonfly prototype on 16 Sep 2026 after the president
+asked for a revamp: "simple is the new beautiful". The old page is kept as
+`dragonfly.html` for reference only.
 
-This is published from its own repo so it stays entirely separate from the live
-site at lcoaurelian.in. A `prototype.lcoaurelian.in` subdomain is intended but
-is not yet serving, so the GitHub URL above is the one to use for now.
+This repo is published on its own so it stays separate from the live site at
+lcoaurelian.in (repo `ShashankBallaya/LCOA`, branch `main`). Never point that
+repo's Pages source at this work.
 
-## What to look at
+## What is in the page
 
-- The dragonfly's flight path across the seven sections, and whether the timing
-  feels right at different scroll speeds
-- The mood/lighting shift per section (energetic / reflective / functional)
-- Team cards lighting as the dragonfly passes them, rather than on a generic
-  scroll stagger
-- The circling flourish near the highlighted event card
+One static file, `index.html`, no build step. Jost and Cormorant Garamond
+from Google Fonts. Vanilla JS only.
 
-Colours are placeholders driven by CSS variables, ready to swap for real brand
-colours. The type system is the live site's: Birds of Paradise, Jost, Cormorant
-Garamond, Pinyon Script.
+| Section | State |
+| --- | --- |
+| Hero | Done. Generated scene (`images/hero-wide.webp` on desktop, `images/hero-tall.webp` on phones), emblem crest, headline, two buttons. |
+| Stat strip | Done. Figures are from the term so far: 6 events, 120+ reached, 3 causes. |
+| Promise | Done. Heading, motto text, the group photo in the arch, three pillars (Service, Fellowship, Leadership). |
+| Recap | Done. Five real events with photos in `images/recap/`. Photos still carry baked-in dates from the collages; drop in clean sources under the same names, no code change needed. |
+| Team | Layout done. Six board members, auto-rotating portrait on desktop, grid on phones. **Photos are stand-ins** from the old site; replace `images/team/{president,vicepresident,secretary,treasurer,marketing,advisor}.webp` with the photoshoot portraits, cropped 4:5, about 900x1125. |
+| Events | Placeholder content. Three dark cards, first one wide. |
+| Join | Layout done. The form validates but posts nowhere; it needs a form service or backend. |
+| Footer | Done. Shares the closing image band (`images/closing.webp`) with Join. |
 
-## Known gaps
+## Motion
 
-- Content, copy and imagery are all placeholder
-- Wing-flap amplitude and resting pose may still need tuning
-- The 3D model is 3.5 MB, mostly two PNG textures. It needs compressing
-  (WebP/KTX2 + Draco) before anything like this ships.
+- Hero: staged entrance on load (crest, headline, sentence, buttons, meta line).
+- Photos wipe up with `clip-path` when scrolled into view, only after the image has loaded.
+- Text blocks fade in. `prefers-reduced-motion` keeps opacity fades and drops movement.
+- Team portrait rotates every 3.2 s with a gold progress line. Hover pauses it.
 
-## Running it locally
+Gotcha: Chrome's IntersectionObserver applies `clip-path`, so a fully clipped
+photo never intersects. The observer watches each photo's parent and maps
+back (see the `owner` map in the script).
 
-ES modules will not load over `file://`, so it needs a static server:
+## Design rules used
+
+- All hover effects sit under `@media (hover:hover) and (pointer:fine)`.
+- Buttons scale to .97 on press. Transitions name their properties and use
+  `--ease-out` / `--ease-in-out` from `:root`.
+- Small text in gold uses `--gold-ink` (#7E5F3A) for contrast. `--gold` is for rules only.
+- No eyebrow labels above headings, no section numbers, no arrows on cards that go nowhere.
+- Card radii 16 px. Border or shadow, not both.
+
+## Working on it
+
+Open `index.html` in a browser, or serve the folder:
 
 ```bash
-python -m http.server 5180
+python -m http.server 5184
 ```
 
-Then open http://localhost:5180
-
-## Console handles
-
-The page exposes `window.__dfly` for tuning without a reload:
-
-| Call | Effect |
-|---|---|
-| `__dfly.setSize(1.2)` | Resize the dragonfly (world units, nose to tail) |
-| `__dfly.flipNose()` | Reverse travel direction if it flies tail-first |
-| `__dfly.roll(180)` | One-off roll, to inspect another face |
-| `__dfly.t` | Current scroll progress, 0–1 |
-
-Loading with `?placeholder=1` forces the box-and-planes stand-in instead of the
-real model.
-
-## Stack
-
-Vanilla JS, GSAP + ScrollTrigger, Lenis, Three.js. No framework, no build step —
-it drops into the existing site as-is.
-
-## Credits
-
-"[skull island dragonfly](https://skfb.ly/pHntB)" by dinoguy263allo is licensed
-under [Creative Commons Attribution](http://creativecommons.org/licenses/by/4.0/).
-Attribution is a condition of the licence, so the credit must stay in the footer
-wherever this is used.
+Fonts need a network connection.

@@ -1,1994 +1,631 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>LCOA — Dragonfly scroll guide (prototype)</title>
-<meta name="robots" content="noindex">
-
-<!-- Type system lifted from the live site so the prototype reads as LCOA -->
+<title>Leo Club of Aurelian · Built on Bonds</title>
+<meta name="description" content="Leo Club of Aurelian, District 3231 A4, India. A young leaders' club built on service, fellowship and leadership.">
+<meta name="theme-color" content="#FBF0E3">
+<link rel="icon" href="images/logo-700.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-@font-face{
-  font-family:'Birds of Paradise';
-  font-style:normal;font-weight:400;font-display:swap;
-  src:local('Birds of Paradise  Personal use'),
-      url('https://fonts.cdnfonts.com/s/15021/Birds%20of%20Paradise%20%C2%A9%20PERSONAL%20USE%20ONLY.woff') format('woff');
-}
-/* ============================================================
-   MOOD SYSTEM
-   Three mood categories -> one bg + one accent each.
-   Placeholder values. Swap for real brand colours later;
-   nothing else needs to change.
-   ============================================================ */
 :root{
-  /* live values, written each frame from a continuous 5-stop gradient
-     across the whole page - see GRADIENT_BG/GRADIENT_ACCENT in the JS */
-  --bg:#EBE5D6;
-  --accent:#CBA093;
-
-  /* Type colour is fixed, never gradient-driven. Two of the five gradient
-     colours fail contrast as body text at full saturation - Vintage Rose
-     3.68:1 and Dusty Blush 2.79:1 against Muted Moss, both under the 4.5:1
-     AA floor - which is why the background gradient uses tinted versions
-     of them (see GRADIENT_BG) while ACCENT keeps the full-strength hex,
-     since accents are never a text background.
-     Slate Blue and Muted Moss clear AA against every one of the tinted
-     background stops. */
-  --ink:#5A657C;       /* slate blue - headings */
-  --ink-body:#57614D;  /* muted moss - body copy */
-  --line:#DDD6C7;      /* soft linen - borders & rules */
-  --paper:#FFFFFF;     /* card lift over the paper tones */
-
-  /* Deepened rose, same hue family as --accent but FIXED - never written by
-     the gradient. Needed because --accent is only safe as a decorative wash:
-     it starts the page at #EBE5D6, so anything that must stay legible on it
-     (or in it) vanishes at t=0. Use this, not --accent, wherever an accent
-     carries text or marks focus. White on it measures 4.8:1 - clears the AA
-     4.5:1 floor for the nav CTA's 11px uppercase label. */
-  --accent-ink:#9A6154;
-
-  /* same roles as the live site: display / sans / serif / script */
-  --f-display:'Birds of Paradise','Birds of Paradise  Personal use','Cormorant Garamond',serif;
-  --f-sans:'Jost',sans-serif;
-  --f-serif:'Cormorant Garamond',serif;
-  --f-script:'Pinyon Script',cursive;
+  --paper:#FBF0E3;
+  --paper-2:#F4E6D3;
+  --sage:#AEC49D;
+  --sage-soft:#DCE5D2;
+  --sage-deep:#7F9673;
+  --ink:#1E3324;
+  --ink-2:#4F5F4F;
+  --gold:#967349;
+  --gold-line:#DCC3A3;
+  --blush:#E6A4AE;
+  --gold-ink:#7E5F3A;   /* gold for small text: 5.6:1 on paper */
+  --ease-out:cubic-bezier(.23,1,.32,1);
+  --ease-in-out:cubic-bezier(.77,0,.175,1);
+  --f-display:'Cormorant Garamond',Georgia,serif;
+  --f-sans:'Jost',system-ui,sans-serif;
+  --wrap:1120px;
+  --arch:999px 999px 28px 28px;
 }
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scrollbar-color:var(--sage-deep) var(--paper-2);caret-color:var(--ink)}
+body{font-family:var(--f-sans);font-weight:300;font-size:1.0625rem;line-height:1.65;color:var(--ink-2);background:var(--paper);-webkit-font-smoothing:antialiased}
+h1,h2,h3{text-wrap:balance}
+a{text-underline-offset:.18em}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--sage-soft);color:var(--ink)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
 
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
-html.lenis,html.lenis body{height:auto}
-.lenis.lenis-smooth{scroll-behavior:auto!important}
-.lenis.lenis-stopped{overflow:hidden}
-
-body{
-  background:var(--bg);
-  color:var(--ink-body);
-  font-family:var(--f-sans);
-  -webkit-font-smoothing:antialiased;
-  overflow-x:hidden;
-}
-
-/* ---- the one fixed transparent canvas ---- */
-#dfly-canvas{
-  position:fixed; inset:0;
-  width:100vw; height:100vh;
-  pointer-events:none;
-  z-index:50;
-}
-
-/* ---- decorative hero frame ----
-   Fixed layer at z-index 1, under the sections (z-index 2) so the botanicals
-   sit behind the emblem and headline. */
-#heroFrame{
-  position:fixed; inset:0; z-index:1;
-  pointer-events:none; overflow:hidden;
-}
-#heroFrame .hf{
-  position:absolute; display:block; height:auto;
-  will-change:transform, opacity;   /* these are the only animated properties */
-  /* Layer blur, so the emblem and headline hold focus. Calibrated against
-     the mockup rather than guessed: matching the rendered edge sharpness of
-     the top-left star puts it at 1.5px on a 1901px-wide frame, i.e. 0.079vw.
-     Applied per element rather than to the container - a filter on the
-     parent would force the whole layer to re-blur on every animation frame,
-     whereas each image can be blurred once and then just transformed. */
-  filter:blur(clamp(0.5px,0.079vw,2px));
-}
-/* Positions and sizes are the ones measured off the Figma frame
-   (1901x866), expressed as % so the composition holds as the hero
-   resizes. The vw terms below reproduce the mockup's pixel sizes exactly
-   at 1901px wide; the px floors stop the stars vanishing on a phone.
-
-   PEONY PANELS: one per side, full frame height, hugging the edge.
-   The asset is 336x617 (aspect 0.5446), so at full height it is 472px
-   wide = 24.8% of the frame - which is exactly the botanical band width
-   measured in the mockup. width is min(54.46vh, 40vw): the first term
-   keeps it exactly full-height, the second caps it on narrow screens
-   where a full-height panel would otherwise be wider than the phone. */
-.hf-peony-l{ width:min(54.46vh,40vw); left:0;  bottom:0; }
-.hf-peony-r{ width:min(54.46vh,40vw); right:0; bottom:0; }
-
-/* Top-corner pieces exist for portrait only. On desktop the full-height
-   panels already carry foliage through the top corners - that is the
-   measured Figma composition - so adding more there would break it. */
-#heroFrame .hf-peony-tl, #heroFrame .hf-peony-tr{ display:none; }
-
-/* Phone-only floral border, off everywhere else. */
-#heroFrame .hfm{ display:none; }
-
-.hf-star-l1{ width:clamp(52px,11.15vw,212px); left:10.57%; top:-8.78%; }
-.hf-star-l2{ width:clamp(16px, 2.50vw, 47px); left: 2.42%; top:73.56%; }
-.hf-star-r1{ width:clamp(44px, 9.02vw,172px); left:93.90%; top: 9.82%; }
-.hf-star-r2{ width:clamp(26px, 4.89vw, 93px); left:92.74%; top:71.48%; }
-
-/* NB: these need the #heroFrame prefix. The base rule above is
-   `#heroFrame .hf` (id + class), which outranks a bare `.hf-star-l1` -
-   media queries add no specificity of their own, so an unprefixed
-   `display:none` here silently loses to the base `display:block`. */
-@media (max-width:640px){
-  /* PORTRAIT: floral border, clear centre. Measured off the portrait mockup
-     (1203x2361, 0.510). Desktop's frame is authored for 2.2:1 and does not
-     translate, so phones get their own composition. */
-  #heroFrame{ display:block; }
-  #heroFrame .hf { display:none; }      /* desktop frame off */
-  #heroFrame .hfm{ display:block; }
-
-  #heroFrame .hfm{
-    position:absolute;
-    /* transform only. Deliberately NOT will-change:opacity - these carry a
-       static blur, and animating opacity on a blurred layer forces a fresh
-       blur pass every frame, which is what made the hero laggy before. */
-    will-change:transform;
-  }
-  #heroFrame img.hfm{ height:auto; }
-
-  /* Blooms cropped out of the bouquet. background-size pushes the art past
-     the element's own box so ONE flower fills it and the stems land outside;
-     background-position picks which flower - the pink bloom sits at (35%,78%)
-     of the asset and the cream at (52%,37%), measured by colour segmentation. */
-  #heroFrame .hfm-bloom{
-    background-image:url(images/peonies.webp);
-    background-repeat:no-repeat;
-    background-size:210% auto;
-    /* The crop box would otherwise cut the bloom off with hard straight
-       edges mid-frame. In the mockup flowers are only ever cut by the frame
-       edge itself, so fade each box radially and the petals dissolve into
-       the paper instead of ending on a rectangle. */
-    -webkit-mask-image:radial-gradient(closest-side, #000 76%, rgba(0,0,0,0) 100%);
-            mask-image:radial-gradient(closest-side, #000 76%, rgba(0,0,0,0) 100%);
-  }
-  #heroFrame .hfm-pink { background-position:35% 78%; }
-  #heroFrame .hfm-cream{ background-position:52% 37%; }
-
-  /* Variable layer blur, standing in for depth of field: the biggest and
-     outermost blooms read as nearest the lens, so they blur hardest. */
-  #heroFrame .hfm-b1{ filter:blur(0.22vw); }
-  #heroFrame .hfm-b2{ filter:blur(0.34vw); }
-  #heroFrame .hfm-b3{ filter:blur(0.48vw); }
-  #heroFrame .hfm-b4{ filter:blur(0.66vw); }
-
-  /* Denser ring. Clear zone measured from the live layout: the emblem
-     occupies y 33-52% at x 29-71%, and the headline y 63-67% at x 17-83%.
-     Everything above 33% and below 67% can run full width; between those
-     the blooms stay outside x 22%/78% so the centre reads clean. */
-
-  /* top band - full width above the emblem */
-  #heroFrame .hfm-mint-tl { width:46%; left:-10%; top: -5%; }
-  #heroFrame .hfm-cream-tc{ width:46%; height:24%; left: 12%; top:-3%; }
-  #heroFrame .hfm-pink-tc2{ width:34%; height:18%; left: 30%; top:12%; }
-  #heroFrame .hfm-pink-tr { width:42%; height:22%; right:14%; top:-5%; }
-  #heroFrame .hfm-blue-tr { width:54%; right:-12%; top:  0%; }
-
-  /* middle - edges only, so the emblem and headline stay clear */
-  #heroFrame .hfm-pink-ml { width:38%; height:32%; left:-10%; top:20%; }
-  #heroFrame .hfm-pink-mr { width:38%; height:30%; right:-10%; top:24%; }
-  #heroFrame .hfm-mint-mr { width:28%; right:-8%; top:44%; }
-  #heroFrame .hfm-cream-bl{ width:34%; height:24%; left:-10%; top:50%; }
-  #heroFrame .hfm-cream-mr{ width:32%; height:22%; right:-8%; top:52%; }
-
-  /* bottom band - full width below the headline */
-  #heroFrame .hfm-pink-bl { width:44%; height:26%; left:-10%; bottom:-2%; }
-  #heroFrame .hfm-mint-bl { width:30%; left: 16%; bottom: 8%; }
-  #heroFrame .hfm-pink-bc { width:36%; height:22%; left: 34%; bottom:-6%; }
-  #heroFrame .hfm-cream-br{ width:42%; height:26%; right:-8%; bottom: 2%; }
-  #heroFrame .hfm-blue-bc { width:46%; left: 26%; bottom:-12%; }
-}
-/* Short landscape windows: very little vertical room, so cap the panels
-   against width instead of height. */
-@media (max-height:520px){
-  #heroFrame .hf-peony-l, #heroFrame .hf-peony-r{ width:min(54.46vh,22vw); }
-  #heroFrame .hf-peony-tl, #heroFrame .hf-peony-tr{ display:none; }
-}
-
-/* hero light bloom the dragonfly emerges from */
-#bloom{
-  position:fixed; left:50%; top:46%;
-  width:60vmin; height:60vmin;
-  transform:translate(-50%,-50%);
-  border-radius:50%;
-  background:radial-gradient(circle,
-    color-mix(in srgb,var(--accent) 62%,transparent) 0%,
-    color-mix(in srgb,var(--accent) 20%,transparent) 40%,
-    transparent 72%);
-  /* No filter:blur here. The backdrop is already a radial-gradient whose
-     outer stop is fully transparent, so it has no hard edge for a blur to
-     soften - but its opacity is animated every frame during the emergence,
-     and each write to a blurred layer forces a fresh blur pass. Dropping it
-     is visually near-identical and takes that cost out of the hero. */
-  pointer-events:none; z-index:40; opacity:0;
-}
-
-/* ---- sections: equal height keeps waypoint↔section alignment 1:1 ---- */
-section{
-  min-height:100vh;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  padding:10vh 6vw; position:relative; z-index:2;
-  text-align:center;
-}
-.eyebrow{
-  font-family:var(--f-sans); font-weight:500;
-  font-size:clamp(.6rem,1.4vw,.72rem); letter-spacing:.42em; text-transform:uppercase;
-  color:var(--ink-body); margin:0 0 1.4rem;
-}
-h1{font-family:var(--f-display); font-weight:400; font-size:clamp(2rem,7.6vw,5.4rem); letter-spacing:.01em; margin:0; line-height:1.0; color:var(--ink)}
-h2{font-family:var(--f-display); font-weight:500; font-size:clamp(2rem,6vw,3.6rem); line-height:1.08; margin:0 0 1.2rem; color:var(--ink)}
-p{font-family:var(--f-serif); font-size:clamp(1.05rem,2.2vw,1.35rem); color:var(--ink-body); max-width:42ch; line-height:1.7; margin:0 auto}
-.hero-logo{
-  display:block; margin:0 auto;
-  width:min(42vw,240px); height:auto; margin-bottom:2rem;
-  /* the emblem is a light illustration on light paper, so it needs a lift
-     rather than a hard edge */
-  filter:drop-shadow(0 18px 42px color-mix(in srgb,var(--ink) 22%,transparent));
-}
-
-/* ---- mobile hero "wow" layer ----
-   Three additions that exist ONLY under 640px: a radial glow that blooms
-   behind the emblem as it lands, a word-split headline with a one-shot
-   shimmer sweep, and a scroll cue. Everything here is display:none above
-   the breakpoint - the desktop hero is measured off the Figma frame and is
-   deliberately left exactly as it was. */
-.hero-glow,.hero-cue{display:none}
-
-@media (max-width:640px){
-  /* Plain radial-gradient with a transparent outer stop and NO filter:blur -
-     same reasoning as #bloom above: its opacity IS animated, and a blurred
-     layer would force a fresh blur pass on every write for no visual gain
-     that the gradient's own soft falloff isn't already giving. */
-  #hero .hero-glow{
-    display:block;position:absolute;left:50%;top:36%;
-    width:86vw;height:86vw;max-width:430px;max-height:430px;
-    border-radius:50%;pointer-events:none;z-index:0;opacity:0;
-    transform:translate(-50%,-50%);
-    background:radial-gradient(circle,
-      color-mix(in srgb,var(--accent-ink) 22%,transparent) 0%,
-      color-mix(in srgb,var(--accent-ink) 9%,transparent) 44%,
-      transparent 70%);
-    will-change:transform,opacity;
-  }
-  /* the glow is a POSITIONED child, so without this it would paint over the
-     in-flow emblem and type (positioned elements beat non-positioned ones at
-     the same z). position:relative alone changes no geometry. */
-  #hero .hero-logo,#hero .eyebrow,#hero h1{position:relative;z-index:1}
-
-  /* one span per word, injected by JS only while this breakpoint matches and
-     torn back down on exit - inline-block so each can carry its own y. */
-  #hero h1 .hw{display:inline-block;will-change:transform,opacity}
-
-  /* One-shot gold sweep, class added after the entrance and removed on
-     animationend so the headline settles back to solid --ink. The gradient's
-     base stops are --ink and its highlight is --accent-ink: both are FIXED
-     tokens, never the gradient-driven --accent, so the headline cannot lose
-     contrast mid-sweep. @supports guards it because the fallback of
-     text-fill-color:transparent without background-clip is invisible text. */
-  @supports ((-webkit-background-clip:text) or (background-clip:text)){
-    #hero h1.shimmer{
-      background-image:linear-gradient(100deg,var(--ink) 34%,var(--accent-ink) 50%,var(--ink) 66%);
-      background-size:300% 100%;background-repeat:no-repeat;
-      -webkit-background-clip:text;background-clip:text;
-      -webkit-text-fill-color:transparent;
-      animation:heroShimmer 1.6s cubic-bezier(.4,0,.2,1) forwards;
-    }
-  }
-  @keyframes heroShimmer{from{background-position:200% 0}to{background-position:-60% 0}}
-
-  #hero .hero-cue{
-    display:flex;flex-direction:column;align-items:center;gap:.45rem;
-    position:absolute;left:50%;bottom:4vh;transform:translateX(-50%);
-    z-index:1;pointer-events:none;
-  }
-  #hero .hero-cue span{
-    font-family:var(--f-sans);font-weight:500;
-    font-size:.55rem;letter-spacing:.3em;text-transform:uppercase;
-    color:var(--ink-body);opacity:.7;
-  }
-  #hero .hero-cue svg{display:block;width:17px;height:auto;overflow:visible}
-  #hero .hero-cue path{fill:none;stroke:var(--ink-body);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  #hero .hero-cue .cue-arrow{animation:heroCueBob 2.1s ease-in-out infinite}
-  @keyframes heroCueBob{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(5px);opacity:1}}
-}
-/* the shimmer class is only ever added when !reduce (see the mobile hero
-   block), so only the always-on cue bob needs muting here */
-@media (prefers-reduced-motion:reduce){
-  #hero .hero-cue .cue-arrow{animation:none}
-}
+.wrap{width:min(var(--wrap),calc(100% - 3rem));margin-inline:auto}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+h1,h2,h3{font-family:var(--f-display);font-variant-numeric:lining-nums;font-weight:400;color:var(--ink);line-height:1.05;letter-spacing:-.01em}
+h2{font-size:clamp(2.3rem,4.4vw,3.5rem)}
+h3{font-size:1.5rem;line-height:1.2}
+em{font-style:italic;font-weight:300}
+p{max-width:58ch}
 
 
-/* ---- team: cards revealed by the dragonfly's x-position ---- */
-.team-row{display:flex;gap:1.4rem;flex-wrap:wrap;justify-content:center;margin-top:3rem}
-.t-card{
-  width:150px;padding:1.6rem 1rem;border-radius:14px;
-  background:color-mix(in srgb,var(--paper) 58%,transparent);
-  border:1px solid var(--line);
-  opacity:0;transform:translateY(28px) scale(.96);
-  transition:opacity .7s cubic-bezier(.2,.7,.3,1),transform .7s cubic-bezier(.2,.7,.3,1);
-}
-.t-card.lit{opacity:1;transform:none}
-.t-card .av{width:56px;height:56px;border-radius:50%;margin:0 auto .8rem;background:color-mix(in srgb,var(--accent) 70%,var(--paper))}
-.t-card .nm{font-family:var(--f-script);font-size:1.35rem;line-height:1;color:var(--ink)}
-.t-card .ro{font-family:var(--f-sans);font-weight:500;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-body);margin-top:.35rem}
+.btn{display:inline-flex;align-items:center;gap:.6rem;font-family:var(--f-sans);font-weight:500;font-size:.9rem;letter-spacing:.04em;padding:.85rem 1.5rem;border-radius:999px;border:1px solid transparent;cursor:pointer;transition:background .2s ease,color .2s ease,border-color .2s ease,transform .16s var(--ease-out)}
+.btn:active{transform:scale(.97)}
+@media (hover:hover) and (pointer:fine){.btn:hover{transform:translateY(-1px)}.btn:hover:active{transform:scale(.97)}}
+.btn-ink{background:var(--ink);color:var(--paper)}
+.btn-ink:hover{background:#2B4634}
+.btn-blush{background:var(--blush);color:var(--ink)}
+.btn-blush:hover{background:#EBB5BD}
+.btn-line{border-color:var(--gold-line);color:var(--ink)}
+@media (hover:hover) and (pointer:fine){.btn-line:hover{border-color:var(--gold);background:var(--paper-2)}}
 
-/* ---- recap: stat strip + PINNED horizontal scrolling gallery ----
-   #gallery is pinned and the track is translated sideways by vertical
-   scroll (GSAP's classic horizontal-gallery pattern) - deliberately NOT the
-   pattern used elsewhere in this file. A pin injects a pin-spacer, so this
-   section is no longer ~100vh like its siblings, which would have desynced
-   the dragonfly's section<->waypoint mapping (see the "section N <-> segment
-   N" comment on the master ScrollTrigger) if that mapping still assumed
-   equal-height sections. It doesn't anymore: remapT() there now measures
-   every waypoint's real position instead, specifically so this could be
-   pinned safely. Do not reintroduce an equal-height assumption elsewhere
-   without checking that fix still covers it. */
-/* #gallery overrides the base section{padding:10vh 6vw}: while pinned, this
-   section's laid-out height can't exceed the viewport or whatever's past
-   the bottom edge (the focus text, as it happens) is simply not visible -
-   pinning holds position, it doesn't compress content. Measured on a
-   1440x750 window (not unusual for a laptop once browser chrome is
-   subtracted): the old 10vh+10vh padding alone reserved 150px, and with the
-   80%-bigger card at that width (342x428) the section's total content came
-   to 925px against a 750px viewport - recap-focus landed at top:760, fully
-   below the fold. Cut vertical padding here and sized .r-card off vh
-   (below) rather than vw so it degrades on short-but-wide screens instead
-   of just running off the bottom. */
-#gallery{padding-top:4vh;padding-bottom:4vh}
-.recap-stats{display:flex;gap:2.2rem;margin:.4rem 0 1rem}
-.recap-stats .rs{display:flex;flex-direction:column;align-items:center}
-.recap-stats .n{font-family:var(--f-serif);font-weight:600;font-size:1.7rem;color:var(--accent-ink);line-height:1}
-.recap-stats .l{font-family:var(--f-sans);font-weight:500;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-body);margin-top:.3rem}
+/* ---------- nav ---------- */
+.nav{position:sticky;top:0;z-index:20;background:rgba(251,240,227,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .3s}
+.nav.scrolled{border-bottom-color:var(--gold-line)}
+.nav .wrap{display:flex;align-items:center;justify-content:space-between;height:4.5rem}
+.brand{display:flex;align-items:center;gap:.75rem;color:var(--ink)}
+.brand img{width:2.4rem;height:auto}
+.brand span{font-family:var(--f-display);font-size:1.25rem;letter-spacing:.01em}
+.nav-links{display:flex;align-items:center;gap:2.2rem;list-style:none}
+.nav-links a{font-size:.92rem;font-weight:400;color:var(--ink-2);position:relative;padding:.25rem 0}
+.nav-links a::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:left;transition:transform .2s var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.nav-links a:hover::after{transform:scaleX(1)}}
+.nav-links .btn{padding:.6rem 1.15rem;font-size:.82rem;color:var(--ink)}
+.burger{display:none;background:none;border:0;width:2.5rem;height:2.5rem;cursor:pointer;flex-direction:column;justify-content:center;gap:5px;align-items:center}
+.burger span{display:block;width:20px;height:1.5px;background:var(--ink);transition:transform .2s var(--ease-out),opacity .15s ease}
+.nav.open .burger span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+.nav.open .burger span:nth-child(2){opacity:0}
+.nav.open .burger span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
 
-/* full-bleed past the section's own 6vw side padding, so more than one
-   card's neighbours are visible at once - body{overflow-x:hidden} (see the
-   base rules) is what keeps the 100vw math from opening a page scrollbar.
-   overflow:hidden (not visible) now: the track is wider than the viewport
-   on purpose and JS slides it under this window rather than letting it
-   scroll natively. */
-.recap-wrap{width:100vw;margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);overflow:hidden}
-.recap-track{
-  display:flex;align-items:center;gap:1rem;
-  padding-block:.5rem;
-  will-change:transform;   /* JS sets x every scrub tick - no CSS transition, it would lag behind the scrub */
-}
-/* flex-basis % resolves against the track's own width, so these spacers let
-   the FIRST and LAST card reach centre. Half of .r-card's rendered width,
-   kept in sync algebraically rather than restated: width = height*0.8 (the
-   4:5 aspect-ratio), so half-width = height*0.4 - same clamp() bounds as
-   the height below, each multiplied by 0.4. */
-.recap-track::before,.recap-track::after{content:"";flex:0 0 calc(50% - clamp(60px,16.8vh,168px))}
-/* mobile (<=640px, same breakpoint as the hero swap): the pinned/scrub
-   gallery above is replaced at init time by a JS-driven seamless marquee
-   (see the recap gallery script) - no scroll-linked pin, no centring
-   spacers, just a looping track the visitor can also drag. */
-@media (max-width:640px){
-  .recap-track::before,.recap-track::after{content:none}
-  .recap-wrap{touch-action:pan-y}
-  .recap-track{cursor:grab}
-  .recap-track:active{cursor:grabbing}
-}
-.r-card{
-  position:relative;flex:none;
-  /* height-driven, NOT width: a vw-based size is blind to viewport HEIGHT,
-     which is the dimension a pinned section actually has to fit inside.
-     Verified empirically down to a 1440x650 window (see the recap gallery
-     memory) rather than derived purely on paper - the fixed ~310px of
-     eyebrow/heading/stats/focus-text chrome around the card does not shrink
-     with vh, so the multiplier had to be picked with that margin in mind. */
-  height:clamp(150px,42vh,420px);aspect-ratio:4/5;border-radius:14px;
-  overflow:hidden;   /* clips the <img> to the card's own rounded corners */
-  /* the gradient shows behind the <img> while it loads, and stands in
-     entirely for the one placeholder card that has no photo yet */
-  background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 55%,var(--paper)),color-mix(in srgb,var(--accent) 15%,var(--paper)));
-  border:1px solid var(--line);
-  opacity:.55;transform:scale(.88);   /* rewritten every scroll frame by JS - no transition here, it would fight the scrub */
-}
-.r-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-/* darkens just the top of the photo so the pill stays legible regardless of
-   how bright that particular photo is there - not needed on the gradient
-   placeholder card, but harmless on it either way */
-.r-card::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,0) 42%)}
-.r-card .pill{
-  position:absolute;top:.7rem;left:.7rem;z-index:1;
-  font-family:var(--f-sans);font-weight:500;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;
-  padding:.32rem .7rem;border-radius:999px;color:var(--paper);
-}
-/* reuses the three text colours already established elsewhere, rather than
-   inventing a 4th palette for category coding */
-.r-card .pill.service{background:var(--accent-ink)}
-.r-card .pill.fellowship{background:var(--ink-body)}
-.r-card .pill.leadership{background:var(--ink)}
-
-.recap-focus{margin-top:.8rem;min-height:5.6rem}
-/* NOT --f-display: tried it first, but Birds of Paradise is only ever used
-   elsewhere for titles with no digits (h1/h2 - "Recap", "Built on Bonds")
-   and it turns out to have no usable numeral glyphs - confirmed by
-   rendering "Chapter 1" to a canvas, where the "1" came out as an unrelated
-   circular ornament, not a digit. Several real card titles have numbers
-   ("1st BOD Meet"), so that font is out for this element. Cormorant
-   Garamond italic instead: same family already used correctly for numerals
-   elsewhere on the page (e-card dates, etc), so it's not a gamble, and
-   italic + bigger + heavier is enough to read as a title rather than
-   another line of body copy. Colour is set per-card by JS (matches that
-   card's pill - see setFocusText), so both opacity and color transition
-   together on swap. */
-/* duration/easing here must match the setTimeout delay in setFocusText (JS) -
-   they used to be .3s CSS vs a 220ms swap, so the fade-out got cut short and
-   the fade-in yanked in before it visually finished. cubic-bezier(.4,0,.2,1)
-   ("standard" material easing) plus a small translateY drift reads as a soft
-   crossfade instead of a blink; the p's slight delay staggers it just behind
-   the heading rather than both snapping at once. */
-.recap-focus h3{font-family:var(--f-serif);font-style:italic;font-weight:600;font-size:clamp(1.5rem,3.2vw,1.9rem);color:var(--ink);margin:0 0 .4rem;transition:opacity .28s cubic-bezier(.4,0,.2,1),transform .28s cubic-bezier(.4,0,.2,1),color .28s ease}
-.recap-focus p{font-size:.92rem;transition:opacity .28s cubic-bezier(.4,0,.2,1) .04s,transform .28s cubic-bezier(.4,0,.2,1) .04s}
-
-/* ---- events ---- */
-.ev{display:flex;gap:1.2rem;flex-wrap:wrap;justify-content:center;margin-top:3rem}
-.e-card{width:210px;padding:1.6rem;border-radius:14px;text-align:left;border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 45%,transparent)}
-.e-card.featured{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 26%,var(--paper))}
-.e-card .dt{font-family:var(--f-sans);font-weight:500;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-body)}
-.e-card .ti{font-family:var(--f-serif);font-weight:600;margin-top:.6rem;font-size:1.25rem;color:var(--ink)}
-
-/* ---- form: dragonfly rests to the SIDE, never over the inputs ---- */
-#form .wrap{width:min(440px,100%);margin-right:auto;margin-left:0;text-align:left}
-@media(min-width:900px){ #form{align-items:flex-start;padding-left:12vw} }
-label{display:block;font-family:var(--f-sans);font-weight:500;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-body);margin:1.4rem 0 .5rem}
-input{
-  width:100%;padding:.85rem 1rem;border-radius:9px;
-  border:1px solid var(--line);
-  background:color-mix(in srgb,var(--paper) 62%,transparent);
-  color:var(--ink-body);font:inherit;
-}
-/* --accent-ink, not --accent: this is the only focus indicator on the form and
-   it kills the UA default, so it has to stay visible at every scroll position.
-   On --accent it measured 1.0-1.9:1 against the page - invisible at the top,
-   still under the 3:1 non-text floor by the time you reach the form. */
-input:focus{outline:none;border-color:var(--accent-ink);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent-ink) 30%,transparent)}
-button.sub{margin-top:2rem;padding:.9rem 2rem;border-radius:100px;border:0;background:var(--ink);color:#EBE5D6;font:inherit;font-weight:600;cursor:pointer}
-
-.credit{font-size:.72rem;line-height:1.6;margin-top:1.6rem;color:var(--ink-body);opacity:.85;max-width:40ch}
-.credit a{color:var(--ink)}
-footer{min-height:60vh;display:grid;place-items:center;text-align:center;padding:4rem 6vw;position:relative;z-index:2}
-
-/* ---- reduced motion ---- */
-@media(prefers-reduced-motion:reduce){
-  .t-card{opacity:1;transform:none;transition:none}
-  .g-card{filter:none;transform:none;opacity:1}
-}
-
-/* dev readout */
-#hud{position:fixed;left:10px;bottom:10px;z-index:99;font:11px ui-monospace,monospace;color:var(--ink-body);background:color-mix(in srgb,var(--paper) 70%,transparent);border:1px solid var(--line);padding:6px 9px;border-radius:6px;pointer-events:none}
-
-/* ============================================================
-   LIQUID-GLASS NAV — ported from the live site, re-tinted for paper.
-   Structure, geometry and motion are unchanged from the original; only
-   the palette moved: the dark-green glass became frosted white, cream
-   text became --ink, and the gold monogram/CTA became --accent.
-
-   Deliberately adds NO layout: it is position:fixed and the hero gets
-   no compensating padding-top. Sections must stay exactly 100vh or the
-   dragonfly's waypoint mapping drifts (see the #heroFrame comment).
-   The hero logo already sits low enough to clear it.
-   ============================================================ */
-.nav{
-  position:fixed;
-  top:18px;
-  left:50%;
-  transform:translateX(-50%);
-
-  width:min(92%, 1200px);
-  border-radius:999px;
-
-  z-index:9500;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:1rem;
-
-  padding:clamp(.65rem,1.5vw,1rem) clamp(1rem,4vw,2.6rem);
-
-  background:linear-gradient(
-    180deg,
-    rgba(255,255,255,.52),
-    rgba(255,255,255,.24)
-  );
-  -webkit-backdrop-filter:blur(14px) saturate(160%) brightness(1.04);
-  backdrop-filter:blur(14px) saturate(160%) brightness(1.04);
-
-  border:1px solid rgba(255,255,255,.55);
-
-  box-shadow:
-    0 12px 40px rgba(90,101,124,.10),
-    inset 0 1px 0 rgba(255,255,255,.75),
-    inset 0 -1px 0 rgba(255,255,255,.20);
-
-  transition:
-    background .55s ease,
-    backdrop-filter .55s ease,
-    box-shadow .55s ease,
-    border-color .55s ease,
-    padding .45s ease;
-}
-.nav.scrolled{
-  background:linear-gradient(
-    180deg,
-    rgba(255,255,255,.82),
-    rgba(255,255,255,.62)
-  );
-
-  -webkit-backdrop-filter:blur(24px) saturate(200%) brightness(1.04);
-  backdrop-filter:blur(24px) saturate(200%) brightness(1.04);
-
-  border-color:rgba(203,160,147,.34);
-
-  box-shadow:
-    0 16px 50px rgba(90,101,124,.18),
-    inset 0 1px 0 rgba(255,255,255,.85);
-}
-.nav::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  pointer-events:none;
-
+/* ---------- hero ---------- */
+.hero{padding:.75rem .75rem 0}
+.hero-card{position:relative;overflow:hidden;border-radius:36px;min-height:clamp(560px,86vh,820px);display:grid;place-items:center;text-align:center;padding:clamp(3rem,8vh,5rem) 1.5rem;
   background:
-    linear-gradient(
-      180deg,
-      rgba(255,255,255,.35),
-      rgba(255,255,255,0)
-    );
+    radial-gradient(55% 45% at 50% 12%,rgba(255,251,243,.95) 0%,rgba(255,251,243,0) 70%),
+    radial-gradient(70% 40% at 50% 100%,rgba(143,164,130,.55) 0%,rgba(143,164,130,0) 70%),
+    linear-gradient(180deg,#EEF0E2 0%,#DCE4CF 40%,#B9CBA8 100%)}
+.hero-peony{position:absolute;bottom:-3%;width:min(48vh,30vw);max-width:420px;pointer-events:none;user-select:none;opacity:.95;
+  -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0) 0%,#000 22%);mask-image:linear-gradient(180deg,rgba(0,0,0,0) 0%,#000 22%)}
+.hero-peony.l{left:-2%;transform:scaleX(-1)}
+.hero-peony.r{right:-2%}
+.hero-inner{position:relative;max-width:760px;display:flex;flex-direction:column;align-items:center}
+.crest{width:clamp(130px,13vw,170px);height:auto;margin:0 auto 1.6rem;filter:drop-shadow(0 14px 22px rgba(30,51,36,.18));animation:seal-in .9s var(--ease-out) .1s both}
+@keyframes seal-in{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.hero-inner > :not(.crest){animation:rise .6s var(--ease-out) both}
+.hero-inner > :nth-child(2){animation-delay:.26s}
+.hero-inner > :nth-child(3){animation-delay:.34s}
+.hero-inner > :nth-child(4){animation-delay:.42s}
+.hero-inner > :nth-child(5){animation-delay:.5s}
+.hero-meta{margin-top:2.2rem;font-family:var(--f-display);font-style:italic;font-size:1.05rem;letter-spacing:.01em;color:var(--ink-2);max-width:none}
+.hero h1{font-size:clamp(3.2rem,7.4vw,6rem);font-weight:300;margin:0 0 1.2rem}
+.hero h1 em{color:var(--sage-deep)}
+.hero .lede{font-size:1.15rem;max-width:42ch;margin:0 auto 2rem;color:var(--ink-2)}
+.hero-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:.8rem}
+.hero .btn-line{border-color:rgba(30,51,36,.38);background:rgba(251,240,227,.35)}
+.hero .btn-line:hover{border-color:var(--ink);background:rgba(251,240,227,.7)}
 
-  opacity:.8;
+/* desktop hero uses the generated scene; phones keep the gradient + peonies until the tall render lands */
+@media (min-width:761px){
+  .hero-card{background:
+    radial-gradient(50% 60% at 50% 52%,rgba(251,240,227,.55) 0%,rgba(251,240,227,0) 70%),
+    linear-gradient(180deg,rgba(251,240,227,.18) 0%,rgba(251,240,227,0) 30%),
+    url("images/hero-wide.webp") center 28% / cover no-repeat,
+    #DCE4CF}
+  .hero-peony{display:none}
 }
-.nav-brand{display:flex;align-items:center;gap:.6rem;text-decoration:none}
-/* The emblem replaces the old gold "A" disc. No circular crop or tinted
-   ground: it is a crest with its own silhouette, and a disc clips the
-   banner scrolls off both sides. Sized by height so the pill's rhythm
-   holds; width follows the 700x662 intrinsic ratio. */
-.nav-logo{display:block;height:34px;width:auto;flex:none;
-  filter:drop-shadow(0 2px 6px color-mix(in srgb,var(--ink) 18%,transparent));
-  transition:transform .3s cubic-bezier(.2,.7,.3,1)}
-.nav-brand:hover .nav-logo{transform:scale(1.04)}
-.nav-name{font-family:var(--f-serif);font-weight:600;font-size:clamp(1rem,2vw,1.22rem);color:var(--ink);letter-spacing:.01em;white-space:nowrap}
-.nav-links{display:flex;align-items:center;gap:clamp(1rem,2.4vw,2rem)}
-.nav-links a{font-family:var(--f-sans);font-weight:500;letter-spacing:.14em;text-transform:uppercase;font-size:.66rem;color:var(--ink);text-decoration:none;position:relative;transition:color .25s;white-space:nowrap}
-/* All four of these use --accent-ink, not --accent: they carry text or mark
-   focus, and --accent is #EBE5D6 on cream at the top of the page. */
-.nav-links a:not(.nav-cta)::after{content:"";position:absolute;left:0;right:100%;bottom:-6px;height:1px;background:var(--accent-ink);transition:right .3s ease}
-.nav-links a:not(.nav-cta):hover{color:var(--accent-ink)}
-.nav-links a:not(.nav-cta):hover::after{right:0}
-.nav-cta{padding:.52rem 1.15rem;border-radius:999px;color:var(--paper)!important;/* darkens toward the bottom-right rather than lightening toward the top-left,
-   so the LIGHTEST pixel behind the label is --accent-ink itself and the 4.8:1
-   floor holds across the whole pill - mixing 12% white in drops it to 3.9:1 */
-  background:linear-gradient(135deg,var(--accent-ink),color-mix(in srgb,var(--accent-ink) 84%,var(--ink)));box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 4px 14px rgba(90,101,124,.22);transition:transform .25s,box-shadow .25s,filter .25s}
-.nav-cta:hover{transform:translateY(-1px);filter:brightness(1.08)}
-.nav a:focus-visible,.nav-burger:focus-visible{outline:2px solid var(--accent-ink);outline-offset:4px;border-radius:6px}
-.nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:8px}
-.nav-burger span{width:24px;height:2px;background:var(--ink);border-radius:2px;transition:transform .3s ease,opacity .25s ease}
-@media (max-width:820px){
-  .nav-burger{display:flex}
-  .nav-links{position:absolute;top:calc(100% + .4rem);right:clamp(1rem,4vw,2.6rem);min-width:210px;flex-direction:column;align-items:stretch;gap:1.1rem;padding:1.3rem 1.4rem;border-radius:18px;
-    background:linear-gradient(180deg, rgba(255,255,255,.88), rgba(255,255,255,.74));
-    -webkit-backdrop-filter:blur(22px) saturate(180%) brightness(1.04);backdrop-filter:blur(22px) saturate(180%) brightness(1.04);
-    border:1px solid rgba(203,160,147,.30);box-shadow:0 18px 44px rgba(90,101,124,.22), inset 0 1px 0 rgba(255,255,255,.8);
-    opacity:0;transform:translateY(-12px) scale(.98);transform-origin:top right;pointer-events:none;transition:opacity .3s ease,transform .3s ease}
-  .nav-links.open{opacity:1;transform:none;pointer-events:auto}
-  .nav-links a{font-size:.74rem;text-align:left}
-  .nav-cta{text-align:center;padding:.7rem 1.15rem}
-  .nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-  .nav-burger.open span:nth-child(2){opacity:0}
-  .nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* promise photo */
+.promise-photo{position:relative;aspect-ratio:3/4;max-width:420px;justify-self:end;width:100%;border-radius:var(--arch);overflow:hidden;background:var(--sage-soft);box-shadow:0 30px 60px -30px rgba(30,51,36,.35)}
+.promise-photo img{width:100%;height:100%;object-fit:cover;object-position:center}
+.promise-caption{position:absolute;right:1.2rem;bottom:1rem;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--paper);background:rgba(30,51,36,.55);padding:.4rem .75rem;border-radius:999px;backdrop-filter:blur(6px)}
+
+/* ---------- stat strip ---------- */
+.stats{border-top:1px solid var(--gold-line);border-bottom:1px solid var(--gold-line)}
+.stats .wrap{display:grid;grid-template-columns:repeat(3,1fr)}
+.stat{padding:1.8rem 1rem;text-align:center}
+.stat + .stat{border-left:1px solid var(--gold-line)}
+.stat b{display:block;font-family:var(--f-display);font-weight:400;font-size:2.6rem;line-height:1;color:var(--ink);font-variant-numeric:lining-nums tabular-nums;font-feature-settings:"lnum","tnum"}
+.stat span{font-size:.74rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-ink)}
+
+/* ---------- sections ---------- */
+.section{padding:clamp(5rem,11vh,8rem) 0}
+.section-head{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:end;margin-bottom:3.5rem}
+.section-head .lede{font-size:1.1rem}
+.promise-head{align-items:center}
+.promise-head h2{margin-bottom:1.2rem}
+
+/* motto */
+.motto{background:var(--paper-2)}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.pillar{background:var(--paper);border:1px solid var(--gold-line);border-radius:16px;padding:2rem 1.8rem 2.2rem}
+.pillar .mark{width:2.6rem;height:2.6rem;border-radius:50%;display:grid;place-items:center;margin-bottom:1.6rem;background:var(--sage-soft);color:var(--ink)}
+.pillar h3{margin-bottom:.6rem}
+.pillar p{font-size:.98rem}
+
+/* shared: round arrow button */
+.arrow{width:2.4rem;height:2.4rem;border-radius:50%;border:1px solid var(--gold-line);display:grid;place-items:center;color:var(--ink);flex:none;transition:background .2s ease,color .2s ease,border-color .2s ease}
+.arrow svg{width:.9rem;height:.9rem;transition:transform .2s var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.event:hover .arrow svg{transform:translate(1px,-1px)}}
+.head-row{display:flex;align-items:flex-end;justify-content:space-between;gap:2rem;margin-bottom:2.2rem}
+.head-row h2{max-width:14ch}
+.head-row .btn{flex:none}
+
+/* recap: product-card grid */
+.recap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem}
+.card{display:flex;flex-direction:column;border-radius:16px;overflow:hidden;background:var(--paper-2);border:1px solid var(--gold-line);transition:transform .2s var(--ease-out),border-color .2s ease}
+@media (hover:hover) and (pointer:fine){
+  .card:hover{transform:translateY(-3px);border-color:var(--gold)}
+  .card:hover img{transform:scale(1.03)}
 }
+.card figure{aspect-ratio:4/3;overflow:hidden;margin:.4rem;border-radius:12px;background:var(--sage-soft)}
+.card img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease-out)}
+.card-body{padding:.6rem 1.1rem 1.2rem;display:flex;flex-direction:column;gap:.4rem;flex:1}
+.pill{display:inline-block;align-self:flex-start;font-size:.64rem;letter-spacing:.2em;text-transform:uppercase;font-weight:500;padding:.3rem .65rem;border-radius:999px;color:var(--ink)}
+.pill.service{background:var(--sage-soft)}
+.pill.fellowship{background:#F6D9DD}
+.pill.leadership{background:#EFE0C6}
+.card h3{font-size:1.35rem;margin-top:.2rem}
+.card p{font-size:.92rem;color:var(--ink-2)}
+.recap-lede{display:block;font-family:var(--f-display);font-size:clamp(1.3rem,2.2vw,1.7rem);line-height:1.5;color:var(--ink);margin-bottom:2.5rem;max-width:44ch}
+
+/* team: editorial roster. Left: sticky arch portrait of the active member. Right: list rows. */
+.team{background:var(--paper-2)}
+.team-layout{display:grid;grid-template-columns:minmax(300px,420px) 1fr;gap:clamp(2rem,6vw,5rem);align-items:start}
+.portrait{position:sticky;top:6rem}
+.portrait-frame{position:relative;aspect-ratio:4/5;border-radius:var(--arch);overflow:hidden;background:var(--sage-soft);box-shadow:0 30px 60px -30px rgba(30,51,36,.4)}
+.portrait-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 20%;opacity:0;transform:scale(1.03);filter:blur(6px);transition:opacity .45s ease,transform .7s var(--ease-out),filter .45s ease}
+.portrait-frame img.on{opacity:1;transform:none;filter:blur(0)}
+.portrait-cap{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-top:1.1rem;padding:0 .4rem}
+.portrait-cap b{font-family:var(--f-display);font-weight:400;font-size:1.5rem;color:var(--ink)}
+.portrait-cap span{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-ink);white-space:nowrap}
+.rot-bar{height:1px;background:var(--gold-line);margin:.9rem .4rem 0;overflow:hidden}
+.rot-bar i{display:block;height:100%;background:var(--gold-ink);transform:scaleX(0);transform-origin:left}
+.rot-bar i.run{animation:fill var(--rot,3200ms) linear both}
+.rot-bar.paused i{animation-play-state:paused}
+@keyframes fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.people{border-top:1px solid var(--gold-line)}
+.person{display:grid;grid-template-columns:1fr auto;gap:1.2rem;align-items:center;padding:1.15rem 1rem;border-bottom:1px solid var(--gold-line);border-radius:12px;transition:background .2s ease,color .2s ease;cursor:pointer;background:none;border-left:0;border-right:0;border-top:0;width:100%;text-align:left;font:inherit;color:inherit}
+.person b{font-family:var(--f-display);font-weight:400;font-size:1.45rem;color:var(--ink)}
+.person .role{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-ink)}
+.person.on{background:var(--ink);color:var(--paper);border-bottom-color:transparent}
+.person.on b,.person.on .role{color:var(--paper)}
+@media (hover:hover) and (pointer:fine){.person:hover{background:var(--ink)}.person:hover b,.person:hover .role{color:var(--paper)}}
+.person:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+/* phone: portrait cards instead of the roster */
+.team-cards{display:none}
+
+/* events: dark location cards */
+.events-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem}
+.event{position:relative;background:var(--ink);color:var(--paper);border-radius:16px;padding:1.5rem 1.5rem 1.4rem;min-height:300px;display:flex;flex-direction:column;overflow:hidden;transition:transform .2s var(--ease-out)}
+.event:active{transform:scale(.985)}
+@media (hover:hover) and (pointer:fine){.event:hover{transform:translateY(-3px)}}
+.event.wide{grid-column:span 2}
+.event.wide::before{content:"";position:absolute;inset:0;background:url("images/hero-wide.webp") center 60% / cover no-repeat;opacity:.55}
+.event.wide::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,51,36,.35) 0%,rgba(30,51,36,.9) 100%)}
+.event > *{position:relative;z-index:1}
+.event .top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.event h3{color:var(--paper);font-size:1.6rem;max-width:16ch}
+.event p{font-size:.92rem;color:rgba(251,240,227,.78);margin-top:.5rem;max-width:34ch}
+.event .arrow{border-color:rgba(251,240,227,.35);color:var(--paper)}
+@media (hover:hover) and (pointer:fine){.event:hover .arrow{background:var(--paper);color:var(--ink);border-color:var(--paper)}}
+.event .foot{margin-top:auto;padding-top:1.5rem;display:flex;gap:1.2rem;align-items:center;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(251,240,227,.86)}
+.event .foot .dot{width:.5rem;height:.5rem;border-radius:50%;background:var(--blush)}
+
+/* join + footer: one image band. The disc floats in the upper part, the footer sits in the dark lower part. */
+.closing{padding:0 .75rem .75rem}
+.closing .band{position:relative;border-radius:36px;overflow:hidden;display:flex;flex-direction:column;align-items:center;min-height:980px;
+  background:url("images/closing.webp") center 40% / cover no-repeat,#DCE4CF}
+.closing .band::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,51,36,.05) 0%,rgba(30,51,36,.18) 45%,rgba(30,51,36,.78) 78%,rgba(30,51,36,.96) 100%)}
+.closing .band > *{position:relative;z-index:1}
+.join{width:100%;display:grid;place-items:center;padding:clamp(3rem,7vh,5rem) 1.5rem 2rem;flex:1}
+.disc{position:relative;width:min(560px,100%);aspect-ratio:1;border-radius:50%;background:rgba(251,240,227,.8);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.7);box-shadow:0 40px 80px -40px rgba(30,51,36,.55);display:grid;place-items:center;text-align:center;padding:3.5rem}
+.disc h2{font-size:clamp(2rem,3.6vw,2.9rem);margin:0 0 .3rem}
+.disc .lede{font-size:.95rem;margin:0 auto 1.2rem;max-width:30ch}
+.form{display:grid;gap:.6rem;width:100%;max-width:320px;margin:0 auto}
+.field input{font:inherit;font-weight:300;font-size:.95rem;padding:.75rem 1rem;border-radius:999px;border:1px solid rgba(30,51,36,.25);background:rgba(255,255,255,.7);color:var(--ink);width:100%;text-align:center}
+.field input::placeholder{color:rgba(30,51,36,.62)}
+.field input:focus{outline:none;border-color:var(--ink);background:#fff}
+.form.tried input:invalid{border-color:#B5525F;background:#FFF6F7}
+.form-note.err{color:#8C3A45;opacity:1}
+.form .btn{justify-content:center;margin-top:.2rem}
+.form-note{font-size:.8rem;color:var(--ink);opacity:.85;min-height:1.2em}
+
+footer{width:100%;color:var(--paper);padding:2rem clamp(1.5rem,4vw,3rem) 2rem}
+footer .top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:1.5rem;padding-bottom:1.6rem;border-bottom:1px solid rgba(251,240,227,.22)}
+footer .big{font-family:var(--f-display);font-weight:300;font-size:clamp(2.2rem,6vw,4.6rem);line-height:1;color:var(--paper)}
+footer .big em{color:var(--sage)}
+.foot-links{display:flex;flex-wrap:wrap;gap:1.4rem;font-size:.9rem}
+.foot-links a{opacity:.85}.foot-links a:hover{opacity:1}
+footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;padding-top:1.2rem;font-size:.78rem;color:rgba(251,240,227,.72)}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .5s var(--ease-out),transform .5s var(--ease-out)}
+.reveal.in{opacity:1;transform:none}
+/* photos wipe up once loaded; the wipe is the page's one authored scroll moment */
+.reveal-img{clip-path:inset(0 0 100% 0);transition:clip-path .8s var(--ease-in-out)}
+.reveal-img.in{clip-path:inset(0 0 0 0)}
 @media (prefers-reduced-motion:reduce){
-  .nav,.nav-links,.nav-cta,.nav-burger span,.nav-links a::after{transition:none}
+  html{scroll-behavior:auto}
+  .reveal{transform:none;transition:opacity .2s ease}
+  .reveal-img{clip-path:none;transition:none}
+  .hero-inner > :not(.crest){animation:none}
+  .rot-bar{display:none}
+  .btn,.card,.card img,.event{transition:none}
+  .crest{animation:none}
+  .portrait-frame img{transition:opacity .2s ease;transform:none;filter:none}
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:960px){
+  .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:flex-start;gap:0;background:var(--paper);border-bottom:1px solid var(--gold-line);padding:.5rem 1.5rem 1.2rem;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .18s ease,transform .18s var(--ease-out),visibility 0s .18s}
+  .nav.open .nav-links{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+  .nav-links li{width:100%}
+  .nav-links a{display:block;padding:.8rem 0;font-size:1.05rem}
+  .nav-links .btn{margin-top:.6rem;display:inline-flex}
+  .burger{display:flex}
+  .promise-photo{justify-self:start;max-width:380px}
+  .section-head{grid-template-columns:1fr}
+  .recap-grid{grid-template-columns:repeat(2,1fr)}
+  .events-grid{grid-template-columns:1fr 1fr}
+  .team-layout{display:none}
+  .team-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+  .tcard-frame{aspect-ratio:4/5;border-radius:var(--arch);overflow:hidden;background:var(--sage-soft);margin-bottom:.8rem}
+  .tcard-frame img{width:100%;height:100%;object-fit:cover;object-position:50% 20%}
+  .tcard b{display:block;font-family:var(--f-display);font-weight:400;font-size:1.25rem;color:var(--ink)}
+  .tcard span{font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-ink)}
+}
+@media (max-width:760px){
+  body{font-size:1rem}
+  .brand span{font-size:1.1rem}
+  .hero{padding:.5rem .5rem 0}
+  .hero-card{border-radius:26px;min-height:min(92vh,780px);padding:3rem 1.25rem 3.5rem;place-items:center}
+  .hero-card{background:
+    radial-gradient(75% 42% at 50% 56%,rgba(251,240,227,.72) 0%,rgba(251,240,227,0) 72%),
+    linear-gradient(180deg,rgba(251,240,227,.2) 0%,rgba(251,240,227,0) 30%),
+    url("images/hero-tall.webp") 50% 50% / cover no-repeat,
+    #DCE4CF;padding-bottom:6rem}
+  .hero-peony{display:none}
+  .hero-meta{font-size:.95rem;margin-top:1.4rem}
+  .crest{width:120px;margin-bottom:1.2rem}
+  .hero h1{margin:1rem 0 1rem}
+  .hero .lede{margin-bottom:1.6rem}
+  .hero-actions{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;width:100%;max-width:340px}
+  .hero-actions .btn{justify-content:center;padding:.85rem .6rem;font-size:.82rem;white-space:nowrap}
+  .pillars{grid-template-columns:1fr}
+  .recap-grid{grid-template-columns:1fr}
+  .head-row{flex-direction:column;align-items:flex-start;gap:1rem}
+  .team-cards{grid-template-columns:repeat(2,1fr);gap:.8rem}
+  .tcard b{font-size:1.1rem}
+  .events-grid{grid-template-columns:1fr}
+  .event.wide{grid-column:auto}
+  .event{min-height:240px}
+  .closing{padding:0 .5rem .5rem}
+  .closing .band{border-radius:26px;min-height:0}
+  .join{padding:2rem 1rem 1.5rem}
+  .disc{aspect-ratio:auto;border-radius:28px;padding:2rem 1.4rem}
+  footer{padding:1.5rem 1.25rem 1.5rem}
+  .stat b{font-size:2rem}
+  .stat{padding:1.3rem .4rem}
+  .stat span{font-size:.6rem;letter-spacing:.12em}
 }
 </style>
 </head>
 <body>
 
-<nav class="nav" id="nav" aria-label="Primary">
-  <a class="nav-brand" href="#hero" aria-label="Leo Club of Aurelian, top">
-    <!-- same asset the hero uses, so this is a cache hit, not a second request.
-         alt is empty on purpose: the brand link is already labelled, and the
-         emblem's own banner repeats the wordmark sitting next to it. -->
-    <img class="nav-logo" src="images/logo-700.webp" width="700" height="662"
-         alt="" decoding="async" fetchpriority="low">
-    <span class="nav-name">Leo Club of Aurelian</span>
-  </a>
-  <div class="nav-links" id="navLinks">
-    <a href="#motto">The promise</a>
-    <a href="#team">Meet the team</a>
-    <a href="#events">What's on</a>
-    <a href="#form" class="nav-cta">Become a member</a>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Leo Club of Aurelian, home">
+      <img src="images/logo-700.webp" alt="">
+      <span>Leo Club of Aurelian</span>
+    </a>
+    <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#motto">The promise</a></li>
+      <li><a href="#recap">Recap</a></li>
+      <li><a href="#team">Team</a></li>
+      <li><a href="#events">What's on</a></li>
+      <li><a class="btn btn-blush" href="#join">Become a member</a></li>
+    </ul>
   </div>
-  <button class="nav-burger" id="navBurger" type="button" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
-</nav>
+</header>
 
-<!-- Decorative hero frame. Sits in the body rather than inside #hero so it
-     stacks BEHIND the section content (sections are z-index 2, this is 1),
-     which is what puts the peonies behind the emblem and headline.
-     Fixed rather than ScrollTrigger-pinned on purpose: pinning injects a
-     spacer that makes the document taller, and the dragonfly's waypoint
-     mapping assumes every section is exactly 100vh. Fixed gives the same
-     stuck-to-viewport result with zero layout change.
+<main id="top">
 
-     Composition measured from the Figma frame (1901x866) rather than
-     eyeballed: each side is ONE full-height peony panel anchored to the
-     edge (the asset at full frame height is 472px = 24.8% of width, which
-     is exactly the botanical band measured in the mockup), plus two stars
-     per side at their measured percentages. -->
-<div id="heroFrame" aria-hidden="true">
-  <img class="hf hf-left  hf-peony-l"  src="images/peonies.webp" width="336" height="617" alt="" decoding="async" loading="lazy">
-  <img class="hf hf-left  hf-peony-tl" src="images/peonies.webp" width="336" height="617" alt="" decoding="async" loading="lazy">
-  <img class="hf hf-left  hf-star-l1" src="images/star.webp"    width="320" height="371" alt="" decoding="async" loading="lazy">
-  <img class="hf hf-left  hf-star-l2" src="images/star.webp"    width="320" height="371" alt="" decoding="async" loading="lazy">
+<section class="hero">
+  <div class="hero-card">
+    <img class="hero-peony l" src="images/peonies.webp" alt="" aria-hidden="true">
+    <img class="hero-peony r" src="images/peonies.webp" alt="" aria-hidden="true">
+    <div class="hero-inner">
+      <img class="crest" src="images/logo-700.webp" alt="Leo Club of Aurelian emblem: a dragonfly above two peonies, with the words Built on Bonds" fetchpriority="high">
+      <h1>Built on <em>bonds.</em></h1>
+      <p class="lede">A club of young leaders in Thane. We serve our city, look after each other, and learn to lead by doing it together.</p>
+      <div class="hero-actions">
+        <a class="btn btn-ink" href="#join">Become a member</a>
+        <a class="btn btn-line" href="#recap">See what we've done</a>
+      </div>
+      <p class="hero-meta">Leo Club International · District 3231 A4 · Thane, India</p>
+    </div>
+  </div>
+</section>
 
-  <img class="hf hf-right hf-peony-r"  src="images/peonies.webp" width="336" height="617" alt="" decoding="async" loading="lazy">
-  <img class="hf hf-right hf-peony-tr" src="images/peonies.webp" width="336" height="617" alt="" decoding="async" loading="lazy">
-  <img class="hf hf-right hf-star-r1" src="images/star.webp"    width="320" height="371" alt="" decoding="async" loading="lazy">
-  <img class="hf hf-right hf-star-r2" src="images/star.webp"    width="320" height="371" alt="" decoding="async" loading="lazy">
-
-  <!-- Phone-only floral border.
-       The pink and cream blooms are CROPPED out of the bouquet asset rather
-       than shown whole: divs with a background-image scaled past their own
-       box, so a single bloom fills each one and the stems fall outside the
-       frame. Showing the whole bouquet is what made this read as stems and
-       leaves instead of flowers. Blue and mint are single blooms already, so
-       they stay as plain imgs. -->
-  <img class="hfm hfm-left  hfm-mint-tl  hfm-b3" src="images/bloom-mint.webp" width="375" height="499" alt="" decoding="async" loading="lazy">
-  <div class="hfm hfm-left  hfm-bloom hfm-cream hfm-cream-tc hfm-b2"></div>
-  <div class="hfm hfm-left  hfm-bloom hfm-pink  hfm-pink-ml  hfm-b3"></div>
-  <div class="hfm hfm-left  hfm-bloom hfm-cream hfm-cream-bl hfm-b2"></div>
-  <div class="hfm hfm-left  hfm-bloom hfm-pink  hfm-pink-bl  hfm-b3"></div>
-  <div class="hfm hfm-left  hfm-bloom hfm-pink  hfm-pink-tc2 hfm-b2"></div>
-  <div class="hfm hfm-left  hfm-bloom hfm-pink  hfm-pink-bc  hfm-b3"></div>
-  <img class="hfm hfm-left  hfm-mint-bl  hfm-b2" src="images/bloom-mint.webp" width="375" height="499" alt="" decoding="async" loading="lazy">
-
-  <div class="hfm hfm-right hfm-bloom hfm-pink  hfm-pink-tr  hfm-b2"></div>
-  <img class="hfm hfm-right hfm-blue-tr  hfm-b3" src="images/bloom-blue.webp" width="424" height="458" alt="" decoding="async" loading="lazy">
-  <div class="hfm hfm-right hfm-bloom hfm-pink  hfm-pink-mr  hfm-b2"></div>
-  <img class="hfm hfm-right hfm-mint-mr  hfm-b1" src="images/bloom-mint.webp" width="375" height="499" alt="" decoding="async" loading="lazy">
-  <div class="hfm hfm-right hfm-bloom hfm-cream hfm-cream-br hfm-b2"></div>
-  <div class="hfm hfm-right hfm-bloom hfm-cream hfm-cream-mr hfm-b2"></div>
-  <img class="hfm hfm-right hfm-blue-bc  hfm-b3" src="images/bloom-blue.webp" width="424" height="458" alt="" decoding="async" loading="lazy">
+<div class="stats">
+  <div class="wrap">
+    <div class="stat"><b>6</b><span>Events held</span></div>
+    <div class="stat"><b>120+</b><span>People reached</span></div>
+    <div class="stat"><b>3</b><span>Causes served</span></div>
+  </div>
 </div>
 
-<div id="bloom"></div>
-<canvas id="dfly-canvas"></canvas>
-<div id="hud">scroll —</div>
-
-<!-- 1 -->
-<section id="hero" data-mood="reflective">
-  <!-- phone-only; both are display:none above 640px (see the mobile hero
-       "wow" layer in the CSS). Kept in the markup on every breakpoint so
-       gsap.matchMedia has something to attach to when it starts matching. -->
-  <div class="hero-glow" aria-hidden="true"></div>
-  <img class="hero-logo"
-       src="images/logo-700.webp"
-       srcset="images/logo-700.webp 700w, images/logo-1000.webp 1000w"
-       sizes="(max-width:600px) 42vw, 240px"
-       width="1000" height="946"
-       fetchpriority="high" decoding="async"
-       alt="Leo Club of Aurelian — Built on Bonds. MD 3231 A4, India.">
-  <p class="eyebrow">Leo Club International · District 3231 A4</p>
-  <h1>Leo Club of Aurelian</h1>
-  <div class="hero-cue" aria-hidden="true">
-    <span>Scroll</span>
-    <svg class="cue-arrow" viewBox="0 0 24 14"><path d="M2 2 L12 11 L22 2"/></svg>
-  </div>
-</section>
-
-<!-- 2 -->
-<section id="motto" data-mood="reflective">
-  <p class="eyebrow">Our motto for the year</p>
-  <h2>Built on Bonds</h2>
-  <p>Just as a building stands firm because of its foundation, our club stands strong because of the bonds that bring us together.</p>
-</section>
-
-<!-- 3 -->
-<section id="team" data-mood="energetic">
-  <p class="eyebrow">The circle that leads</p>
-  <h2>Meet the team</h2>
-  <p>Each card lights as the dragonfly passes it.</p>
-  <div class="team-row">
-    <div class="t-card"><div class="av"></div><div class="nm">Name</div><div class="ro">President</div></div>
-    <div class="t-card"><div class="av"></div><div class="nm">Name</div><div class="ro">Vice President</div></div>
-    <div class="t-card"><div class="av"></div><div class="nm">Name</div><div class="ro">Secretary</div></div>
-    <div class="t-card"><div class="av"></div><div class="nm">Name</div><div class="ro">Treasurer</div></div>
-    <div class="t-card"><div class="av"></div><div class="nm">Name</div><div class="ro">Marketing</div></div>
-  </div>
-</section>
-
-<!-- 4 -->
-<section id="gallery" data-mood="reflective">
-  <p class="eyebrow">Activities till now</p>
-  <h2>Recap</h2>
-
-  <div class="recap-stats">
-    <div class="rs"><span class="n">6</span><span class="l">Events</span></div>
-    <div class="rs"><span class="n">120+</span><span class="l">Reached</span></div>
-    <div class="rs"><span class="n">3</span><span class="l">Causes</span></div>
-  </div>
-
-  <div class="recap-wrap">
-    <div class="recap-track" id="recapTrack">
-      <article class="r-card" data-title="Aanchal: Chapter 1" data-desc="Finger painting, games, and a birthday celebration filled a joyful first service visit to Bethany's Children's Home.">
-        <img src="images/recap/bethanys-visit.webp" alt="Leo Club members and children posing together at Bethany's Children's Home" width="900" height="455" decoding="async" loading="lazy">
-        <span class="pill service">Service</span>
+<section class="section motto" id="motto">
+  <div class="wrap">
+    <div class="section-head promise-head">
+      <div class="reveal">
+        <h2>A club stands on the bonds between its people.</h2>
+        <p class="lede">Just as a building stands firm because of its foundation, our club stands strong because of the bonds that bring us together. Everything we do falls under three kinds of work.</p>
+      </div>
+      <div class="promise-photo reveal-img">
+        <img src="images/hero-group.webp" alt="Members of Leo Club of Aurelian at their first regular meeting at Meadows" loading="lazy">
+        <span class="promise-caption">Meadows · August 2026</span>
+      </div>
+    </div>
+    <div class="pillars">
+      <article class="pillar reveal">
+        <div class="mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z"/></svg></div>
+        <h3>Service</h3>
+        <p>Visits, drives and distributions for people in Thane who need a hand. Children's homes, workers on the road, and causes we choose as a club.</p>
       </article>
-      <article class="r-card" data-title="1st BOD Meet" data-desc="Planning the term's celebrations, fellowship events, and service initiatives around the table.">
-        <img src="images/recap/bod-meet.webp" alt="Club board members on a video call planning the term" width="900" height="415" decoding="async" loading="lazy">
-        <span class="pill leadership">Leadership</span>
+      <article class="pillar reveal">
+        <div class="mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="9" r="3"/><circle cx="16" cy="9" r="3"/><path d="M2 20c0-3 3-5 6-5s6 2 6 5M10 20c0-3 3-5 6-5s6 2 6 5"/></svg></div>
+        <h3>Fellowship</h3>
+        <p>Photoshoots, district ceremonies, meetings that run long because nobody wants to leave. The friendships are the point, not a side effect.</p>
       </article>
-      <article class="r-card" data-title="District Installation Ceremony" data-desc="A day of fellowship at the Lions District 3231-A4 ceremony, meeting Youth Exchange students and PID Lion Sangeeta Jatia.">
-        <img src="images/recap/installation-ceremony.webp" alt="Club members at the Lions District 3231-A4 Installation Ceremony" width="900" height="900" decoding="async" loading="lazy">
-        <span class="pill fellowship">Fellowship</span>
-      </article>
-      <article class="r-card" data-title="Club Photoshoot & 1st Meeting" data-desc="Capturing memories and aligning on roles for the year ahead at our first regular meeting.">
-        <img src="images/recap/club-photoshoot.webp" alt="Club members posing together at their photoshoot at Meadows" width="900" height="594" style="object-position:35% center" decoding="async" loading="lazy">
-        <span class="pill fellowship">Fellowship</span>
-      </article>
-      <article class="r-card" data-title="Friendship Day Distribution" data-desc="Cakes and cold drinks for Thane's rickshaw drivers and delivery partners, as thanks for their hard work.">
-        <img src="images/recap/friendship-day.webp" alt="Leo Club members handing out cakes and drinks to rickshaw drivers on Friendship Day" width="900" height="594" decoding="async" loading="lazy">
-        <span class="pill service">Service</span>
+      <article class="pillar reveal">
+        <div class="mark" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z"/></svg></div>
+        <h3>Leadership</h3>
+        <p>Every member runs something. Board meets, event ownership and district roles teach us to lead while we are still young enough to make mistakes.</p>
       </article>
     </div>
   </div>
-
-  <div class="recap-focus">
-    <h3 id="recapTitle">Aanchal: Chapter 1</h3>
-    <p id="recapDesc">Finger painting, games, and a birthday celebration filled a joyful first service visit to Bethany's Children's Home.</p>
-  </div>
 </section>
 
-<!-- 5 -->
-<section id="events" data-mood="energetic">
-  <p class="eyebrow">What comes next</p>
-  <h2>Upcoming events</h2>
-  <div class="ev">
-    <div class="e-card"><div class="dt">Coming soon</div><div class="ti">Placeholder event</div></div>
-    <div class="e-card featured" id="featuredEvent"><div class="dt">Next up</div><div class="ti">The Unveiling</div></div>
-    <div class="e-card"><div class="dt">Coming soon</div><div class="ti">Placeholder event</div></div>
-  </div>
-</section>
-
-<!-- 6 -->
-<section id="form" data-mood="functional">
+<section class="section" id="recap">
   <div class="wrap">
-    <p class="eyebrow">Join us</p>
-    <h2>Become a member</h2>
-    <label for="n">Full name</label><input id="n" type="text" autocomplete="name">
-    <label for="e">Email</label><input id="e" type="email" autocomplete="email">
-    <label for="w">WhatsApp number</label><input id="w" type="tel" autocomplete="tel">
-    <button class="sub" type="button">Become a member</button>
+    <div class="head-row reveal">
+      <h2>Recap</h2>
+      <a class="btn btn-ink" href="#events">What's next</a>
+    </div>
+    <p class="recap-lede reveal">From one first meeting to six events in one term. Here are five of them.</p>
+    <div class="recap-grid">
+      <article class="card">
+        <figure class="reveal-img"><img src="images/recap/bethanys-visit.webp" alt="Leo Club members and children posing together at Bethany's Children's Home" loading="lazy"></figure>
+        <div class="card-body">
+          <span class="pill service">Service</span>
+          <h3>Aanchal: Chapter 1</h3>
+          <p>Finger painting, games, and a birthday celebration at Bethany's Children's Home.</p>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="reveal-img"><img src="images/recap/friendship-day.webp" alt="Leo Club members handing out cakes and drinks to rickshaw drivers on Friendship Day" loading="lazy"></figure>
+        <div class="card-body">
+          <span class="pill service">Service</span>
+          <h3>Friendship Day Distribution</h3>
+          <p>Cakes and cold drinks for Thane's rickshaw drivers and delivery partners.</p>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="reveal-img"><img src="images/recap/installation-ceremony.webp" alt="Club members at the Lions District 3231 A4 Installation Ceremony" loading="lazy"></figure>
+        <div class="card-body">
+          <span class="pill fellowship">Fellowship</span>
+          <h3>District Installation Ceremony</h3>
+          <p>Fellowship at the Lions District 3231 A4 ceremony, with Youth Exchange students and PID Lion Sangeeta Jatia.</p>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="reveal-img"><img src="images/recap/club-photoshoot.webp" alt="Club members posing together at their photoshoot at Meadows" loading="lazy"></figure>
+        <div class="card-body">
+          <span class="pill fellowship">Fellowship</span>
+          <h3>Club Photoshoot &amp; 1st Meeting</h3>
+          <p>Capturing memories and aligning on roles for the year ahead.</p>
+        </div>
+      </article>
+      <article class="card">
+        <figure class="reveal-img"><img src="images/recap/bod-meet.webp" alt="Club board members on a video call planning the term" loading="lazy"></figure>
+        <div class="card-body">
+          <span class="pill leadership">Leadership</span>
+          <h3>1st BOD Meet</h3>
+          <p>Planning the term's celebrations, fellowship events, and service initiatives.</p>
+        </div>
+      </article>
+    </div>
   </div>
 </section>
 
-<!-- 7 -->
-<footer id="footer" data-mood="functional">
-  <div>
-    <p class="eyebrow">Leo Club of Aurelian</p>
-    <p>Prototype — dragonfly scroll guide.</p>
-    <p class="credit">
-      &ldquo;<a href="https://skfb.ly/pHntB" rel="noopener">skull island dragonfly</a>&rdquo;
-      by dinoguy263allo is licensed under
-      <a href="http://creativecommons.org/licenses/by/4.0/" rel="noopener license">Creative Commons Attribution</a>.
-    </p>
+<section class="section team" id="team">
+  <div class="wrap">
+    <div class="head-row reveal">
+      <h2>Meet the team</h2>
+      <p class="lede" style="max-width:30ch">Six people, one term, and a promise to keep.</p>
+    </div>
+    <div class="team-layout">
+      <div class="portrait">
+        <div class="portrait-frame reveal-img" id="portraitFrame">
+        <img src="images/team/president.webp" alt="Leo Drishti Sinha, President" data-i="0" class="on">
+        <img src="images/team/vicepresident.webp" alt="Leo Abhishek Ajit, Vice President" data-i="1" loading="lazy">
+        <img src="images/team/secretary.webp" alt="Leo Khushboo Patel, Secretary" data-i="2" loading="lazy">
+        <img src="images/team/treasurer.webp" alt="Leo Khushi Sonawane, Treasurer" data-i="3" loading="lazy">
+        <img src="images/team/marketing.webp" alt="Leo Dhruti Ajmera, Marketing Director" data-i="4" loading="lazy">
+        <img src="images/team/advisor.webp" alt="MJF Lion Dhirendra Sinha, Advisor" data-i="5" loading="lazy">
+        </div>
+        <div class="portrait-cap"><b id="portraitName">Leo Drishti Sinha</b><span id="portraitRole">President</span></div>
+        <div class="rot-bar" id="rotBar" aria-hidden="true"><i></i></div>
+      </div>
+      <div class="people reveal" id="people">
+        <button class="person on" type="button" data-i="0"><b>Leo Drishti Sinha</b><span class="role">President</span></button>
+        <button class="person" type="button" data-i="1"><b>Leo Abhishek Ajit</b><span class="role">Vice President</span></button>
+        <button class="person" type="button" data-i="2"><b>Leo Khushboo Patel</b><span class="role">Secretary</span></button>
+        <button class="person" type="button" data-i="3"><b>Leo Khushi Sonawane</b><span class="role">Treasurer</span></button>
+        <button class="person" type="button" data-i="4"><b>Leo Dhruti Ajmera</b><span class="role">Marketing Director</span></button>
+        <button class="person" type="button" data-i="5"><b>MJF Lion Dhirendra Sinha</b><span class="role">Advisor</span></button>
+      </div>
+    </div>
+    <div class="team-cards">
+      <div class="tcard"><div class="tcard-frame reveal-img"><img src="images/team/president.webp" alt="Leo Drishti Sinha, President" loading="lazy"></div><b>Leo Drishti Sinha</b><span>President</span></div>
+      <div class="tcard"><div class="tcard-frame reveal-img"><img src="images/team/vicepresident.webp" alt="Leo Abhishek Ajit, Vice President" loading="lazy"></div><b>Leo Abhishek Ajit</b><span>Vice President</span></div>
+      <div class="tcard"><div class="tcard-frame reveal-img"><img src="images/team/secretary.webp" alt="Leo Khushboo Patel, Secretary" loading="lazy"></div><b>Leo Khushboo Patel</b><span>Secretary</span></div>
+      <div class="tcard"><div class="tcard-frame reveal-img"><img src="images/team/treasurer.webp" alt="Leo Khushi Sonawane, Treasurer" loading="lazy"></div><b>Leo Khushi Sonawane</b><span>Treasurer</span></div>
+      <div class="tcard"><div class="tcard-frame reveal-img"><img src="images/team/marketing.webp" alt="Leo Dhruti Ajmera, Marketing Director" loading="lazy"></div><b>Leo Dhruti Ajmera</b><span>Marketing Director</span></div>
+      <div class="tcard"><div class="tcard-frame reveal-img"><img src="images/team/advisor.webp" alt="MJF Lion Dhirendra Sinha, Advisor" loading="lazy"></div><b>MJF Lion Dhirendra Sinha</b><span>Advisor</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="events">
+  <div class="wrap">
+    <div class="head-row reveal">
+      <h2>Upcoming events</h2>
+      <a class="btn btn-line" href="#join">Get notified</a>
+    </div>
+    <div class="events-grid">
+      <a class="event wide reveal" href="#join"><div class="top"><div><h3>The Unveiling</h3><p>Details to follow.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot"><span class="dot"></span>Next up<span>Date to be announced</span></div></a>
+      <a class="event reveal" href="#join"><div class="top"><div><h3>Placeholder event</h3><p>Details to follow.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot">Coming soon</div></a>
+      <a class="event reveal" href="#join"><div class="top"><div><h3>Placeholder event</h3><p>Details to follow.</p></div><span class="arrow" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 13L13 3M5 3h8v8"/></svg></span></div><div class="foot">Coming soon</div></a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<div class="closing">
+  <div class="band reveal">
+    <section class="join" id="join">
+      <div class="disc">
+      <div>
+        <h2>Become a member.</h2>
+        <p class="lede">Leave your details and a board member will reach you on WhatsApp within a few days.</p>
+        <form class="form" id="joinForm" novalidate>
+          <div class="field"><label for="n" class="sr-only">Full name</label><input id="n" name="name" type="text" autocomplete="name" placeholder="Full name" required></div>
+          <div class="field"><label for="e" class="sr-only">Email</label><input id="e" name="email" type="email" autocomplete="email" placeholder="Email" required></div>
+          <div class="field"><label for="w" class="sr-only">WhatsApp number</label><input id="w" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" placeholder="WhatsApp number" required></div>
+          <button class="btn btn-ink" type="submit">Become a member</button>
+          <p class="form-note" id="formNote" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+    </section>
+    <footer>
+  <div class="top">
+    <p class="big">Built on <em>bonds.</em></p>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="#motto">The promise</a><a href="#recap">Recap</a><a href="#team">Team</a><a href="#events">What's on</a><a href="#join">Join</a>
+    </nav>
+  </div>
+  <div class="bottom">
+    <span>Leo Club of Aurelian · MD 3231 A4 · India</span>
+    <span>Leo Club International</span>
   </div>
 </footer>
+  </div>
+</div>
 
-<!-- GSAP: same version already on the live site -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<!-- needed by the nav's smoothTo() on touch, where Lenis is not constructed -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
-
-<script type="importmap">
-{"imports":{
-  "three":"https://unpkg.com/three@0.160.0/build/three.module.js",
-  "three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"
-}}
-</script>
-
-<script type="module">
-import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
-const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
-/* ============================================================
-   1. LENIS  <->  SCROLLTRIGGER SYNC   (do this before anything else)
-   Lenis 1.x drives the real window scroll, so ScrollTrigger only
-   needs to be told *when* to re-read it. No scrollerProxy: that is
-   for Lenis running on a custom wrapper, and adding it here would
-   reintroduce the desync it is meant to fix.
-   ============================================================ */
-if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-
-const isTouch = matchMedia('(pointer:coarse)').matches || navigator.maxTouchPoints > 0;
-let lenis = null;
-if (!reduce && window.Lenis && !isTouch){
-  lenis = new Lenis({ lerp:.09, smoothWheel:true });
-  lenis.on('scroll', ScrollTrigger.update);
-  gsap.ticker.add(t => lenis.raf(t * 1000));
-  gsap.ticker.lagSmoothing(0);
-}
-/* Lenis only emits 'scroll' for scrolls IT drives, and while it is active the
-   native scroll event does not fire at all (measured: 0 events across a
-   window.scrollTo of 3000px). So a native-scroll listener is dead code here.
-   Anything that moves the page without going through Lenis — scrollTo, scroll
-   restoration, keyboard Home/End, find-in-page, an anchor jump — would freeze
-   the flight while the content kept moving. Updating from the shared ticker
-   instead is unconditional: whatever moved the page, the next frame reads it.
-   It is also what scrub already does internally, so the cost is nil. */
-const syncScroll = () => ScrollTrigger.update();
-if (!reduce) gsap.ticker.add(syncScroll);
-
-/* ============================================================
-   2. THREE SETUP — camera is FIXED. Only the dragonfly moves.
-   ============================================================ */
-const canvas   = document.getElementById('dfly-canvas');
-const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
-renderer.setClearAlpha(0);
-
-const scene  = new THREE.Scene();
-const FOV    = 45, CAM_Z = 12;
-const camera = new THREE.PerspectiveCamera(FOV, 1, .1, 100);
-camera.position.set(0, 0, CAM_Z);
-
-/* Lit for a light paper background: a dark silhouette needs less fill than
-   it did on the old dark ground, or it washes out to a grey smudge. */
-const key  = new THREE.DirectionalLight(0xffffff, 1.5); key.position.set(3,5,6); scene.add(key);
-const hemi = new THREE.HemisphereLight(0xffffff, 0xDDD6C7, 0.9); scene.add(hemi);
-/* glow.position tracks the model's own position every frame (see the render
-   loop below), so this light sits AT the surface it's lighting - inverse-
-   square falloff at near-zero distance means intensity 5 was clipping ~13%
-   of the dragonfly's opaque pixels to (250,250,250)+ under the renderer's
-   default NoToneMapping, which reads as a glossy hotspot rather than the
-   soft mood-tinted rim-glow this was meant to be. Swept 5/3/1.5/0.8/0.4 and
-   measured the rendered canvas each time: 0.8 already gets blowout under
-   0.2%; 0.6 leaves margin either side of that knee. */
-const glow = new THREE.PointLight(0xCBA093, 0.6, 14); scene.add(glow);   // travels with the dragonfly, tinted by mood
-
-/* world-units visible at a given z, so waypoints can be authored
-   as viewport fractions and stay correct on every screen size */
-function halfExtents(z){
-  const h = Math.tan(THREE.MathUtils.degToRad(FOV/2)) * (CAM_Z - z);
-  return { hh:h, hw:h * camera.aspect };
-}
-
-/* ============================================================
-   3. PLACEHOLDER DRAGONFLY  (step 1 of build order)
-   Cone body + sphere head + 4 flat wing planes.
-   Real .glb swaps in at step 4 — replace buildDragonfly() only.
-   ============================================================ */
-const fly = new THREE.Group();
-const placeholder = new THREE.Group();   // kept as fallback if the .glb fails
-fly.add(placeholder);
-
-const bodyMat = new THREE.MeshStandardMaterial({ color:0x57614D, roughness:.45, metalness:.25 });  // muted moss
-const body = new THREE.Mesh(new THREE.CapsuleGeometry(.10,.95,4,12), bodyMat);
-body.rotation.x = Math.PI/2;                       // lie along +z (travel axis)
-placeholder.add(body);
-
-const tail = new THREE.Mesh(new THREE.ConeGeometry(.09,.85,10), bodyMat);
-tail.rotation.x = -Math.PI/2; tail.position.z = -.85;
-placeholder.add(tail);
-
-const head = new THREE.Mesh(new THREE.SphereGeometry(.15,16,16),
-  new THREE.MeshStandardMaterial({ color:0x5A657C, roughness:.3, metalness:.4 }));  // slate blue
-head.position.z = .58; placeholder.add(head);
-
-// glassy wings — MeshPhysicalMaterial + transmission, per the guardrail (no custom shaders)
-const wingMat = new THREE.MeshPhysicalMaterial({
-  color:0xF4F0E6, transmission:.88, thickness:.3, roughness:.12,
-  iridescence:1, iridescenceIOR:1.3, transparent:true, opacity:.62,
-  side:THREE.DoubleSide, depthWrite:false
-});
-const wings = [];
-for (const side of [1,-1]){
-  for (const [i,zOff] of [[0,.24],[1,-.16]]){
-    const w = new THREE.Mesh(new THREE.PlaneGeometry(.95,.30), wingMat);
-    w.position.set(side * .5, 0, zOff);
-    w.rotation.y = Math.PI/2;                      // plane spans outward from body
-    const pivot = new THREE.Group();               // pivot at the body so it hinges, not spins
-    pivot.position.z = zOff;
-    w.position.set(side * .48, 0, 0);
-    pivot.add(w);
-    placeholder.add(pivot);
-    wings.push({ pivot, side, pair:i });
-  }
-}
-scene.add(fly);
-
-/* ============================================================
-   3b. REAL MODEL  (step 4 of build order)
-   "skull island dragonfly" by dinoguy263allo, CC-BY-4.0.
-   The model ships with NO baked animation clips, so there is no
-   AnimationMixer here — the procedural sine flap is retained and
-   driven through the armature's four wing-root bones instead.
-   Load with ?placeholder=1 to force the box-and-planes stand-in.
-   ============================================================ */
-/* Names as they appear in scene.gltf. GLTFLoader runs them through
-   PropertyBinding.sanitizeNodeName, which strips '.', so 'wing.r.004_042'
-   arrives as 'wingr004_042'. Match on a normalised key to survive that. */
-const WING_ROOTS = [        // fore/hind pair per side
-  { name:'wing.r_034',     side: 1, pair:0 },
-  { name:'wing.l_038',     side:-1, pair:0 },
-  { name:'wing.r.004_042', side: 1, pair:1 },
-  { name:'wing.l.004_046', side:-1, pair:1 },
-];
-const normName = n => n.toLowerCase().replace(/[^a-z0-9]/g, '');
-/* Target world size, nose to tail. Calibrated by reading the WebGL buffer
-   and measuring the rendered silhouette on a 783px viewport:
-       1.0 ->  67px (too small)    5.0 -> 343px
-       2.2 -> 147px               8.0 -> 479px (too big)
-   3.1 lands near 210px, about 27% of viewport width - a companion creature
-   rather than a mascot. Tune live with __dfly.setSize(3.4). */
-const BODY_LENGTH = 3.1;
-
-/* Phones render the dragonfly 25% smaller. Applied as a scale on the rig
-   group, NOT by lowering BODY_LENGTH: sizeTo also derives the recentre
-   offset from the same k (`ctr * -k`), so shrinking the length walks the
-   model along the view axis and perspective eats most of the reduction -
-   measured, a 0.75 body length gave only a 0.84 silhouette. The rig sits at
-   the recentred origin, so scaling it is truly proportional. It is also the
-   only wrapper free to take a scale: fly.scale carries the birth animation.
-   640px is the phone breakpoint already used for the mobile hero and the
-   pixel-ratio cap. */
-const PHONE_SCALE = 0.75;
-const phoneScale = () => innerWidth <= 640 ? PHONE_SCALE : 1;
-let applyPhoneScale = () => {};   // rebound once the model loads
-const MODEL_YAW = 90;       // degrees, spins the model within the screen plane
-let setYaw = () => {};      // rebound once the model loads
-
-if (!new URLSearchParams(location.search).has('placeholder')){
-  new GLTFLoader().load('models/dragonfly/scene.gltf', gltf => {
-    const model = gltf.scene;
-
-    /* --- normalise scale + orientation from the model's own bounds, so we
-       do not hard-code assumptions about how it was exported --- */
-    /* updateMatrixWorld first: this glTF nests scale on its child nodes (it
-       came from an FBX), and Box3.setFromObject reads matrixWorld. Measuring
-       before the matrices are current returned 0.305 units instead of ~3,
-       so every derived scale came out ~10x too large. */
-    model.updateMatrixWorld(true);
-    const box  = new THREE.Box3().setFromObject(model);
-    const size = box.getSize(new THREE.Vector3());
-    const ctr  = box.getCenter(new THREE.Vector3());
-    const axes = [size.x, size.y, size.z];
-    const longest = axes.indexOf(Math.max(...axes));       // body's length axis
-
-    /* one place sets both scale and the recentre offset, so they can never
-       drift apart when the size is retuned */
-    const sizeTo = len => {
-      const k = len / axes[longest];
-      model.scale.setScalar(k);
-      model.position.copy(ctr).multiplyScalar(-k);
-    };
-    sizeTo(BODY_LENGTH);
-
-    const rig = new THREE.Group();                          // aligns model -> +Z travel axis
-    rig.add(model);
-    applyPhoneScale = () => rig.scale.setScalar(phoneScale());
-    applyPhoneScale();
-    if (longest === 0) rig.rotation.y =  Math.PI / 2;       // X-long -> face +Z
-    else if (longest === 1) rig.rotation.x = -Math.PI / 2;  // Y-long -> face +Z
-
-    /* Spin wrapper. The axis alignment above only guarantees the body lies IN
-       the screen plane, not which way along it - without this the dragonfly
-       tracks its path sideways, body across the direction of travel.
-       fly's local +Y is the view axis (that is what VIEW_UP maps to), so
-       rotating a child about ITS Y spins the model within the screen plane
-       without ever tipping it and exposing the legs.
-       Tune with __dfly.setYaw(deg). */
-    const spin = new THREE.Group();
-    spin.rotation.y = THREE.MathUtils.degToRad(MODEL_YAW);
-    spin.add(rig);
-    fly.add(spin);
-    setYaw = deg => { spin.rotation.y = THREE.MathUtils.degToRad(deg); return deg; };
-
-    /* --- rebind the flap to the armature --- */
-    const byName = new Map();
-    model.traverse(o => byName.set(normName(o.name), o));
-    const bones = [];
-    const fwdModel = new THREE.Vector3(0,0,0).setComponent(longest, 1);  // hinge axis, model space
-    const qRootInv = new THREE.Quaternion(), qParent = new THREE.Quaternion(), rel = new THREE.Quaternion();
-    model.getWorldQuaternion(qRootInv).invert();
-
-    for (const w of WING_ROOTS){
-      const b = byName.get(normName(w.name));
-      if (!b || !b.parent) continue;
-      b.parent.getWorldQuaternion(qParent);
-      rel.copy(qRootInv).multiply(qParent);                 // parent frame, relative to model root
-      bones.push({
-        bone: b,
-        restQ: b.quaternion.clone(),
-        axis : fwdModel.clone().applyQuaternion(rel.clone().invert()).normalize(),
-        side : w.side, pair: w.pair,
-      });
-    }
-
-    /* --- hide the legs ---
-       The legs are not a separate mesh: the whole insect is one skinned mesh,
-       so they can only be removed by collapsing the bones that drive them.
-       Scaling a leg ROOT to ~0 folds its vertices into the thorax and every
-       child bone inherits, so the 6 roots cover all 34 leg bones. Roots are
-       found structurally (a 'leg' bone whose parent is not one) rather than
-       by hard-coded names, so a re-export cannot silently bring them back.
-       Not exactly 0: a singular matrix can propagate NaN through skinning. */
-    let legRoots = 0;
-    model.traverse(o => {
-      const isLeg = n => /leg/i.test(n || '');
-      if (o.isBone && isLeg(o.name) && !isLeg(o.parent?.name)){
-        o.scale.setScalar(1e-4);
-        legRoots++;
-      }
-    });
-    if (!legRoots) console.warn('[dfly] no leg bones found — legs may still be visible');
-
-    /* ---- recolour toward the emblem's palette, soften the specular ----
-       Both meshes (body: thorax+wings+legs, and Beak) came in at
-       roughness .78/1.0, metalness 0, tint white - i.e. whatever the
-       source photo texture already was. There is no clipping-safe way to
-       tell "shiny" from "correctly pale wing" by eye, so this was measured:
-       with the renderer's default NoToneMapping, raw light values above 1
-       clip straight to 255 rather than compressing, and 13% of the
-       dragonfly's opaque pixels were reading (250,250,250)+ before this
-       change (see scroll-3d-gotchas). setTint/setGlossy are exposed on
-       __dfly for retuning without a reload. */
-    const bodyMat = [], beakMat = [];
-    model.traverse(o => { if (o.isMesh){
-      const mats = Array.isArray(o.material) ? o.material : [o.material];
-      for (const m of mats) (m.name === 'Beak' ? beakMat : bodyMat).push(m);
-    }});
-    const setTint = (bodyHex, beakHex = bodyHex) => {
-      for (const m of bodyMat) m.color.setHex(bodyHex);
-      for (const m of beakMat) m.color.setHex(beakHex);
-    };
-    const setGlossy = (roughness = 0.92) => {
-      for (const m of [...bodyMat, ...beakMat]) m.roughness = roughness;
-    };
-    setTint(0xA9C08C, 0xC7A868);   // moss body/wings, warmer gold head — see __dfly.setTint to retune
-    setGlossy();
-    window.__dfly && (window.__dfly.setTint = setTint, window.__dfly.setGlossy = setGlossy);
-
-    if (bones.length === WING_ROOTS.length){
-      placeholder.visible = false;
-      wings.length = 0;
-      for (const b of bones) wings.push(b);
-    } else {
-      // rig did not match expectations — keep the stand-in rather than ship a static model
-      rig.visible = false;
-      console.warn(`[dfly] matched ${bones.length}/${WING_ROOTS.length} wing bones, keeping placeholder`);
-    }
-    // live tuning handle: __dfly.setSize(1.2) in the console, then tell me the number
-    window.__dfly && (window.__dfly.model = model, window.__dfly.bones = bones,
-                      window.__dfly.setSize = sizeTo);
-  },
-  undefined,
-  err => console.warn('[dfly] model failed to load, keeping placeholder', err));
-}
-
-/* ============================================================
-   4. FLIGHT PATH — 7 waypoints, one per section.
-   Authored as viewport fractions (x,y) + world depth (z).
-   CatmullRomCurve3 gives a genuinely 3D curve; MotionPathPlugin
-   only curves in x/y, which would flatten the gallery depth beat.
-   ============================================================ */
-const WAYPOINTS = [
-  { id:'hero',    fx: 0.00, fy: 0.12, z: 0.0 },   // emerges from the bloom
-  { id:'motto',   fx:-0.52, fy:-0.08, z:-1.2 },   // settles, rests (left)
-  { id:'team',    fx: 0.62, fy: 0.05, z: 0.8 },   // sweeps L->R so cards light in reading order
-  { id:'gallery', fx:-0.45, fy:-0.15, z:-2.6 },   // drifts deep, "through rooms"
-  { id:'events',  fx: 0.30, fy: 0.10, z: 0.6 },   // circles the featured card
-  { id:'form',    fx: 0.72, fy:-0.02, z: 0.2 },   // off to the side of the inputs
-  { id:'footer',  fx: 1.45, fy: 0.55, z:-1.0 },   // exits off-screen
-];
-const SEGMENTS = WAYPOINTS.length - 1;            // 6
-
-/* Mood still drives flap speed and idle-bob damping (unrelated to colour -
-   see GRADIENT_BG/GRADIENT_ACCENT below for the background). */
-const MOODS = {
-  energetic : { flap:26, bob:1.00 },
-  reflective: { flap:13, bob:0.42 },
-  functional: { flap:16, bob:0.30 },
-};
-const SECTION_MOOD = [...document.querySelectorAll('[data-mood]')].map(el => el.dataset.mood);
-const MOOD_FLAP = SECTION_MOOD.map(m => MOODS[m].flap);
-const MOOD_BOB  = SECTION_MOOD.map(m => MOODS[m].bob);
-
-const bloomEl = document.getElementById('bloom');
-
-/* Where the emblem's own illustrated dragonfly sits, in the same viewport
-   fractions the waypoints use. Measured from the logo rather than hard-coded
-   so it stays right at any viewport size. Page coords (rect + scrollY) keep
-   it correct even if the window is resized while scrolled away from the hero. */
-function emblemAnchor(){
-  const el = document.querySelector('.hero-logo');
-  if (!el || !el.offsetWidth) return null;
-  const r = el.getBoundingClientRect();
-  const cx = r.left + r.width / 2;
-  const cy = r.top + scrollY + r.height * 0.34;   // the emblem's dragonfly, not its centre
-  return { fx: (cx - innerWidth/2) / (innerWidth/2),
-           fy: (innerHeight/2 - cy) / (innerHeight/2) };
-}
-
-let curve;
-function buildCurve(){
-  const anchor = emblemAnchor();
-  curve = new THREE.CatmullRomCurve3(
-    WAYPOINTS.map((w, i) => {
-      const { hh, hw } = halfExtents(w.z);
-      // waypoint 0 rides the emblem so the dragonfly emerges out of it
-      const fx = (i === 0 && anchor) ? anchor.fx : w.fx;
-      const fy = (i === 0 && anchor) ? anchor.fy : w.fy;
-      return new THREE.Vector3(fx * hw, fy * hh, w.z);
-    }),
-    false, 'catmullrom', 0.5
-  );
-  if (anchor){                       // park the bloom on the emblem too
-    bloomEl.style.left = `${50 + anchor.fx * 50}%`;
-    bloomEl.style.top  = `${50 - anchor.fy * 50}%`;
-  }
-}
-
-function resize(){
-  const w = innerWidth, h = innerHeight;
-  renderer.setSize(w, h, false);
-  /* A DPR-3 phone capped at 2 renders 750x1624 fragments for a canvas that
-     is mostly empty paper. 1.5 halves that work and is indistinguishable at
-     phone viewing distance for a soft-edged subject like this. */
-  renderer.setPixelRatio(Math.min(devicePixelRatio, innerWidth <= 640 ? 1.5 : 2));
-  camera.aspect = w / h;
-  camera.updateProjectionMatrix();
-  /* the rig scale is otherwise set only once at load, so rotating a phone to
-     landscape (375 -> 812) would leave it stuck at the phone size */
-  const phone = w <= 640;
-  if (phone !== wasPhone){ wasPhone = phone; applyPhoneScale(); }
-  buildCurve();                                   // world units depend on aspect
-}
-let wasPhone = innerWidth <= 640;
-addEventListener('resize', resize);
-resize();
-
-/* The hero is flex-centred, so the emblem's Y position depends on the total
-   height of the hero content - which shifts when the display font finishes
-   loading. Re-anchor once that has settled, and again on full load, or the
-   dragonfly emerges from where the emblem *was*.
-
-   ScrollTrigger.refresh() rides along on both: font swaps change section
-   heights (that's the whole reason buildCurve needs re-running), and the
-   master body-scroll ScrollTrigger's cached 'end' does NOT auto-update for
-   that - only for window resize. Measured: without this, 'end' stayed
-   locked at whatever document.body.scrollHeight was at initial script
-   execution (before fonts had swapped), so state.t maxed out at 1 while
-   there was still real document left to scroll - the dragonfly read
-   virtualT=1 (the exit waypoint) as soon as the recap gallery's pin ended,
-   nowhere near the actual footer. */
-function settleLayout(){ buildCurve(); ScrollTrigger.refresh(); }
-document.fonts && document.fonts.ready.then(settleLayout);
-addEventListener('load', settleLayout);
-
-/* ============================================================
-   5. MASTER SCROLLTRIGGER — one scrubbed timeline, whole page.
-   state.t 0→1 tracks raw scroll progress across the whole document.
-   ============================================================ */
-/* docScrollDistance: the ONE value both the master ScrollTrigger's `end`
-   and rebuildTBoundaries's `total` need, and the trickiest number in this
-   file to get right.
-
-   ScrollTrigger.refresh() temporarily reverts every active pin to its
-   natural (unpinned) layout to correctly measure OTHER triggers' positions,
-   THEN restores all pins, THEN fires the 'refresh' event - and any
-   start/end value supplied as a FUNCTION gets invoked mid-pass, while pins
-   are still reverted. Proven directly: calling the master trigger's own
-   `end` function by hand returned 8325 (correct), but letting GSAP call
-   that same function internally during refresh() produced 5095 - short by
-   exactly 3230px, the recap gallery pin's own scroll distance. A literal
-   'bottom bottom' keyword has the identical problem, just less visibly.
-
-   So this is measured from OUTSIDE that window - inside the 'refresh'
-   EVENT listener below, which fires after pins are back - and cached here.
-   Both the master trigger's `end` and rebuildTBoundaries's `total` read
-   this cached number instead of measuring live. */
-let docScrollDistance = 0;
-
-const state = { t: 0 };
-if (!reduce){
-  gsap.to(state, {
-    t: 1, ease:'none',
-    scrollTrigger:{
-      trigger:document.body, start:'top top',
-      end: () => docScrollDistance,
-      scrub:true,
-    }
-  });
-}
-
-/* remapT: state.t -> the "virtual" t that curve.getPoint/applyGradient/
-   applyMood all expect, where waypoint i lands at exactly i/SEGMENTS.
-   This used to just BE state.t, which only lined up while every section
-   measured exactly 100vh. The recap gallery is pinned and can be taller
-   than that (bigger cards, more cards, the pin's own scroll distance), so
-   boundaries are measured from each waypoint's actual element instead of
-   assumed - rebuilt on every ScrollTrigger refresh, which already fires on
-   load/resize and after the pin's own distance is known. Segments before
-   the tall one simply get a smaller slice of the 0..1 range and segments
-   after it get pushed later, exactly matching real scroll position.
-
-   getBoundingClientRect().top + scrollY, NOT el.offsetTop: offsetTop is
-   relative to offsetParent, and GSAP wraps a pinned element (#gallery) in
-   its own pin-spacer div - once pinned, gallery.offsetParent IS that
-   spacer and gallery.offsetTop reads 0 regardless of where the section
-   actually sits in the document. That collapsed the team->gallery segment
-   to ~zero width (measured: 0.2676 and 0.2677, a hair apart) and skipped
-   the dragonfly straight from segment 1 to segment 3.
-
-   getBoundingClientRect() has its OWN, different problem for the same
-   element: pinType:'transform' (see the recap gallery IIFE) holds the
-   pinned element in place with a CSS transform, and once scrolled PAST the
-   pin, GSAP leaves that transform at its final value rather than resetting
-   it - so gallery's rect reflects the pin's full scroll distance added on
-   top of its real position (measured: reported ~5917 for an element that
-   actually starts around 2700). The pin-SPACER (the element's parentNode
-   while pinned) is never transformed - only its child is - so measuring
-   the spacer instead, when one is present, is unaffected by both bugs. */
-let tBoundaries = WAYPOINTS.map((_, i) => i / SEGMENTS);   // even-spacing fallback, replaced below once elements exist
-function measureDocTop(el){
-  const p = el.parentElement;
-  const ref = (p && p.classList.contains('pin-spacer')) ? p : el;
-  return ref.getBoundingClientRect().top + scrollY;
-}
-function rebuildTBoundaries(){
-  if (docScrollDistance <= 0) return;
-  const raw = WAYPOINTS.map(w => {
-    const el = document.getElementById(w.id);
-    return el ? measureDocTop(el) / docScrollDistance : null;
-  });
-  raw[0] = 0;                          // hero always starts the scroll
-  raw[raw.length - 1] = 1;             // footer/exit always ends it
-  for (let i = 1; i < raw.length; i++){
-    const v = raw[i] == null ? raw[i - 1] + 1e-4 : raw[i];
-    raw[i] = Math.max(v, raw[i - 1] + 1e-4);   // guard against measurement noise going non-monotonic
-  }
-  tBoundaries = raw;
-}
-
-/* Runs after every refresh, with pins back in their normal state. Updates
-   docScrollDistance and, if it actually moved, asks for ONE more refresh so
-   the master trigger's `end` function (and everything pin-related) picks up
-   the corrected number - guarded by the size check so that second refresh's
-   own 'refresh' firing doesn't loop forever once the value has settled. */
-function onScrollTriggerRefresh(){
-  const measured = document.documentElement.scrollHeight - innerHeight;
-  const changed = Math.abs(measured - docScrollDistance) > 1;
-  docScrollDistance = measured;
-  rebuildTBoundaries();
-  if (changed) ScrollTrigger.refresh();
-}
-onScrollTriggerRefresh();
-ScrollTrigger.addEventListener('refresh', onScrollTriggerRefresh);
-
-function remapT(real){
-  let i = 0;
-  while (i < SEGMENTS - 1 && real > tBoundaries[i + 1]) i++;
-  const segStart = tBoundaries[i], segEnd = tBoundaries[i + 1];
-  const local = segEnd > segStart ? (real - segStart) / (segEnd - segStart) : 0;
-  return (i + THREE.MathUtils.clamp(local, 0, 1)) / SEGMENTS;
-}
-
-/* ============================================================
-   MOBILE HERO MOTION — the phone hero has no botanical frame, so the
-   emblem and type carry it on their own. Entrance on load, a slow idle
-   float, then a scroll-linked drift as the hero leaves.
-
-   gsap.matchMedia() scopes this to phones and reverts it automatically
-   when the viewport crosses the breakpoint, so a desktop resize does not
-   leave transforms stranded on the elements.
-
-   Property split matters here: the entrance animates `y` and `opacity`,
-   the scroll drift animates `yPercent`. GSAP composes y and yPercent into
-   one translate, so the two never fight over the same value - whereas two
-   tweens both writing `y` would.
-   ============================================================ */
-/* 0..1, read by frame() below to lift and swell the dragonfly on load before
-   any scrolling has happened. Declared out here so both this block and
-   frame() close over the same variable; frame() only ever runs from rAF, so
-   it can never observe the temporal dead zone. */
-let heroPeek = 0;
-const peekState = { v: 0 };
-
-if (!reduce){
-  gsap.matchMedia().add('(max-width: 640px)', () => {
-    const els = ['.hero-logo', '#hero .eyebrow', '#hero h1'];
-    let float, drift, frame, bloomIdle, peek, cueFade;
-
-    /* Split the headline into one inline-block span per word so the entrance
-       can stagger them. Done in JS rather than in the markup, and undone in
-       the cleanup below, so the desktop DOM stays exactly as authored. */
-    const h1El = document.querySelector('#hero h1');
-    const h1Html = h1El.innerHTML;
-    h1El.innerHTML = h1El.textContent.trim().split(/\s+/)
-      .map(w => `<span class="hw">${w}</span>`).join(' ');
-    const words = h1El.querySelectorAll('.hw');
-
-    /* Floral border exit. Starts at 0.30 of the hero rather than 0, so the
-       dragonfly reads as emerging from the emblem FIRST and the border only
-       then parts around it - the emergence finishes at t=0.055 of the page,
-       which is 0.33 of the hero.
-       Transform only, no fade: these elements carry a static CSS blur, and
-       animating opacity on a blurred layer forces it to re-blur every frame.
-       Translating a blurred layer just repositions the cached raster, so it
-       stays cheap. They travel 1.25 viewports to guarantee they clear. */
-    frame = gsap.timeline({
-      scrollTrigger:{ trigger:'#hero', start:'top top', end:'bottom top',
-                      scrub:true, invalidateOnRefresh:true },
-      defaults:{ ease:'none' },
-    })
-      .to('.hfm-left',  { x: () => -(innerWidth * 1.25), duration:0.70 }, 0.30)
-      .to('.hfm-right', { x: () =>  (innerWidth * 1.25), duration:0.70 }, 0.30);
-
-    /* The border used to sit dead still until the visitor scrolled. A slow
-       idle breath makes it read as alive on arrival instead of as wallpaper.
-       yPercent + scale, NOT x: the exit timeline above owns x, and GSAP
-       composes separate transform components rather than letting two tweens
-       fight over one value (the same split the entrance/drift pair uses).
-       Transform only, never opacity - these carry a static CSS blur and an
-       opacity write would re-blur the layer every frame. */
-    bloomIdle = gsap.to('#heroFrame .hfm', {
-      yPercent: i => (i % 2 ? -2.4 : 2.4),
-      scale:    i => (i % 2 ? 1.028 : 0.976),
-      duration: i => 3.6 + (i % 5) * 0.5,
-      ease: 'sine.inOut', yoyo: true, repeat: -1,
-      stagger: { each: 0.17, from: 'random' },
-    });
-
-    const entrance = gsap.timeline({
-      defaults: { ease: 'power3.out' },
-      onComplete(){
-        /* Re-anchor the dragonfly: emblemAnchor() reads the emblem's
-           rect, and during the entrance that rect is still offset by the
-           tween, so the anchor taken at fonts.ready would be ~30px high. */
-        buildCurve();
-
-        /* One-shot gold sweep, then back to solid --ink. The class carries
-           its own CSS animation; removing it on animationend is what
-           guarantees the headline doesn't sit permanently in a
-           background-clip:text state. */
-        h1El.classList.add('shimmer');
-        const unShimmer = () => h1El.classList.remove('shimmer');
-        h1El.addEventListener('animationend', unShimmer, { once:true });
-        /* belt and braces: animationend does not fire if the animation never
-           starts (element off-screen in some engines, or the class removed
-           and re-added). Worst case without this is cosmetic rather than
-           broken - the @supports guard means the text still paints via the
-           gradient - but it should not be left clipped indefinitely. */
-        setTimeout(unShimmer, 2600);
-
-        /* Tease the dragonfly. Until the visitor scrolls, t is 0 and the
-           dragonfly renders at scale 0.08 on the emblem - present but far
-           too small to notice, so nothing suggests scrolling is worth it.
-           Rise + swell, hold, sink back (yoyo with a repeatDelay). The value
-           is handed to frame() rather than tweened onto fly directly,
-           because frame() rewrites fly.scale/position every tick and would
-           overwrite any tween; and it is forced to 0 as soon as real scroll
-           starts so it can never fight the scroll-driven emergence. */
-        peek = gsap.fromTo(peekState, { v:0 }, {
-          v:1, duration:1.0, ease:'power2.inOut',
-          yoyo:true, repeat:1, repeatDelay:0.45,
-          onUpdate(){ heroPeek = state.t < 0.01 ? peekState.v : 0; },
-          onComplete(){ heroPeek = 0; },
-        });
-
-        float = gsap.to('.hero-logo', {
-          y: '+=7', duration: 3.4, ease: 'sine.inOut', yoyo: true, repeat: -1,
-        });
-
-        drift = gsap.to(els, {
-          yPercent: -18, opacity: 0, ease: 'none',
-          scrollTrigger: { trigger:'#hero', start:'top top', end:'bottom top', scrub: true },
-        });
-
-        /* opacity only, deliberately: .hero-cue is centred with a CSS
-           translateX(-50%), and animating any transform component here would
-           hand that property to GSAP. */
-        cueFade = gsap.to('.hero-cue', {
-          opacity: 0, ease: 'none',
-          scrollTrigger: { trigger:'#hero', start:'top top', end:'22% top', scrub: true },
-        });
-      },
-    });
-
-    entrance
-      /* back.out overshoot rather than power3.out: the emblem should arrive
-         with a little settle, not just fade up. The glow is timed to bloom
-         underneath it as it lands, then rest at a low level. */
-      .from('.hero-logo', { opacity:0, y:30, scale:.86, duration:1.05, ease:'back.out(1.6)' })
-      .fromTo('.hero-glow', { opacity:0, scale:.55 },
-                            { opacity:1, scale:1, duration:1.0, ease:'power2.out' }, 0.12)
-      .to('.hero-glow',     { opacity:.55, duration:.9, ease:'sine.inOut' }, '>-0.15')
-      .from('#hero .eyebrow', { opacity:0, y:14, duration:.60 }, '-=1.05')
-      /* word-by-word rather than one block - on a phone the h1 is the
-         dominant element, so it carries the most of the entrance. */
-      .from(words, { opacity:0, y:26, duration:.70, stagger:.085 }, '-=0.85')
-      .from('.hero-cue', { opacity:0, y:10, duration:.55 }, '-=0.15');
-
-    return () => {                       // runs when the breakpoint stops matching
-      entrance.kill();
-      float && float.kill();
-      drift  && drift.kill();
-      frame && frame.kill();
-      bloomIdle && bloomIdle.kill();
-      peek && peek.kill();
-      cueFade && cueFade.kill();
-      heroPeek = 0; peekState.v = 0;
-      gsap.set(els, { clearProps: 'all' });
-      gsap.set('#heroFrame .hfm', { clearProps: 'x,yPercent,scale' });
-      gsap.set('.hero-glow,.hero-cue', { clearProps: 'all' });
-      h1El.classList.remove('shimmer');
-      h1El.innerHTML = h1Html;           // hand the desktop DOM back as authored
-    };
-  });
-}
-
-/* ============================================================
-   HERO FRAME — GSAP timeline, scrubbed over the hero's own scroll.
-   Left-side art exits left, right-side art exits right.
-
-   Distances are function-based + invalidateOnRefresh so they are
-   recomputed from the live innerWidth on every resize and orientation
-   change, rather than baking in whatever the viewport was at load.
-   Each element is pushed a full viewport width PAST its own edge, so
-   it clears the frame on ultrawide and on a phone alike.
-
-   No pin: pinning would lengthen the document and desync the
-   dragonfly's section<->waypoint mapping. Fixed positioning already
-   holds the frame to the viewport.
-   ============================================================ */
-/* In the mockup the RIGHT panel is the asset's natural orientation - foliage
-   reaching to the top-right - and the left side is its mirror, so it is the
-   left group that gets flipped, not the right.
-   Mirroring is presentation, not motion, so it happens regardless of
-   prefers-reduced-motion; only the scroll animation below is gated. */
-gsap.set('.hf-left', { scaleX: -1 });
-
-/* Desktop only. The frame is display:none under 640px, so on a phone this
-   timeline was still writing x/rotation/autoAlpha to eight hidden images on
-   every scroll frame - pure cost for nothing visible, during exactly the
-   stretch of scroll that felt laggy. */
-if (!reduce){
-  gsap.matchMedia().add('(min-width: 641px)', () => {
-    const frameEls = gsap.utils.toArray('#heroFrame .hf');
-    if (!frameEls.length) return;
-
-    const heroFrameTl = gsap.timeline({
-      scrollTrigger:{
-        trigger: '#hero',
-        start: 'top top',
-        end:   'bottom top',      // fully gone by the time the hero leaves
-        scrub: true,
-        invalidateOnRefresh: true,
-      },
-      defaults: { ease: 'none' },
-    });
-
-    heroFrameTl
-      .to('.hf-left',  { x: () => -(innerWidth * 0.85), rotation:'-=6', duration:1 }, 0)
-      .to('.hf-right', { x: () =>  (innerWidth * 0.85), rotation:'+=6', duration:1 }, 0)
-      .to(frameEls,      { autoAlpha: 0, duration:0.45 }, 0.55);
-
-    return () => { heroFrameTl.kill(); gsap.set(frameEls, { clearProps:'x,rotation,autoAlpha' }); };
-  });
-}
-
-/* ============================================================
-   BACKGROUND GRADIENT — five brand colours as one continuous wash
-   across the whole page (0..1), independent of section mood (which
-   only drives flap speed / idle-bob damping, above).
-   Vintage Rose and Dusty Blush measure 3.68:1 and 2.79:1 against
-   Muted Moss body text at full saturation - both under the 4.5:1 AA
-   floor for regular text. Tinted 40%/60% toward paper they clear
-   4.7:1+ while keeping the same hue. GRADIENT_ACCENT keeps the raw,
-   full-strength hex since accents (borders, glow, discs) are never a
-   text background - the same scope the source palette itself gives
-   these two ("florals", not paper tones). */
-const GRADIENT_BG     = ['#EBE5D6','#E5DFCF','#DDD6C7','#E6D8D0','#EAD9D4'];
-const GRADIENT_ACCENT = ['#EBE5D6','#E5DFCF','#DDD6C7','#D6BEB1','#CBA093'];
-const ACCENT_LEAD = 0.12;   // accent samples slightly ahead of bg, so it's never flatly identical
-
-const tmpA = new THREE.Color(), tmpB = new THREE.Color(), tmpC = new THREE.Color();
-function sampleStops(stops, t){
-  const n = stops.length - 1;
-  const s = THREE.MathUtils.clamp(t, 0, 1) * n;
-  const i = Math.min(Math.floor(s), n - 1);
-  tmpA.set(stops[i]); tmpB.set(stops[i+1]);
-  return tmpC.copy(tmpA).lerp(tmpB, s - i);
-}
-
-/* Writing a custom property on :root invalidates style for every element
-   that consumes it, so doing it unconditionally meant a full-document style
-   recalc on EVERY frame. The colour only changes every few frames at scroll
-   speed, so compare first and write only on an actual change. */
-let lastBg = '', lastAccent = '';
-function applyGradient(t){
-  const bg = '#' + sampleStops(GRADIENT_BG, t).getHexString();
-  if (bg !== lastBg){
-    document.documentElement.style.setProperty('--bg', bg);
-    lastBg = bg;
-  }
-  const ac = '#' + sampleStops(GRADIENT_ACCENT, Math.min(t + ACCENT_LEAD, 1)).getHexString();
-  if (ac !== lastAccent){
-    document.documentElement.style.setProperty('--accent', ac);
-    glow.color.set(ac);
-    lastAccent = ac;
-  }
-}
-
-function applyMood(t){
-  const s = Math.min(t * SEGMENTS, SEGMENTS - 1e-6);
-  const i = Math.floor(s), f = s - i;
-  return {
-    flap: THREE.MathUtils.lerp(MOOD_FLAP[i], MOOD_FLAP[i+1], f),
-    bob : THREE.MathUtils.lerp(MOOD_BOB[i],  MOOD_BOB[i+1],  f),
-  };
-}
-
-/* ============================================================
-   6. RENDER LOOP
-   Wing flap + idle bob run off elapsed time, NOT scroll, so they
-   never freeze when the visitor stops scrolling.
-   ============================================================ */
-const clock = new THREE.Clock();
-const pos = new THREE.Vector3(), look = new THREE.Vector3();
-const targetQ = new THREE.Quaternion(), mat4 = new THREE.Matrix4(), flapQ = new THREE.Quaternion();
-const up = new THREE.Vector3(0,1,0);
-const noseDir = new THREE.Vector3();
-const VIEW_UP = new THREE.Vector3(0,0,1);   // camera axis: keeps the back to the viewer
-let NOSE = 1;                                // flip to -1 if it flies tail-first (__dfly.flipNose())
-const teamCards = [...document.querySelectorAll('.t-card')];
-const hud = document.getElementById('hud');
-const bloom = document.getElementById('bloom');
-let flapPhase = 0;
-let lastBloomOp = -1;
-
-/* --- scroll speed tracking ---
-   No longer drives the nose pitch (that's fixed "up" now, per explicit
-   design call - see the orient block below), but __dfly.scrollState still
-   surfaces it live for tuning, so it stays computed. Derived from
-   window.scrollY each frame rather than a Lenis event, same reasoning as
-   the earlier ScrollTrigger sync fix: it has to keep working regardless of
-   what is actually driving the scroll (Lenis, native, touch), and the
-   shared ticker sees every case. */
-let prevScrollY = scrollY, smoothedScrollSpeed = 0, lastMovingAt = 0;
-const IDLE_DWELL = 0.15;     // seconds of near-zero speed before it counts as "stopped"
-const SPEED_EPS  = 3;        // px/sec deadzone, absorbs easing residue near a stop
-
-function smoothstep(a,b,x){ const t = THREE.MathUtils.clamp((x-a)/(b-a),0,1); return t*t*(3-2*t); }
-
-function frame(){
-  const dt = Math.min(clock.getDelta(), .05);
-  const el = clock.elapsedTime;
-  const t  = remapT(state.t);
-
-  applyGradient(t);
-  const mood = applyMood(t);
-
-  /* --- position along the curve --- */
-  curve.getPoint(t, pos);
-
-  /* --- scroll speed, smoothed, surfaced live via __dfly.scrollState --- */
-  const rawSpeed = dt > 0 ? (scrollY - prevScrollY) / dt : 0;   // px/sec, + = scrolling down
-  prevScrollY = scrollY;
-  smoothedScrollSpeed += (rawSpeed - smoothedScrollSpeed) * Math.min(1, dt * 6);
-  if (Math.abs(smoothedScrollSpeed) > SPEED_EPS) lastMovingAt = el;
-
-  /* idle bob — independent of scroll, damped by mood */
-  pos.x += Math.sin(el * 0.73) * 0.10 * mood.bob;
-  pos.y += Math.sin(el * 1.21) * 0.14 * mood.bob;
-
-  /* circling flourish over the featured event card (segment 4 → 5) */
-  const circ = smoothstep(4/SEGMENTS, 4.35/SEGMENTS, t) * (1 - smoothstep(4.65/SEGMENTS, 5/SEGMENTS, t));
-  if (circ > 0){
-    pos.x += Math.cos(el * 2.1) * 0.85 * circ;
-    pos.y += Math.sin(el * 2.1) * 0.55 * circ;
-  }
-
-  /* Mobile load "peek" (see heroPeek in the mobile hero block): lifts the
-     dragonfly clear of the emblem before any scrolling has happened. Applied
-     additively here, rather than as a tween on fly itself, because this
-     function rewrites fly.position and fly.scale every single tick and would
-     overwrite one. heroPeek is 0 on desktop, under reduced motion, and the
-     instant real scroll begins, so this is a no-op in all three cases. */
-  if (heroPeek > 0) pos.y += heroPeek * 0.42;
-
-  fly.position.copy(pos);
-
-  /* --- emergence from the light bloom at the very start --- */
-  /* Emerge FROM the emblem: start almost nothing, at the emblem's own
-     dragonfly, and swell to full size as the path carries it clear. */
-  const born = smoothstep(0, 0.055, t);
-  /* the peek's own swell fades out as the real, scroll-driven emergence
-     takes over, so the two never sum into an oversized dragonfly */
-  fly.scale.setScalar(0.08 + born * 0.92 + heroPeek * (1 - born) * 0.30);
-  /* #bloom is 60vmin under filter:blur(18px); each opacity write re-composites
-     that blurred layer. Quantise and skip no-op writes, so it stops costing
-     anything the moment it has faded out. */
-  const bloomOp = Math.round((1 - smoothstep(0, 0.085, t)) * 0.55 * 1000) / 1000;
-  if (bloomOp !== lastBloomOp){ bloom.style.opacity = bloomOp; lastBloomOp = bloomOp; }
-
-  /* --- orient: nose fixed up, held upright ---
-     The legs sit on the underside, so they only come into view when the
-     insect is seen edge-on. Keeping its back to the camera shows the wing
-     spread and hides the legs behind the body: steer using only the
-     screen-plane component (no pitch out of plane), and use the view axis
-     +Z as "up", so the dorsal side always faces the camera regardless of
-     which way the nose points.
-     Nose direction used to flip to "down" while scrolling down; now fixed
-     "up" always, per explicit design call - the pitch no longer reacts to
-     scroll speed at all (scrollY/idle are still tracked above for
-     __dfly.scrollState, just no longer read here). Position still follows
-     the curve; only the pitch is decoupled from it. No roll: banking would
-     tip the underside into view. The idle wobble is a yaw about the view
-     axis instead, which stays flat to camera. */
-  noseDir.set(0, 1, 0).multiplyScalar(NOSE);
-  look.copy(pos).add(noseDir);
-  mat4.lookAt(pos, look, VIEW_UP);
-  targetQ.setFromRotationMatrix(mat4);
-  fly.quaternion.slerp(targetQ, 1 - Math.pow(0.0015, dt));   // frame-rate independent
-  fly.rotateY(Math.sin(el * 0.9) * 0.10 * mood.bob);          // wobble in the view plane
-
-  glow.position.copy(pos);
-
-  /* --- wings: own loop, never scroll-driven --- */
-  flapPhase += dt * mood.flap;
-  for (const w of wings){
-    // fore/hind beat out of phase, as a real dragonfly's do
-    const a = Math.sin(flapPhase + w.pair * Math.PI * 0.55) * 0.62 * w.side;
-    if (w.bone){
-      flapQ.setFromAxisAngle(w.axis, a);
-      w.bone.quaternion.copy(flapQ).multiply(w.restQ);   // offset applied in parent frame
-    } else {
-      w.pivot.rotation.z = a;
-    }
-  }
-
-  /* --- team cards lit by the dragonfly's projected x-position --- */
-  if (teamCards.length){
-    const p = pos.clone().project(camera);
-    const flyX = (p.x * .5 + .5) * innerWidth;
-    for (const c of teamCards){
-      if (c.classList.contains('lit')) continue;
-      const r = c.getBoundingClientRect();
-      const onScreen = r.top < innerHeight && r.bottom > 0;
-      if (onScreen && flyX > r.left + r.width * .35) c.classList.add('lit');
-    }
-  }
-
-  hud.textContent = `t ${t.toFixed(3)}  ·  seg ${Math.min(Math.floor(t*SEGMENTS),SEGMENTS-1)}  ·  ${SECTION_MOOD[Math.min(Math.round(t*SEGMENTS),SEGMENTS)]}`;
-  renderer.render(scene, camera);
-}
-
-/* ============================================================
-   7. REDUCED MOTION — static dragonfly, no flight, no flap.
-   ============================================================ */
-if (reduce){
-  state.t = 0.12;
-  const t0 = remapT(state.t);
-  applyGradient(t0);
-  applyMood(t0);
-  curve.getPoint(t0, pos);
-  fly.position.copy(pos);
-  fly.scale.setScalar(1);
-  bloom.style.opacity = 0;
-  teamCards.forEach(c => c.classList.add('lit'));
-  hud.textContent = 'reduced motion — static';
-  renderer.render(scene, camera);
-  addEventListener('resize', () => renderer.render(scene, camera));
-} else {
-  gsap.ticker.add(frame);      // one loop, shared with Lenis
-}
-
-/* ============================================================
-   LIQUID-GLASS NAV — scroll state, smooth scroll, mobile menu.
-
-   Ported from the live site with two changes forced by this page:
-
-   1. The original toggled .scrolled from addEventListener('scroll').
-      That is dead code here — while Lenis is active the native scroll
-      event does not fire at all (see the syncScroll comment above).
-      A ScrollTrigger fires under both Lenis and the native touch path,
-      since ScrollTrigger.update is already driven off the shared ticker.
-
-   2. smoothTo() has three branches, not two: Lenis is only constructed
-      for non-touch, non-reduced-motion, so touch devices need the plain
-      GSAP tween and reduced-motion needs the instant jump.
-   ============================================================ */
+<script>
 (function(){
-  const nav = document.getElementById('nav'); if (!nav) return;
-  const links  = document.getElementById('navLinks');
-  const burger = document.getElementById('navBurger');
-
-  /* trigger:body is load-bearing — with no trigger element, end:'max'
-     resolves to start+1 and the state flickers on for a single pixel. */
-  ScrollTrigger.create({
-    trigger: document.body,
-    start: 'top -40',
-    end: 'max',
-    onToggle: self => nav.classList.toggle('scrolled', self.isActive),
+  var nav=document.getElementById('nav');
+  var burger=document.getElementById('burger');
+  var links=document.getElementById('navLinks');
+  burger.addEventListener('click',function(){
+    var open=nav.classList.toggle('open');
+    burger.setAttribute('aria-expanded',open?'true':'false');
+    burger.setAttribute('aria-label',open?'Close menu':'Open menu');
   });
+  links.addEventListener('click',function(e){
+    if(e.target.tagName==='A'){nav.classList.remove('open');burger.setAttribute('aria-expanded','false');}
+  });
+  function onScroll(){nav.classList.toggle('scrolled',window.scrollY>8);}
+  onScroll();window.addEventListener('scroll',onScroll,{passive:true});
 
-  /* nav sits 18px down from the top, so clear its box plus that offset */
-  const navOffset = () => nav.offsetHeight + 24;
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var els=document.querySelectorAll('.reveal,.reveal-img');
+  function show(el){
+    /* a photo wipes only once it has pixels to show; otherwise the wipe reveals a blank box */
+    var img=el.classList.contains('reveal-img')?el.querySelector('img'):null;
+    if(img&&!img.complete){ img.addEventListener('load',function(){el.classList.add('in');},{once:true}); img.addEventListener('error',function(){el.classList.add('in');},{once:true}); if(img.loading==='lazy') img.loading='eager'; }
+    else el.classList.add('in');
+  }
+  if(reduce||!('IntersectionObserver' in window)){
+    els.forEach(function(el){el.classList.add('in');});
+  }else{
+    /* A clipped photo never intersects (Chrome applies clip-path to the intersection rect),
+       so each photo frame is observed through its parent and mapped back. */
+    var owner=new Map();
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){show(owner.get(en.target)||en.target);io.unobserve(en.target);}
+      });
+    },{rootMargin:'0px 0px -8% 0px',threshold:.12});
+    els.forEach(function(el,i){
+      el.style.transitionDelay=(i%3)*50+'ms';
+      var node=el.classList.contains('reveal-img')?el.parentElement:el;
+      owner.set(node,el); io.observe(node);
+    });
+  }
 
-  function smoothTo(target){
-    const el = typeof target === 'string' ? document.querySelector(target) : target;
-    if (!el) return;
-    const off = navOffset();
-    if (reduce){
-      window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - off);
+
+  /* Team roster: the portrait rotates through the board on its own, like a carousel.
+     Hovering a row pauses the rotation and shows that person; leaving resumes it. */
+  var people=document.getElementById('people');
+  if(people){
+    var frame=document.getElementById('portraitFrame');
+    var pName=document.getElementById('portraitName'), pRole=document.getElementById('portraitRole');
+    var rows=[].slice.call(people.querySelectorAll('.person'));
+    var pics=[].slice.call(frame.querySelectorAll('img'));
+    var cur=0, timer=null, paused=false, visible=false;
+    var EVERY=3200;
+    var bar=document.getElementById('rotBar'), barFill=bar&&bar.querySelector('i');
+    function restartBar(){ if(!barFill||reduce) return; barFill.classList.remove('run'); void barFill.offsetWidth; barFill.classList.add('run'); }
+    function setPaused(v){ paused=v; if(bar) bar.classList.toggle('paused',v); if(!v&&timer){ clearInterval(timer); timer=setInterval(tick,EVERY); restartBar(); } }
+    function pick(i){
+      cur=i;
+      rows.forEach(function(r,j){r.classList.toggle('on',j===i);});
+      pics.forEach(function(p,j){p.classList.toggle('on',j===i);});
+      pName.textContent=rows[i].querySelector('b').textContent;
+      pRole.textContent=rows[i].querySelector('.role').textContent;
+      restartBar();
+    }
+    function tick(){ if(!paused && visible){ pick((cur+1)%rows.length); } }
+    function start(){ if(!timer && !reduce){ restartBar(); timer=setInterval(tick,EVERY); } }
+    function stop(){ if(timer){ clearInterval(timer); timer=null; } }
+    rows.forEach(function(r,i){
+      r.addEventListener('mouseenter',function(){setPaused(true);pick(i);});
+      r.addEventListener('focus',function(){setPaused(true);pick(i);});
+      r.addEventListener('click',function(){pick(i); if(timer){clearInterval(timer); timer=setInterval(tick,EVERY);} });
+    });
+    people.addEventListener('mouseleave',function(){setPaused(false);});
+    people.addEventListener('focusout',function(e){ if(!people.contains(e.relatedTarget)) setPaused(false); });
+    pics.forEach(function(p){ if(p.loading==='lazy') p.loading='eager'; }); /* all six must be ready to crossfade */
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(en){ visible=en[0].isIntersecting; visible?start():stop(); },{threshold:.2}).observe(frame);
+    }else{ visible=true; start(); }
+  }
+
+  /* The form has no backend yet. It validates and tells the visitor so. */
+  var form=document.getElementById('joinForm');
+  var note=document.getElementById('formNote');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    form.classList.add('tried');
+    if(!form.checkValidity()){
+      note.classList.add('err');
+      note.textContent='Please fill in your name, email and WhatsApp number.';
+      form.querySelector(':invalid').focus();
       return;
     }
-    if (lenis) lenis.scrollTo(el, { offset:-off, duration:1.2 });
-    else gsap.to(window, { duration:1.2, scrollTo:{ y:el, offsetY:off, autoKill:false }, ease:'power3.inOut' });
-  }
-
-  function closeMenu(){
-    links.classList.remove('open');
-    burger.classList.remove('open');
-    burger.setAttribute('aria-expanded','false');
-    burger.setAttribute('aria-label','Open menu');
-  }
-
-  burger.addEventListener('click', () => {
-    const open = !links.classList.contains('open');
-    links.classList.toggle('open', open);
-    burger.classList.toggle('open', open);
-    burger.setAttribute('aria-expanded', String(open));
-    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    note.classList.remove('err');
+    note.textContent='Sign-ups open soon. The form is not connected yet.';
   });
-
-  nav.querySelectorAll('a[href^="#"]').forEach(a => {
-    a.addEventListener('click', e => {
-      const id = a.getAttribute('href');
-      if (!document.querySelector(id)) return;
-      e.preventDefault(); closeMenu(); smoothTo(id);
-    });
-  });
-
-  document.addEventListener('click', e => {
-    if (links.classList.contains('open') && !nav.contains(e.target)) closeMenu();
-  });
-  addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
 })();
-
-/* ---- recap: PINNED horizontal gallery (GSAP's classic pattern) ----
-   #gallery pins and the track slides sideways as the visitor scrolls the
-   PAGE vertically - horizontalTween is that slide, and every card's own
-   ScrollTrigger reads position through containerAnimation, which is GSAP's
-   built-in support for "trigger points inside a horizontally-animating
-   container": the same 'center right'/'center left' keywords used for a
-   normal horizontal scroller resolve correctly here without a horizontal
-   flag or a custom scroller.
-
-   Reads *any* number of .r-card elements found at load, and both the pin
-   distance (distance()) and the centring spacers (CSS, see .recap-track)
-   are computed from measured widths, not a card count - so adding more
-   cards later needs no JS/CSS changes here, only more markup.
-
-   This is the one section allowed to break the "no pinning" rule, and only
-   because the master ScrollTrigger's remapT() (see that comment) no longer
-   assumes every section is 100vh - it measures real boundaries instead. */
-(function(){
-  const track = document.getElementById('recapTrack'); if (!track) return;
-  const wrap  = document.querySelector('.recap-wrap');
-  const cards = [...track.querySelectorAll('.r-card')];
-  const titleEl = document.getElementById('recapTitle');
-  const descEl  = document.getElementById('recapDesc');
-  let current = null;
-  /* same three colours the pills themselves use (.r-card .pill.<key> in
-     CSS) - read from the focused card's own pill rather than re-deriving
-     its category, so the two can never drift out of sync. */
-  const PILL_COLOR = { service:'var(--accent-ink)', fellowship:'var(--ink-body)', leadership:'var(--ink)' };
-
-  function setFocusText(card){
-    if (card === current) return;
-    current = card;
-    const pill = card.querySelector('.pill');
-    const key = pill && ['service','fellowship','leadership'].find(k => pill.classList.contains(k));
-    titleEl.style.opacity = 0; titleEl.style.transform = 'translateY(4px)';
-    descEl.style.opacity  = 0; descEl.style.transform  = 'translateY(4px)';
-    setTimeout(() => {
-      titleEl.textContent = card.dataset.title;
-      descEl.textContent  = card.dataset.desc;
-      titleEl.style.color = key ? PILL_COLOR[key] : '';
-      titleEl.style.opacity = 1; titleEl.style.transform = 'translateY(0)';
-      descEl.style.opacity  = 1; descEl.style.transform  = 'translateY(0)';
-    }, 280);
-  }
-
-  /* Mobile (<=640px) never gets the pin: scroll-linking a horizontal slide
-     to vertical touch-scroll is what "doesn't work" on a phone (the whole
-     point of a pin is overscroll dwell, which a phone's momentum scroll
-     fights instead of cooperating with). Same breakpoint used for the hero
-     swap and the '640px is the phone breakpoint' comment elsewhere in this
-     file - checked once at load, not live-reactive (this file doesn't
-     re-decide mobile-vs-desktop on resize anywhere else either). */
-  if (window.matchMedia('(max-width:640px)').matches) {
-    initMobileMarquee();
-    return;
-  }
-
-  /* distanceScale corrects for a gap between the geometry .r-card/.recap-track
-     actually need (scrollWidth - viewport) and what GSAP's containerAnimation
-     internally treats as "one full pass" for nested 'center right'/'center
-     left' triggers - measured, not derived: with scale=1 the first and last
-     card's own trigger windows land partly OUTSIDE the tween's [0,duration]
-     domain (card0 started at -0.06, card5 ended at 0.586 of a 0.5 domain),
-     so neither can ever reach true centre/full focus. Corrected once, right
-     after creation, from the actual measured overflow - self-calibrating
-     against whatever GSAP's real formula is, rather than reverse-engineering
-     it by hand. */
-  let distanceScale = 1;
-  const distance = () => Math.max(0, track.scrollWidth - wrap.clientWidth) * distanceScale;
-
-  const horizontalTween = gsap.to(track, { x: () => -distance(), ease: 'none' });
-
-  const pinST = ScrollTrigger.create({
-    trigger: '#gallery', start: 'top top', end: () => '+=' + distance(),
-    pin: true, pinType: 'transform', scrub: true, invalidateOnRefresh: true,
-    animation: horizontalTween,
-  });
-
-  const cardSTs = cards.map(card => ScrollTrigger.create({
-    trigger: card, containerAnimation: horizontalTween,
-    start: 'center right', end: 'center left', scrub: true,
-    onUpdate: self => {
-      const p = self.progress;                        // 0 entering -> 1 leaving
-      const focus = 1 - Math.abs(p - 0.5) * 2;          // 0..1, peaks at centre
-      card.style.opacity   = (0.55 + focus * 0.45).toFixed(3);
-      card.style.transform = `scale(${(0.88 + focus * 0.12).toFixed(3)})`;
-      if (focus > 0.9) setFocusText(card);
-    },
-  }));
-
-  ScrollTrigger.refresh();
-  const span = Math.max(...cardSTs.map(s => s.end)) - Math.min(...cardSTs.map(s => s.start));
-  const dur  = horizontalTween.duration();
-  if (span > 0 && dur > 0) distanceScale *= span / dur;
-  ScrollTrigger.refresh();
-
-  setFocusText(cards[0]);
-
-  /* ---- mobile: seamless autoplay marquee, drag to override ----
-     Fully decoupled from page scroll (no ScrollTrigger, no Lenis) - a
-     rAF loop translates the track at a constant speed and wraps it by
-     exactly one card-set width so the loop point is invisible. The set
-     is cloned once (2 copies back to back) so there's always a full
-     viewport of cards ahead of the wrap point. Dragging (pointer events,
-     so it works for touch AND mouse) grabs the same `x` 1:1 with the
-     finger; autoplay resumes on its own after RESUME_DELAY of no
-     interaction, continuing from wherever the drag left off. */
-  function initMobileMarquee(){
-    const clones = cards.map(c => c.cloneNode(true));
-    clones.forEach(c => track.appendChild(c));
-    const allCards = [...cards, ...clones];
-
-    let setWidth = 0;
-    const geo = [];
-    function measure(){
-      // difference between a card and its clone's LAYOUT position (offsetLeft
-      // ignores the transform we drive below) is exactly one set's width,
-      // whatever the real gap/padding turns out to be - not assumed.
-      setWidth = clones[0].offsetLeft - cards[0].offsetLeft;
-      geo.length = 0;
-      allCards.forEach(c => geo.push({ left: c.offsetLeft, width: c.offsetWidth }));
-    }
-    measure();
-    window.addEventListener('resize', measure);
-
-    const SPEED = 34;           // px/s autoplay drift
-    const RESUME_DELAY = 2500;  // ms of no touch before autoplay resumes
-    let x = 0;                  // current translateX, kept inside (-setWidth, 0]
-    let dragging = false, pointerId = null;
-    let dragStartClientX = 0, dragStartX = 0;
-    let lastInteraction = -Infinity, lastTs = null;
-
-    function wrapX(){
-      while (x <= -setWidth) x += setWidth;
-      while (x > 0) x -= setWidth;
-    }
-
-    function render(){
-      const wrapWidth = wrap.clientWidth;
-      const centerPoint = wrapWidth / 2 - x;   // track-local coord under viewport centre
-      let nearest = null, nearestDist = Infinity;
-      allCards.forEach((card, i) => {
-        const g = geo[i];
-        const cardCenter = g.left + g.width / 2;
-        let d = cardCenter - centerPoint;
-        if (d > setWidth / 2) d -= setWidth;      // fold onto the shortest wrap-around path
-        if (d < -setWidth / 2) d += setWidth;
-        const focus = Math.max(0, 1 - Math.abs(d) / (g.width * 0.9));
-        card.style.opacity = (0.55 + focus * 0.45).toFixed(3);
-        card.style.transform = `scale(${(0.88 + focus * 0.12).toFixed(3)})`;
-        if (Math.abs(d) < nearestDist) { nearestDist = Math.abs(d); nearest = cards[i % cards.length]; }
-      });
-      if (nearest) setFocusText(nearest);
-      track.style.transform = `translateX(${x}px)`;
-    }
-
-    function frame(ts){
-      if (lastTs == null) lastTs = ts;
-      const dt = (ts - lastTs) / 1000; lastTs = ts;
-      if (!dragging && (ts - lastInteraction) > RESUME_DELAY) {
-        x -= SPEED * dt;
-        wrapX();
-      }
-      render();
-      requestAnimationFrame(frame);
-    }
-    requestAnimationFrame(frame);
-
-    wrap.addEventListener('pointerdown', e => {
-      dragging = true; pointerId = e.pointerId;
-      wrap.setPointerCapture(pointerId);
-      dragStartClientX = e.clientX; dragStartX = x;
-      lastInteraction = performance.now();
-    });
-    wrap.addEventListener('pointermove', e => {
-      if (!dragging || e.pointerId !== pointerId) return;
-      x = dragStartX + (e.clientX - dragStartClientX);
-      wrapX();
-      lastInteraction = performance.now();
-    });
-    function endDrag(e){
-      if (!dragging || e.pointerId !== pointerId) return;
-      dragging = false; lastInteraction = performance.now();
-    }
-    wrap.addEventListener('pointerup', endDrag);
-    wrap.addEventListener('pointercancel', endDrag);
-
-    setFocusText(cards[0]);
-  }
-})();
-
-/* prototype-only handle, for reviewing the flight without a mouse */
-window.__dfly = {
-  get t(){ return state.t; },              // raw scroll progress
-  get virtualT(){ return remapT(state.t); }, // remapped so waypoint i lands at i/SEGMENTS - see remapT
-  get tBoundaries(){ return tBoundaries; },
-  lenis, fly, curve, WAYPOINTS, scene, camera, renderer,
-  flipNose(){ NOSE = -NOSE; return NOSE; },          // if it travels tail-first
-  setYaw: d => setYaw(d),                            // align the nose to travel
-  roll(deg){ fly.rotateZ(THREE.MathUtils.degToRad(deg)); },   // one-off, to inspect other faces
-  get scrollState(){ return { idle: (clock.elapsedTime - lastMovingAt) > IDLE_DWELL, speed: +smoothedScrollSpeed.toFixed(1) }; },
-  get heroPeek(){ return heroPeek; },   // 0..1 mobile load tease; 0 on desktop and after any scroll
-};
 </script>
 </body>
 </html>
