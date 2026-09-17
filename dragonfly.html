@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>LCOA — Dragonfly scroll guide (prototype)</title>
 <meta name="robots" content="noindex">
+  
 
 <!-- Type system lifted from the live site so the prototype reads as LCOA -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,32 +13,234 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Jost:wght@300;400;500&family=Pinyon+Script&display=swap" rel="stylesheet">
 
 <style>
+/*envelope*/
+:root {
+  /* Palette from WhatsApp Image */
+  --warm-ivory: #EBE5D6;
+  --antique-cream: #E5DFCF;
+  --soft-linen: #DDD6C7;
+  --dusty-blush: #CBA093;
+  --vintage-rose: #D6BEB1;
+  --sage-green: #ABB49C;
+  --olive-sage: #766F69;
+  --muted-moss: #57614D;
+  --slate-blue: #5A657C;
+  --warm-taupe: #A48D7B;
+}
+
+.events-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10rem; /* Spacing between different events */
+  width: 100%;
+  max-width: 800px;
+  margin-top: 4rem;
+}
+
+/* ---- Envelope Typography & Layout (Centered Everywhere) ---- */
+
+.event-item,
+.event-item.alternate {
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  justify-content: center;
+  gap: 3rem; /* Space between the envelope and the text beneath it */
+  cursor: pointer;
+  margin-bottom: 10rem; /* BULLETPROOF SPACING BETWEEN ENVELOPES */
+}
+
+/* Removes the extra space under the very last event so the footer isn't pushed too far down */
+.event-item:last-child {
+  margin-bottom: 0; 
+}
+
+.event-details,
+.event-item.alternate .event-details {
+  text-align: center;
+  max-width: 400px;
+  transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.event-title {
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-weight: 600; 
+  font-size: 2.6rem;
+  color: var(--warm-taupe);
+  margin: 0 0 0.8rem 0;
+  line-height: 1.1;
+}
+
+/* ---- Envelope Physics ---- */
+.envelope-wrapper {
+  position: relative;
+  width: 300px;
+  height: 200px;
+  perspective: 1200px; 
+}
+
+.envelope {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.env-back {
+  position: absolute;
+  inset: 0;
+  background: var(--antique-cream); 
+  border: 1px solid var(--soft-linen);
+  border-radius: 4px;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--muted-moss) 15%, transparent);
+}
+
+.env-photo {
+  position: absolute;
+  bottom: 10px;
+  left: 15px;
+  right: 15px;
+  height: 160px;
+  background: var(--warm-ivory);
+  border: 2px solid var(--soft-linen);
+  border-radius: 4px;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.env-front {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-left: 150px solid var(--vintage-rose); 
+  border-right: 150px solid var(--vintage-rose);
+  border-bottom: 110px solid var(--warm-ivory); 
+  border-top: 90px solid transparent;
+  border-radius: 0 0 4px 4px;
+  pointer-events: none; 
+}
+
+.env-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-left: 150px solid transparent;
+  border-right: 150px solid transparent;
+  border-top: 100px solid var(--dusty-blush); 
+  z-index: 4;
+  transform-origin: top;
+  pointer-events: none;
+}
+
+/* ---- Envelope Photo Seal ---- */
+.env-seal {
+  position: absolute;
+  width: 70px; 
+  height: 70px;
+  object-fit: cover; 
+  border-radius: 50%; /* Perfect circle */
+  border: 2px solid var(--warm-ivory);
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5; 
+  pointer-events: none; 
+  opacity: 0.95;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  transition: opacity 0.6s ease;
+}
+
+/* ============================================================
+   HOVER & CLICK STATES
+   ============================================================ */
+
+/* 1. Flap rotates up */
+.event-item:hover .env-flap,
+.event-item.is-open .env-flap {
+  transform: rotateX(180deg);
+  z-index: 1; 
+}
+
+/* 2. Photo/Letter slides up */
+.event-item:hover .env-photo,
+.event-item.is-open .env-photo {
+  transform: translateY(-65px);
+  z-index: 4;
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--olive-sage) 25%, transparent);
+}
+
+/* 3. Logo seal fades out so it doesn't block the letter */
+.event-item:hover .env-seal,
+.event-item.is-open .env-seal {
+  opacity: 0;
+}
+
+/* Ensure smooth resting states */
+.env-flap, .env-photo {
+    transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* ---- Pop-out Letter Typography ---- */
+.letter-content {
+  background: var(--warm-ivory);
+  height: 100%;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border: 1px solid var(--soft-linen);
+}
+
+.letter-content h4 {
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-size: 1.4rem;
+  color: var(--warm-taupe);
+  margin: 0 0 0.5rem 0;
+  line-height: 1;
+}
+
+.letter-content p {
+  font-family: var(--f-sans);
+  font-size: 0.85rem;
+  color: var(--muted-moss);
+  line-height: 1.5;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   MOBILE OVERRIDES
+   ============================================================ */
+@media (max-width: 768px) {
+  .events-container {
+    gap: 0; /* Turned off to rely on margin instead */
+  }
+  .event-item,
+  .event-item.alternate {
+    margin-bottom: 14rem; /* Extra large space on mobile so open flaps don't overlap */
+  }
+}
+
 @font-face{
   font-family:'Birds of Paradise';
   font-style:normal;font-weight:400;font-display:swap;
   src:local('Birds of Paradise  Personal use'),
       url('https://fonts.cdnfonts.com/s/15021/Birds%20of%20Paradise%20%C2%A9%20PERSONAL%20USE%20ONLY.woff') format('woff');
 }
+
 /* ============================================================
    MOOD SYSTEM
-   Three mood categories -> one bg + one accent each.
-   Placeholder values. Swap for real brand colours later;
-   nothing else needs to change.
    ============================================================ */
 :root{
-  /* live values, written each frame from a continuous 5-stop gradient
-     across the whole page - see GRADIENT_BG/GRADIENT_ACCENT in the JS */
   --bg:#EBE5D6;
   --accent:#CBA093;
-
-  /* Type colour is fixed, never gradient-driven. Two of the five gradient
-     colours fail contrast as body text at full saturation - Vintage Rose
-     3.68:1 and Dusty Blush 2.79:1 against Muted Moss, both under the 4.5:1
-     AA floor - which is why the background gradient uses tinted versions
-     of them (see GRADIENT_BG) while ACCENT keeps the full-strength hex,
-     since accents are never a text background.
-     Slate Blue and Muted Moss clear AA against every one of the tinted
-     background stops. */
   --ink:#5A657C;       /* slate blue - headings */
   --ink-body:#57614D;  /* muted moss - body copy */
   --line:#DDD6C7;      /* soft linen - borders & rules */
@@ -72,7 +275,6 @@ body{
   overflow-x:hidden;
 }
 
-/* ---- the one fixed transparent canvas ---- */
 #dfly-canvas{
   position:fixed; inset:0;
   width:100vw; height:100vh;
@@ -222,7 +424,6 @@ body{
   pointer-events:none; z-index:40; opacity:0;
 }
 
-/* ---- sections: equal height keeps waypoint↔section alignment 1:1 ---- */
 section{
   min-height:100vh;
   display:flex; flex-direction:column;
@@ -241,8 +442,6 @@ p{font-family:var(--f-serif); font-size:clamp(1.05rem,2.2vw,1.35rem); color:var(
 .hero-logo{
   display:block; margin:0 auto;
   width:min(42vw,240px); height:auto; margin-bottom:2rem;
-  /* the emblem is a light illustration on light paper, so it needs a lift
-     rather than a hard edge */
   filter:drop-shadow(0 18px 42px color-mix(in srgb,var(--ink) 22%,transparent));
 }
 
@@ -332,6 +531,12 @@ p{font-family:var(--f-serif); font-size:clamp(1.05rem,2.2vw,1.35rem); color:var(
 .t-card .nm{font-family:var(--f-script);font-size:1.35rem;line-height:1;color:var(--ink)}
 .t-card .ro{font-family:var(--f-sans);font-weight:500;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-body);margin-top:.35rem}
 
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1.2rem;margin-top:3rem;width:min(900px,100%)}
+.g-card{aspect-ratio:4/5;border-radius:12px;background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 62%,var(--paper)),color-mix(in srgb,var(--accent) 18%,var(--paper)));border:1px solid var(--line)}
+.g-card:nth-child(2){transform:scale(.9) translateY(18px);filter:blur(1px);opacity:.72}
+.g-card:nth-child(3){transform:scale(1.04) translateY(-10px)}
+.g-card:nth-child(4){transform:scale(.86) translateY(26px);filter:blur(1.6px);opacity:.6}
+.g-card:nth-child(5){transform:scale(.96) translateY(6px);opacity:.85}
 /* ---- recap: stat strip + PINNED horizontal scrolling gallery ----
    #gallery is pinned and the track is translated sideways by vertical
    scroll (GSAP's classic horizontal-gallery pattern) - deliberately NOT the
@@ -443,14 +648,12 @@ p{font-family:var(--f-serif); font-size:clamp(1.05rem,2.2vw,1.35rem); color:var(
 .recap-focus h3{font-family:var(--f-serif);font-style:italic;font-weight:600;font-size:clamp(1.5rem,3.2vw,1.9rem);color:var(--ink);margin:0 0 .4rem;transition:opacity .28s cubic-bezier(.4,0,.2,1),transform .28s cubic-bezier(.4,0,.2,1),color .28s ease}
 .recap-focus p{font-size:.92rem;transition:opacity .28s cubic-bezier(.4,0,.2,1) .04s,transform .28s cubic-bezier(.4,0,.2,1) .04s}
 
-/* ---- events ---- */
 .ev{display:flex;gap:1.2rem;flex-wrap:wrap;justify-content:center;margin-top:3rem}
 .e-card{width:210px;padding:1.6rem;border-radius:14px;text-align:left;border:1px solid var(--line);background:color-mix(in srgb,var(--paper) 45%,transparent)}
 .e-card.featured{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 26%,var(--paper))}
 .e-card .dt{font-family:var(--f-sans);font-weight:500;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-body)}
 .e-card .ti{font-family:var(--f-serif);font-weight:600;margin-top:.6rem;font-size:1.25rem;color:var(--ink)}
 
-/* ---- form: dragonfly rests to the SIDE, never over the inputs ---- */
 #form .wrap{width:min(440px,100%);margin-right:auto;margin-left:0;text-align:left}
 @media(min-width:900px){ #form{align-items:flex-start;padding-left:12vw} }
 label{display:block;font-family:var(--f-sans);font-weight:500;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-body);margin:1.4rem 0 .5rem}
@@ -471,13 +674,11 @@ button.sub{margin-top:2rem;padding:.9rem 2rem;border-radius:100px;border:0;backg
 .credit a{color:var(--ink)}
 footer{min-height:60vh;display:grid;place-items:center;text-align:center;padding:4rem 6vw;position:relative;z-index:2}
 
-/* ---- reduced motion ---- */
 @media(prefers-reduced-motion:reduce){
   .t-card{opacity:1;transform:none;transition:none}
   .g-card{filter:none;transform:none;opacity:1}
 }
 
-/* dev readout */
 #hud{position:fixed;left:10px;bottom:10px;z-index:99;font:11px ui-monospace,monospace;color:var(--ink-body);background:color-mix(in srgb,var(--paper) 70%,transparent);border:1px solid var(--line);padding:6px 9px;border-radius:6px;pointer-events:none}
 
 /* ============================================================
@@ -767,10 +968,69 @@ footer{min-height:60vh;display:grid;place-items:center;text-align:center;padding
 <section id="events" data-mood="energetic">
   <p class="eyebrow">What comes next</p>
   <h2>Upcoming events</h2>
-  <div class="ev">
-    <div class="e-card"><div class="dt">Coming soon</div><div class="ti">Placeholder event</div></div>
-    <div class="e-card featured" id="featuredEvent"><div class="dt">Next up</div><div class="ti">The Unveiling</div></div>
-    <div class="e-card"><div class="dt">Coming soon</div><div class="ti">Placeholder event</div></div>
+
+  <div class="events-container">
+      
+    <!-- Event 1: Old Age Home -->
+    <div class="event-item">
+      <div class="envelope-wrapper">
+        <div class="envelope">
+          <div class="env-back"></div>
+          
+          <div class="env-photo">
+            <div class="letter-content">
+              <h4>VIRSA: OLD AGE HOME VISIT</h4>
+              <p>15th August<br> Honouring the legacy of those who came before us, while planting something for those yet to come</p>
+            </div>
+          </div>
+          
+          <div class="env-front"></div>
+          <div class="env-flap"></div>
+          <img class="env-seal" src="images/seal.png" alt="Seal" />
+        </div>
+      </div>
+      
+
+    <!-- Event 2: Installation Ceremony -->
+    <div class="event-item alternate">
+      <div class="envelope-wrapper">
+        <div class="envelope">
+          <div class="env-back"></div>
+          
+          <div class="env-photo">
+             <div class="letter-content">
+              <h4>Installation Ceremony</h4>
+              <p>23rd August<br> We invite you to JASHN-E-A4 <br> Leo District 3231 A4's Installation Ceremony!</p>
+            </div>
+          </div>
+          
+          <div class="env-front"></div>
+          <div class="env-flap"></div>
+          <img class="env-seal" src="images/seal.png" alt="Seal" />
+        </div>
+      </div>
+     
+
+    <!-- Event 3: Aanchal Chapter 2 -->
+    <div class="event-item">
+      <div class="envelope-wrapper">
+        <div class="envelope">
+          <div class="env-back"></div>
+          
+          <div class="env-photo">
+            <div class="letter-content">
+              <h4>Aanchal Chapter: 2</h4>
+              <p>30th August</p>
+            </div>
+          </div>
+          
+          <div class="env-front"></div>
+          <div class="env-flap"></div>
+          <img class="env-seal" src="images/seal.png" alt="Seal" />
+        </div>
+      </div>
+     
+
   </div>
 </section>
 
@@ -1990,5 +2250,15 @@ window.__dfly = {
   get heroPeek(){ return heroPeek; },   // 0..1 mobile load tease; 0 on desktop and after any scroll
 };
 </script>
+
+<script>
+  // Add click-to-toggle functionality to envelopes
+  document.querySelectorAll('.event-item').forEach(item => {
+    item.addEventListener('click', () => {
+      item.classList.toggle('is-open');
+    });
+  });
+</script>
+
 </body>
 </html>
