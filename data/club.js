@@ -172,7 +172,7 @@ window.CLUB = {
     { name: 'Leo Divya Ramakrishnan',  role: 'Chief Innovation Coordinator', photo: 'images/board/divya-ramakrishnan.webp' },
     { name: 'Leo Rahul Dadheech',      role: 'Sponsorship & CSR Director',   photo: 'images/board/rahul-dadheech.webp' },
     { name: 'Leo Mahima Pal',          role: 'Media Outreach Director',      photo: 'images/board/mahima-pal.webp' },
-    { name: 'Leo Aryan Lakde',         role: 'Club Merchandise Officer',     photo: 'images/board/aryan-lakde.webp' }
+    { name: 'Leo Aryan Lakde',         role: 'Club Merchandise Officer',     photo: 'images/board/aryan-lakde.webp?v=2' }
   ],
 
   /* OSW, the flagship week (home page, above Upcoming events). The days come from `upcoming`
