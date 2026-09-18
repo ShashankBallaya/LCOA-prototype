@@ -626,6 +626,57 @@ a.folder:active{transform:scale(.97)}
 }
 .folder.soon .folder-front small{opacity:.85}
 </style>
+<style>
+/* Join form on desktop (18 Sep 2026). The circle left dead arcs at its sides while
+   squeezing the copy into a three line orphan, and at .8 opacity it hid the dusk render
+   it sits on. From 761px up the plate is an arch, the shape the site already uses for
+   portraits, the glass is real glass, and the fields stand in two columns under visible
+   labels. Phones keep the rounded card and the placeholder-only pills. */
+.flabel{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+@media (min-width:761px){
+  .join{padding:clamp(3.5rem,8vh,5.5rem) 1.5rem 2.5rem}
+  .disc{
+    width:min(760px,100%);aspect-ratio:auto;
+    /* an elliptical crown, not a half circle: the curve clears the labels at every width */
+    border-radius:50% 50% 32px 32px / 44% 44% 32px 32px;
+    padding:clamp(3.2rem,5.5vw,4.2rem) clamp(2.8rem,5vw,4rem) clamp(1.6rem,2.6vw,2rem);
+    background:rgba(251,240,227,.62);
+    backdrop-filter:blur(26px) saturate(1.12);
+    -webkit-backdrop-filter:blur(26px) saturate(1.12);
+    border:0;
+    box-shadow:0 50px 90px -46px rgba(30,51,36,.58);
+    /* a floor on the height keeps the crown an arch once the form gives way to the
+       thank you panel, which is barely half as tall */
+    min-height:clamp(480px,52vh,560px);
+    display:grid;align-content:center;justify-items:stretch;
+  }
+  /* the wrapper is shrink to fit inside the old circle: make it own the plate width */
+  .disc > div{width:100%}
+  .disc h2{margin-bottom:.4rem}
+  .disc .lede{max-width:38ch;margin-bottom:1.9rem}
+
+  .form{max-width:none;grid-template-columns:1fr 1fr;gap:1rem .9rem;text-align:left}
+  .form > .field:first-child,.form .interest,.form .btn,.form .form-note{grid-column:1 / -1}
+  .flabel{position:static;width:auto;height:auto;overflow:visible;clip-path:none;
+    display:block;margin:0 0 .35rem .3rem;
+    font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-ink)}
+  .field input{text-align:left;padding:.8rem 1.15rem;background:rgba(255,255,255,.82)}
+  /* the label above the field already names it: no need to say it twice */
+  .field input::placeholder{color:transparent}
+
+  .interest legend{margin:0 0 .4rem .3rem;font-size:.7rem;letter-spacing:.16em}
+  .interest-options{gap:.5rem}
+  .interest-options span{padding:.6rem .4rem;font-size:.84rem;background:rgba(255,255,255,.82)}
+
+  .form .btn{max-width:22rem;margin:.5rem auto 0}
+  .form-note{text-align:center}
+  .joined{max-width:40ch;padding:1rem 0 .5rem}
+}
+@media (min-width:761px) and (prefers-reduced-transparency:reduce){
+  .disc{background:var(--paper);backdrop-filter:none;-webkit-backdrop-filter:none}
+}
+</style>
 </head>
 <body>
 
@@ -931,9 +982,9 @@ a.folder:active{transform:scale(.97)}
         <h2>Become a member.</h2>
         <p class="lede">Leave your details and a board member will reach you on WhatsApp within a few days.</p>
         <form class="form" id="joinForm" novalidate>
-          <div class="field"><label for="n" class="sr-only">Full name</label><input id="n" name="name" type="text" autocomplete="name" placeholder="Full name" required></div>
-          <div class="field"><label for="e" class="sr-only">Email</label><input id="e" name="email" type="email" autocomplete="email" placeholder="Email" required></div>
-          <div class="field"><label for="w" class="sr-only">WhatsApp number</label><input id="w" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" placeholder="WhatsApp number" required></div>
+          <div class="field"><label for="n" class="flabel">Full name</label><input id="n" name="name" type="text" autocomplete="name" placeholder="Full name" required></div>
+          <div class="field"><label for="e" class="flabel">Email</label><input id="e" name="email" type="email" autocomplete="email" placeholder="Email" required></div>
+          <div class="field"><label for="w" class="flabel">WhatsApp number</label><input id="w" name="whatsapp" type="tel" autocomplete="tel" inputmode="tel" placeholder="WhatsApp number" required></div>
           <fieldset class="interest">
             <legend>What interests you?</legend>
             <div class="interest-options">
