@@ -234,6 +234,80 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
   footer{padding:1.5rem 1.25rem max(1.5rem,env(safe-area-inset-bottom))}
 }
 </style>
+<style>
+/* Month calendars (added 18 Sep 2026). The "Coming up" list now sits after the past
+   events, so the home page links to events.html#calendar still land on it. */
+/* Note text on a month card: sage-deep reads 2.6:1 on paper-2, too pale for 11px, so the
+   sage months get a deeper leaf green (4.8:1). The other three tones already pass. */
+:root{--sage-ink:#556B4A}
+.calendar{padding-bottom:clamp(3rem,7vh,4.5rem);scroll-margin-top:5.5rem}
+.calgrid{padding-top:clamp(2.5rem,6vh,4rem)}
+.cg-head{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem 2rem;flex-wrap:wrap;margin-bottom:1.8rem}
+.cg-head h2{font-size:clamp(2.3rem,4.4vw,3.2rem)}
+.cg-head p{font-size:.92rem;max-width:30ch}
+.cg-head a{display:inline-block;white-space:nowrap;font-size:.88rem;color:var(--gold-ink);border-bottom:1px solid var(--gold-line);padding-bottom:.1rem}
+@media (hover:hover) and (pointer:fine){.cg-head a:hover{border-bottom-color:var(--gold)}}
+
+.cg-month{--cg-accent:var(--sage-ink);--cg-plate:var(--sage-soft);position:relative;
+  border:1px solid var(--gold-line);border-radius:24px;background:var(--paper-2);
+  padding:clamp(1.3rem,3vw,2.4rem) clamp(1rem,2.6vw,2.4rem) clamp(1.2rem,2.6vw,1.8rem)}
+.cg-month.blush{--cg-accent:var(--rose-ink);--cg-plate:var(--blush-soft)}
+.cg-month.gold{--cg-accent:var(--gold-ink);--cg-plate:#EFE0C6}
+.cg-month.rose{--cg-accent:var(--rose-ink);--cg-plate:#F1DED0}
+.cg-month + .cg-month{margin-top:clamp(2rem,5vh,3rem)}
+.cg-title{text-align:center;font-family:var(--f-display);font-style:italic;font-weight:300;
+  font-size:clamp(2.6rem,6vw,4rem);line-height:1;color:var(--ink)}
+.cg-year{max-width:none;text-align:center;margin-top:.5rem;font-size:.7rem;letter-spacing:.24em;
+  color:var(--cg-accent);font-variant-numeric:lining-nums tabular-nums}
+.cg-art{margin:1.1rem auto 1.1rem;aspect-ratio:16/6.5;border-radius:16px;overflow:hidden;
+  background:var(--cg-plate);position:relative;display:grid;place-items:center}
+.cg-art img{width:100%;height:100%;object-fit:cover}
+.cg-art.plate-only{aspect-ratio:16/4.2}
+.cg-art .plate{width:min(30%,150px);height:auto;opacity:.5;object-fit:contain;mix-blend-mode:multiply}
+.cg-grid{display:grid;grid-template-columns:repeat(7,1fr);margin-top:1.4rem}
+.cg-dow{font-family:var(--f-display);font-style:italic;font-weight:300;font-size:clamp(1rem,2vw,1.5rem);
+  text-align:center;color:var(--ink);padding-bottom:.6rem;border-bottom:1px solid var(--gold-line)}
+.cg-cell{position:relative;min-height:5rem;padding:.5rem .35rem .7rem;text-align:center;border-bottom:1px solid var(--gold-line)}
+.cg-cell.pad{min-height:0}
+.cg-grid .cg-cell:nth-last-child(-n+7){border-bottom:0}
+.cg-day{display:block;font-size:.9rem;font-variant-numeric:lining-nums tabular-nums;color:var(--ink)}
+.cg-cell.today .cg-day{display:inline-block;min-width:1.7em;border-radius:999px;background:var(--ink);color:var(--paper)}
+.cg-cell.past .cg-day{color:var(--ink-2)}
+.cg-note{display:block;margin-top:.3rem;font-size:.72rem;line-height:1.3;color:var(--cg-accent);text-wrap:balance}
+.cg-note + .cg-note{margin-top:.25rem}
+.cg-note.done{color:var(--ink-2)}
+.cg-note.tent::after{content:"*"}
+.cg-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:.8rem;margin-top:1.1rem}
+.cg-foot p{font-size:.76rem;color:var(--gold-ink)}
+.cg-save{font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;padding:.6rem 1.1rem;
+  border:1px solid var(--gold-line);border-radius:999px;background:transparent;color:var(--ink);
+  font-family:inherit;cursor:pointer;transition:border-color .2s ease,background .2s ease,transform .12s ease}
+.cg-save:active{transform:scale(.97)}
+.cg-save[disabled]{opacity:.6;cursor:default}
+.cg-save:focus-visible,.cg-head a:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:999px}
+@media (hover:hover) and (pointer:fine){.cg-save:hover{border-color:var(--gold);background:var(--paper)}}
+
+/* narrow screens: the cells only carry dots, the month's dates read as a short list */
+.cg-key{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip-path:inset(50%);white-space:nowrap;list-style:none}
+.cg-key li{display:grid;grid-template-columns:2.6rem 1fr;gap:.7rem;padding:.6rem .1rem;border-bottom:1px solid var(--gold-line)}
+.cg-key b{font-family:var(--f-display);font-weight:400;font-size:1.1rem;color:var(--cg-accent);font-variant-numeric:lining-nums}
+.cg-key span{font-size:.86rem;color:var(--ink)}
+.cg-dot{display:none;position:absolute;left:50%;bottom:.55rem;width:.42rem;height:.42rem;
+  margin-left:-.21rem;border-radius:999px;background:var(--cg-accent)}
+.cg-cell.past .cg-dot{background:var(--ink-2)}
+@media (max-width:700px){
+  .cg-month{padding:1.1rem .7rem 1.2rem;border-radius:18px}
+  .cg-grid{margin-top:1rem}
+  .cg-cell{min-height:2.9rem;padding:.4rem .1rem .5rem}
+  .cg-note{display:none}
+  .cg-dot{display:block}
+  .cg-key{position:static;width:auto;height:auto;margin:1rem 0 0;overflow:visible;
+    clip-path:none;white-space:normal;border-top:1px solid var(--gold-line)}
+  .cg-art{aspect-ratio:16/9}
+}
+@media (prefers-reduced-motion:reduce){.cg-save{transition:none}}
+</style>
 </head>
 <body>
 
@@ -301,7 +375,7 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
 
   <section class="wrap" id="next" aria-labelledby="nextTitle"></section>
 
-  <section class="wrap calendar" id="calendar" aria-labelledby="calTitle" hidden></section>
+  <section class="wrap calgrid" id="calgrid" aria-labelledby="calgridTitle" hidden></section>
 
   <section class="section" aria-label="Past events">
     <div class="wrap">
@@ -310,6 +384,8 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
       <noscript><p class="empty">Turn on JavaScript to see the list of events.</p></noscript>
     </div>
   </section>
+
+  <section class="wrap calendar" id="calendar" aria-labelledby="calTitle" hidden></section>
 </main>
 
 <div class="closing">
@@ -334,6 +410,236 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
   </div>
 </div>
 
+<script>
+/* Month calendars above the list (added 18 Sep 2026). Runs before the main script so its
+   reveal observer sees the rendered cards. Facts come from data/club.js. */
+(function(){
+  var C=window.CLUB, host=document.getElementById('calgrid');
+  if(!C||!host) return;
+  var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var DOW=['Sun','Mon','Tues','Wed','Thurs','Fri','Sat'];
+  var TONE=[
+    {key:'sage', ink:'#556B4A', plate:'#DCE5D2'},
+    {key:'blush',ink:'#8E4255', plate:'#F6D9DD'},
+    {key:'gold', ink:'#7E5F3A', plate:'#EFE0C6'},
+    {key:'rose', ink:'#8E4255', plate:'#F1DED0'}
+  ];
+  var CREST='images/logo-340.webp';
+  function esc(t){ var d=document.createElement('div'); d.textContent=t==null?'':t; return d.innerHTML; }
+  function iso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+  function tone(key){ return TONE[(+key.slice(5,7)-1)%TONE.length]; }
+  function art(key){ var a=C.calendarArt||{}; var v=a[key]; if(v===undefined) v=a[key.slice(5,7)]; return v||null; }
+
+  var today=new Date(); today.setHours(0,0,0,0);
+  var todayIso=iso(today);
+  var future=(C.upcoming||[]).filter(function(e){ return e.date && e.date>=todayIso; });
+  if(!future.length){ host.remove(); return; }
+
+  /* one calendar per month that has something coming up, the current month always first */
+  var keys=[], seen={};
+  function push(k){ if(!seen[k]){ seen[k]=1; keys.push(k); } }
+  push(todayIso.slice(0,7));
+  future.forEach(function(e){ push(e.date.slice(0,7)); });
+  keys.sort();
+
+  /* every dated fact of a month: what is coming, and what already happened */
+  function itemsOf(key){
+    var out={};
+    function add(day,title,kind,tentative){
+      (out[day]=out[day]||[]).push({title:title,kind:kind,tentative:!!tentative});
+    }
+    future.forEach(function(e){ if(e.date.slice(0,7)===key) add(+e.date.slice(8,10), e.short||e.title, 'next', e.tentative); });
+    (C.events||[]).forEach(function(e){ if(e.date && e.date.slice(0,7)===key) add(+e.date.slice(8,10), e.short||e.title, 'done', false); });
+    return out;
+  }
+
+  var cards=keys.map(function(key){
+    var y=+key.slice(0,4), m=+key.slice(5,7)-1, t=tone(key), items=itemsOf(key);
+    var first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+    var picture=art(key), cells='', i, d;
+    for(i=0;i<first;i++) cells+='<div class="cg-cell pad"></div>';
+    for(d=1;d<=days;d++){
+      var list=items[d]||[], dIso=key+'-'+String(d).padStart(2,'0');
+      var cls='cg-cell'+(dIso===todayIso?' today':dIso<todayIso?' past':'');
+      cells+='<div class="'+cls+'"><span class="cg-day">'+d+'</span>'+
+        list.map(function(it){
+          return '<span class="cg-note'+(it.kind==='done'?' done':'')+(it.tentative?' tent':'')+'">'+esc(it.title)+'</span>';
+        }).join('')+
+        (list.length?'<span class="cg-dot" aria-hidden="true"></span>':'')+'</div>';
+    }
+    var tail=(7-((first+days)%7))%7;
+    for(i=0;i<tail;i++) cells+='<div class="cg-cell pad"></div>';
+
+    var keyRows=Object.keys(items).sort(function(a,b){ return a-b; }).map(function(d){
+      return '<li><b>'+d+'</b><span>'+items[d].map(function(it){ return esc(it.title)+(it.tentative?'*':''); }).join(' · ')+'</span></li>';
+    }).join('');
+    var anyTent=Object.keys(items).some(function(d){ return items[d].some(function(it){ return it.tentative; }); });
+
+    return '<section class="cg-month '+t.key+' reveal" data-key="'+key+'">'+
+      '<h3 class="cg-title">'+MONTHS[m]+'</h3><p class="cg-year">'+y+'</p>'+
+      '<div class="cg-art'+(picture?'':' plate-only')+'">'+(picture
+        ? '<img src="'+esc(picture)+'" alt="" loading="lazy">'
+        : '<img class="plate" src="'+CREST+'" alt="" width="340" height="322" loading="lazy">')+'</div>'+
+      '<div class="cg-grid" aria-hidden="true">'+
+        DOW.map(function(n){ return '<div class="cg-dow">'+n+'</div>'; }).join('')+cells+
+      '</div>'+
+      (keyRows?'<ul class="cg-key">'+keyRows+'</ul>':'')+
+      '<div class="cg-foot"><p>'+(anyTent?'* tentative, dates can still change':'')+'</p>'+
+        '<button class="cg-save" type="button" data-save="'+key+'">Save as image</button></div>'+
+      '</section>';
+  }).join('');
+
+  host.innerHTML='<div class="cg-head reveal"><h2 id="calgridTitle">The <em>calendar.</em></h2>'+
+    '<p>Month by month, everything on the plan. <a href="#calendar">Read it as a list</a></p></div>'+cards;
+  host.hidden=false;
+
+  /* ---- save one month as a PNG, drawn on a canvas with the page fonts ---- */
+  var W=600, H=860, S=2, PAD=50, COL=(W-PAD*2)/7;
+  function loadImg(src){
+    return new Promise(function(res,rej){
+      var im=new Image(); im.onload=function(){ res(im); }; im.onerror=rej; im.src=src;
+    });
+  }
+  function cover(ctx,im,x,y,w,h){
+    var r=Math.max(w/im.width,h/im.height), iw=im.width*r, ih=im.height*r;
+    ctx.drawImage(im,x+(w-iw)/2,y+(h-ih)/2,iw,ih);
+  }
+  function clipPlate(ctx,x,y,w,h,r){
+    ctx.beginPath();
+    if(ctx.roundRect) ctx.roundRect(x,y,w,h,r); else ctx.rect(x,y,w,h);
+  }
+  function lines(ctx,text,maxW,maxLines){
+    var words=String(text).split(/\s+/), out=[], line='', i;
+    for(i=0;i<words.length;i++){
+      var t=line?line+' '+words[i]:words[i];
+      if(ctx.measureText(t).width>maxW && line){ out.push(line); line=words[i]; }
+      else line=t;
+    }
+    if(line) out.push(line);
+    if(out.length>maxLines){
+      out=out.slice(0,maxLines);
+      out[maxLines-1]=out[maxLines-1].replace(/[\s,.:;]*\S*$/,'…');
+    }
+    return out;
+  }
+  function track(ctx,text,x,y,gap){
+    /* letter spacing by hand: ctx.letterSpacing is not in every browser yet */
+    var chars=String(text).split(''), w=0, i;
+    for(i=0;i<chars.length;i++) w+=ctx.measureText(chars[i]).width+gap;
+    w-=gap;
+    var cx=x-w/2, save=ctx.textAlign;
+    ctx.textAlign='left';
+    for(i=0;i<chars.length;i++){ ctx.fillText(chars[i],cx,y); cx+=ctx.measureText(chars[i]).width+gap; }
+    ctx.textAlign=save;
+  }
+
+  function draw(key){
+    var y=+key.slice(0,4), m=+key.slice(5,7)-1, t=tone(key), items=itemsOf(key);
+    var first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+    var rows=Math.ceil((first+days)/7), picture=art(key);
+    var cv=document.createElement('canvas');
+    cv.width=W*S; cv.height=H*S;
+    var ctx=cv.getContext('2d');
+    ctx.scale(S,S);
+    ctx.fillStyle='#FBF0E3'; ctx.fillRect(0,0,W,H);
+    ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+
+    ctx.fillStyle='#1E3324';
+    ctx.font='italic 300 56px "Cormorant Garamond", Georgia, serif';
+    ctx.fillText(MONTHS[m],W/2,88);
+    ctx.fillStyle=t.ink;
+    ctx.font='300 12px Jost, Arial, sans-serif';
+    track(ctx,String(y),W/2,108,2.4);
+
+    var ax=PAD, ay=124, aw=W-PAD*2, ah=200;
+    ctx.save(); clipPlate(ctx,ax,ay,aw,ah,14); ctx.clip();
+    ctx.fillStyle=t.plate; ctx.fillRect(ax,ay,aw,ah);
+    return loadImg(picture||CREST).then(function(im){
+      if(picture) cover(ctx,im,ax,ay,aw,ah);
+      else {
+        ctx.globalAlpha=.5;
+        var cw=aw*.26, ch=cw*(im.height/im.width);
+        ctx.drawImage(im,ax+(aw-cw)/2,ay+(ah-ch)/2,cw,ch);
+        ctx.globalAlpha=1;
+      }
+      ctx.restore();
+
+      ctx.fillStyle='#7E5F3A';
+      ctx.font='300 11px Jost, Arial, sans-serif';
+      track(ctx,'LCOA CALENDAR',W/2,354,2.6);
+      ctx.strokeStyle='#DCC3A3'; ctx.lineWidth=.8;
+      ctx.beginPath();
+      ctx.moveTo(PAD,350); ctx.lineTo(PAD+110,350);
+      ctx.moveTo(W-PAD-110,350); ctx.lineTo(W-PAD,350);
+      ctx.stroke();
+
+      ctx.fillStyle='#1E3324';
+      ctx.font='italic 300 21px "Cormorant Garamond", Georgia, serif';
+      for(var i=0;i<7;i++) ctx.fillText(DOW[i],PAD+COL*i+COL/2,398);
+
+      var top=412, rh=Math.min(74,(H-top-46)/rows);
+      ctx.strokeStyle='#DCC3A3';
+      ctx.beginPath(); ctx.moveTo(PAD,top-4); ctx.lineTo(W-PAD,top-4); ctx.stroke();
+
+      for(var d=1;d<=days;d++){
+        var slot=first+d-1, cx=PAD+COL*(slot%7)+COL/2, cy=top+rh*Math.floor(slot/7);
+        var dIso=key+'-'+String(d).padStart(2,'0');
+        ctx.font='300 13px Jost, Arial, sans-serif';
+        if(dIso===todayIso){
+          ctx.fillStyle='#1E3324';
+          ctx.beginPath(); ctx.arc(cx,cy+12,10,0,Math.PI*2); ctx.fill();
+          ctx.fillStyle='#FBF0E3';
+        }else ctx.fillStyle=dIso<todayIso?'#4F5F4F':'#1E3324';
+        ctx.fillText(String(d),cx,cy+17);
+
+        var list=items[d]||[], ny=cy+30;
+        ctx.font='300 9.5px Jost, Arial, sans-serif';
+        for(var k=0;k<list.length;k++){
+          ctx.fillStyle=list[k].kind==='done'?'#4F5F4F':t.ink;
+          var ls=lines(ctx,list[k].title+(list[k].tentative?'*':''),COL-8,list.length>1?2:4);
+          for(var l=0;l<ls.length;l++){ ctx.fillText(ls[l],cx,ny); ny+=11; }
+          ny+=2;
+        }
+      }
+      for(var r=1;r<=rows;r++){
+        ctx.beginPath(); ctx.moveTo(PAD,top+rh*r-4); ctx.lineTo(W-PAD,top+rh*r-4); ctx.stroke();
+      }
+
+      ctx.fillStyle='#7E5F3A';
+      ctx.font='300 10px Jost, Arial, sans-serif';
+      var tent=Object.keys(items).some(function(d){ return items[d].some(function(it){ return it.tentative; }); });
+      track(ctx,'LEO CLUB OF AURELIAN  ·  @LCO_AURELIAN'+(tent?'  ·  * TENTATIVE':''),W/2,H-22,1.8);
+      return cv;
+    });
+  }
+
+  function fonts(){
+    if(!document.fonts) return Promise.resolve();
+    return Promise.all([
+      document.fonts.load('italic 300 56px "Cormorant Garamond"'),
+      document.fonts.load('300 13px Jost')
+    ]).then(function(){ return document.fonts.ready; });
+  }
+
+  host.addEventListener('click',function(ev){
+    var b=ev.target.closest('[data-save]');
+    if(!b) return;
+    var key=b.getAttribute('data-save'), label=b.textContent;
+    b.disabled=true; b.textContent='Saving…';
+    fonts().then(function(){ return draw(key); }).then(function(cv){
+      return new Promise(function(res){ cv.toBlob(res,'image/png'); });
+    }).then(function(blob){
+      var url=URL.createObjectURL(blob), a=document.createElement('a');
+      a.href=url; a.download='LCOA-calendar-'+key+'.png';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(url); },4000);
+      b.disabled=false; b.textContent=label;
+    })['catch'](function(){
+      b.disabled=false; b.textContent='Try again';
+    });
+  });
+})();
+</script>
 <script>
 (function(){
   var C=window.CLUB;

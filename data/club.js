@@ -117,7 +117,8 @@ window.CLUB = {
 
   /* Upcoming, in date order. Events drop off both pages on their own once their date has passed.
      Source for October and November: OSW_and_Upcoming_Events_2026.csv (tentative, 17 Sep 2026).
-     `series: 'OSW'` groups the 2 to 9 October run into one block. `focus` is a short label. */
+     `series: 'OSW'` groups the 2 to 9 October run into one block. `focus` is a short label.
+     `short` is an optional shorter title for the month calendars, where a cell is narrow. */
   upcoming: [
     { title: 'Installation Ceremony', date: '2026-09-20',
       text: 'The very first installation of Leo Club of Aurelian. Invitations are on their way.',
@@ -132,12 +133,27 @@ window.CLUB = {
     { title: 'Stationery Kits / Animal Feeding',   date: '2026-10-08', focus: 'Underprivileged children and stray animals', series: 'OSW', tentative: true },
     { title: 'OSW Finale',                         date: '2026-10-09', focus: 'Closing event',                   series: 'OSW', tentative: true },
 
-    { title: 'Blood Donation: Leo Club of Kandivali Lokhandwala', date: '2026-10-18', focus: 'Blood donation',                  tentative: true },
-    { title: 'After Hours',                        date: '2026-10-23', focus: 'GLT event and twinning',          tentative: true },
-    { title: 'Umeed',                              date: '2026-11-01', focus: null,                              tentative: true },
+    { title: 'Blood Donation: Leo Club of Kandivali Lokhandwala', date: '2026-10-18', focus: 'Blood donation',                  tentative: true,
+      short: 'Blood Donation' },
+    { title: 'After Hours',                        date: '2026-10-23', focus: 'Twinning with Vashi Virtues and Ummeed', tentative: true },
+    { title: 'Ummeed',                             date: '2026-11-01', focus: 'District service initiative',      tentative: true },
     { title: 'Aanchal: Chapter 5',                 date: '2026-11-14', focus: 'Party and celebration',           tentative: true },
     { title: 'Empowerment × Side Quest',           date: '2026-11-29', focus: 'Women empowerment',               tentative: true }
   ],
+
+  /* Calendar art: the wide picture at the top of each month card on events.html.
+     Key is 'YYYY-MM' for one month, or 'MM' (month number, zero padded) to reuse the
+     same picture every year. Value is a path under images/calendar/ (landscape, about
+     1400x600, WebP) or null.
+     null is fine: the month then shows a woven paper plate with the crest, and the
+     downloaded image uses the same plate. Note colours rotate through sage, blush,
+     gold and rose by month number, so nothing else needs editing. */
+  calendarArt: {
+    '09': 'images/calendar/september.webp',
+    '10': 'images/calendar/october.webp',
+    '11': 'images/calendar/november.webp',
+    '12': null
+  },
 
   /* Board of directors (club officers), from the 2026-2027 Club Officers directory.
      Names and roles only: never add phone numbers or emails to this file, it is public.
