@@ -118,7 +118,9 @@ window.CLUB = {
   /* Upcoming, in date order. Events drop off both pages on their own once their date has passed.
      Source for October and November: OSW_and_Upcoming_Events_2026.csv (tentative, 17 Sep 2026).
      `series: 'OSW'` groups the 2 to 9 October run into one block. `focus` is a short label.
-     `short` is an optional shorter title for the month calendars, where a cell is narrow. */
+     `short` is an optional shorter title for the month calendars, where a cell is narrow.
+     `place` is the venue. Add it as soon as it is known: an upcoming event with a place
+     is published as a schema.org Event, which can show as a search result of its own. */
   upcoming: [
     { title: 'Installation Ceremony', date: '2026-09-20',
       text: 'The very first installation of Leo Club of Aurelian. Invitations are on their way.',

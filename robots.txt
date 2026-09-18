@@ -1,2 +1,5 @@
+# Leo Club of Aurelian
 User-agent: *
-Disallow: /
+Allow: /
+
+Sitemap: https://lcoaurelian.in/sitemap.xml

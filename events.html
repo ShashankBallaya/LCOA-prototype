@@ -4,12 +4,88 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Events · Leo Club of Aurelian</title>
-<meta name="description" content="Every event Leo Club of Aurelian has run so far: service drives, fellowship and leadership, month by month, plus what is coming next.">
+<meta name="description" content="Every event Leo Club of Aurelian has run, month by month, plus the calendar of what is coming next: service drives, ceremonies and meetings.">
+<link rel="canonical" href="https://lcoaurelian.in/events.html">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Leo Club of Aurelian">
+<meta property="og:locale" content="en_IN">
+<meta property="og:title" content="Events · Leo Club of Aurelian">
+<meta property="og:description" content="Every event Leo Club of Aurelian has run, month by month, plus the calendar of what is coming next: service drives, ceremonies and meetings.">
+<meta property="og:url" content="https://lcoaurelian.in/events.html">
+<meta property="og:image" content="https://lcoaurelian.in/images/og.jpg">
+<meta property="og:image:secure_url" content="https://lcoaurelian.in/images/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The club crest over a sage green room at dusk, with the words Leo Club of Aurelian and Built on bonds.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Events · Leo Club of Aurelian">
+<meta name="twitter:description" content="Every event Leo Club of Aurelian has run, month by month, plus the calendar of what is coming next: service drives, ceremonies and meetings.">
+<meta name="twitter:image" content="https://lcoaurelian.in/images/og.jpg">
+<meta name="twitter:image:alt" content="The club crest over a sage green room at dusk, with the words Leo Club of Aurelian and Built on bonds.">
+<link rel="icon" href="images/icon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="images/icon-64.png" sizes="64x64" type="image/png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": "https://lcoaurelian.in/events.html",
+      "url": "https://lcoaurelian.in/events.html",
+      "name": "Events · Leo Club of Aurelian",
+      "inLanguage": "en-IN",
+      "isPartOf": { "@id": "https://lcoaurelian.in/#site" },
+      "about": { "@id": "https://lcoaurelian.in/#club" },
+      "primaryImageOfPage": "https://lcoaurelian.in/images/og.jpg"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://lcoaurelian.in/" },
+        { "@type": "ListItem", "position": 2, "name": "Events", "item": "https://lcoaurelian.in/events.html" }
+      ]
+    }
+  ]
+}
+</script>
 <meta name="theme-color" content="#FBF0E3">
 <link rel="icon" href="images/logo-96.webp">
 <!-- self-hosted fonts (SIL Open Font License, see fonts/OFL-*.txt): one variable file per style, preloaded -->
 <!-- site data, loaded before the body so the first paint already includes the rendered cards (no layout jump) -->
 <script src="data/club.js"></script>
+<script>
+/* Upcoming events as schema.org Event, built from data/club.js. Google needs a name, a
+   startDate and a location before an Event counts, so an entry without `place` is left
+   out: give it a place in data/club.js and it appears here. Crawlers that do not run
+   JavaScript see the CollectionPage below instead. */
+(function(){
+  var C=window.CLUB; if(!C||!C.upcoming) return;
+  var today=new Date(); today.setHours(0,0,0,0);
+  var items=C.upcoming.filter(function(e){ return e.date && e.place && new Date(e.date+'T00:00')>=today; });
+  if(!items.length) return;
+  var graph=items.map(function(e){
+    var ev={
+      "@type":"Event",
+      "name":e.title,
+      "startDate":e.date,
+      "eventAttendanceMode":"https://schema.org/OfflineEventAttendanceMode",
+      "location":{"@type":"Place","name":e.place,"address":{"@type":"PostalAddress","addressCountry":"IN"}},
+      "organizer":{"@id":"https://lcoaurelian.in/#club"},
+      "image":"https://lcoaurelian.in/images/og.jpg",
+      "url":"https://lcoaurelian.in/events.html"
+    };
+    if(e.focus||e.text) ev.description=e.focus||e.text;
+    return ev;
+  });
+  var tag=document.createElement('script');
+  tag.type='application/ld+json';
+  tag.textContent=JSON.stringify({"@context":"https://schema.org","@graph":graph});
+  document.head.appendChild(tag);
+})();
+</script>
 <link rel="preload" href="fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/cormorant-garamond-italic.woff2" as="font" type="font/woff2" crossorigin>
