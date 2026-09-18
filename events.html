@@ -57,6 +57,21 @@
 <!-- site data, loaded before the body so the first paint already includes the rendered cards (no layout jump) -->
 <script src="data/club.js"></script>
 <script>
+/* The card at the top carries the biggest picture on a phone, and it is the LCP element.
+   The renderer runs at the end of the body, so without this the browser does not learn
+   about the picture until everything else has loaded. Reading it from the same data keeps
+   it correct when the next event changes. */
+(function(){
+  var C=window.CLUB; if(!C||!C.upcoming) return;
+  var now=new Date(), iso=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  var next=C.upcoming.filter(function(e){ return e.date && e.date>=iso; })[0];
+  if(!next||!next.photo) return;
+  var link=document.createElement('link');
+  link.rel='preload'; link.as='image'; link.href=next.photo; link.fetchPriority='high';
+  document.head.appendChild(link);
+})();
+</script>
+<script>
 /* Upcoming events as schema.org Event, built from data/club.js. Google needs a name, a
    startDate and a location before an Event counts, so an entry without `place` is left
    out: give it a place in data/club.js and it appears here. Crawlers that do not run
@@ -255,6 +270,9 @@ p{max-width:58ch}
 .cal-series .cal-row:last-child{border-bottom:0}
 .cal-series .cal-date b{color:var(--rose-ink)}
 .empty[hidden],.card[hidden],.month[hidden]{display:none}
+/* the 0.5s reveal is for scrolling into the page once; filtering is repeated, so it is quicker */
+.card.quick{transition-duration:.15s}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
 /* closing band: image runs into the bottom edge */
 .closing{padding:0 .75rem}
@@ -283,8 +301,8 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
 }
 
 @media (max-width:960px){
-  .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:flex-start;gap:0;background:var(--paper);border-bottom:1px solid var(--gold-line);padding:.5rem 1.5rem 1.2rem;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .18s ease,transform .18s var(--ease-out),visibility 0s .18s}
-  .nav.open .nav-links{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+  .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:flex-start;gap:0;background:var(--paper);border-bottom:1px solid var(--gold-line);padding:.5rem 1.5rem 1.2rem;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .12s ease,transform .12s var(--ease-out),visibility 0s .12s}
+  .nav.open .nav-links{opacity:1;visibility:visible;transform:none;transition:opacity .18s ease,transform .18s var(--ease-out),visibility 0s}
   .nav-links li{width:100%}
   .nav-links a{display:block;padding:.8rem 0;font-size:1.05rem}
   .nav-links a[aria-current]::after{display:none}
@@ -446,6 +464,7 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
     <div class="reveal">
       <p class="lede" id="pageLede">Service drives, ceremonies and meetings, newest first.</p>
       <div class="filters" id="filters" role="group" aria-label="Filter events by kind"></div>
+      <p class="sr-only" id="filterNote" aria-live="polite"></p>
     </div>
   </div>
 
@@ -712,6 +731,8 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
       b.disabled=false; b.textContent=label;
     })['catch'](function(){
       b.disabled=false; b.textContent='Try again';
+      /* the label must not stay wrong: put it back after a moment */
+      setTimeout(function(){ if(b.textContent==='Try again') b.textContent=label; },4000);
     });
   });
 })();
@@ -730,6 +751,14 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
     var open=nav.classList.toggle('open');
     burger.setAttribute('aria-expanded',open?'true':'false');
     burger.setAttribute('aria-label',open?'Close menu':'Open menu');
+  });
+  /* an open menu covers the page: Escape is the key everyone reaches for */
+  document.addEventListener('keydown',function(e){
+    if(e.key!=='Escape'||!nav.classList.contains('open')) return;
+    nav.classList.remove('open');
+    burger.setAttribute('aria-expanded','false');
+    burger.setAttribute('aria-label','Open menu');
+    burger.focus();
   });
   function onScroll(){nav.classList.toggle('scrolled',window.scrollY>8);}
   onScroll(); window.addEventListener('scroll',onScroll,{passive:true});
@@ -836,18 +865,30 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
       '<ul class="grid">'+g.items.map(card).join('')+'</ul></section>';
   }).join('');
 
-  function apply(f){
-    var any=false;
+  var filterNote=document.getElementById('filterNote');
+  function apply(f,fast){
+    var any=false, total=0;
     months.querySelectorAll('[data-month]').forEach(function(m){
       var shown=0;
-      m.querySelectorAll('.card').forEach(function(c){ var on=f==='all'||c.dataset.cat===f; c.hidden=!on; if(on){ shown++; c.classList.add('in'); } });
-      m.hidden=!shown; any=any||!!shown;
+      m.querySelectorAll('.card').forEach(function(c){
+        var on=f==='all'||c.dataset.cat===f;
+        c.hidden=!on;
+        if(on){
+          shown++;
+          /* a filter is not a first scroll: no stagger delay, and a shorter fade */
+          if(fast){ c.style.transitionDelay='0ms'; c.classList.add('quick'); }
+          c.classList.add('in');
+        }
+      });
+      m.hidden=!shown; any=any||!!shown; total+=shown;
       m.querySelector('[data-month-count]').textContent=shown+(shown===1?' event':' events');
     });
     document.getElementById('empty').hidden=any;
     filters.querySelectorAll('.chip').forEach(function(b){ b.setAttribute('aria-pressed',String(b.dataset.f===f)); });
+    /* the grid changing is silent for a screen reader, so say it */
+    if(fast) filterNote.textContent=(WORDS[total]||total)+' '+(f==='all'?'':LABEL[f].toLowerCase()+' ')+(total===1?'event':'events')+' shown.';
   }
-  filters.addEventListener('click',function(e){ var b=e.target.closest('.chip'); if(b) apply(b.dataset.f); });
+  filters.addEventListener('click',function(e){ var b=e.target.closest('.chip'); if(b) apply(b.dataset.f,true); });
   apply('all');
   months.querySelectorAll('.card').forEach(function(c){ c.classList.remove('in'); });
 

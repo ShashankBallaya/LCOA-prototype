@@ -152,9 +152,9 @@ p{max-width:58ch}
 .btn:active{transform:scale(.97)}
 @media (hover:hover) and (pointer:fine){.btn:hover{transform:translateY(-1px)}.btn:hover:active{transform:scale(.97)}}
 .btn-ink{background:var(--ink);color:var(--paper)}
-.btn-ink:hover{background:#2B4634}
+@media (hover:hover) and (pointer:fine){.btn-ink:hover{background:#2B4634}}
 .btn-blush{background:var(--blush);color:var(--ink)}
-.btn-blush:hover{background:#EBB5BD}
+@media (hover:hover) and (pointer:fine){.btn-blush:hover{background:#EBB5BD}}
 .btn-line{border-color:var(--gold-line);color:var(--ink)}
 @media (hover:hover) and (pointer:fine){.btn-line:hover{border-color:var(--gold);background:var(--paper-2)}}
 
@@ -202,7 +202,7 @@ p{max-width:58ch}
 .hero .lede{font-size:1.15rem;max-width:42ch;margin:0 auto 2rem;color:var(--ink-2)}
 .hero-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:.8rem}
 .hero .btn-line{border-color:rgba(30,51,36,.38);background:rgba(251,240,227,.35)}
-.hero .btn-line:hover{border-color:var(--ink);background:rgba(251,240,227,.7)}
+@media (hover:hover) and (pointer:fine){.hero .btn-line:hover{border-color:var(--ink);background:rgba(251,240,227,.7)}}
 
 /* desktop hero uses the generated scene; phones keep the gradient + peonies until the tall render lands */
 @media (min-width:761px){
@@ -335,7 +335,8 @@ footer .top{display:flex;flex-wrap:wrap;justify-content:space-between;align-item
 footer .big{font-family:var(--f-display);font-weight:300;font-size:clamp(2.2rem,6vw,4.6rem);line-height:1;color:var(--paper)}
 footer .big em{color:var(--sage)}
 .foot-links{display:flex;flex-wrap:wrap;gap:1.4rem;font-size:.9rem}
-.foot-links a{opacity:.85}.foot-links a:hover{opacity:1}
+.foot-links a{opacity:.85}
+@media (hover:hover) and (pointer:fine){.foot-links a:hover{opacity:1}}
 footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;padding-top:1.2rem;font-size:.78rem;color:rgba(251,240,227,.72)}
 
 /* reveal */
@@ -357,8 +358,8 @@ footer .bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1re
 
 /* ---------- responsive ---------- */
 @media (max-width:960px){
-  .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:flex-start;gap:0;background:var(--paper);border-bottom:1px solid var(--gold-line);padding:.5rem 1.5rem 1.2rem;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .18s ease,transform .18s var(--ease-out),visibility 0s .18s}
-  .nav.open .nav-links{opacity:1;visibility:visible;transform:none;transition-delay:0s}
+  .nav-links{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:flex-start;gap:0;background:var(--paper);border-bottom:1px solid var(--gold-line);padding:.5rem 1.5rem 1.2rem;opacity:0;visibility:hidden;transform:translateY(-6px);transition:opacity .12s ease,transform .12s var(--ease-out),visibility 0s .12s}
+  .nav.open .nav-links{opacity:1;visibility:visible;transform:none;transition:opacity .18s ease,transform .18s var(--ease-out),visibility 0s}
   .nav-links li{width:100%}
   .nav-links a{display:block;padding:.8rem 0;font-size:1.05rem}
   .nav-links .btn{margin-top:.6rem;display:inline-flex}
@@ -1280,9 +1281,16 @@ a.folder:active{transform:scale(.97)}
     burger.setAttribute('aria-expanded',open?'true':'false');
     burger.setAttribute('aria-label',open?'Close menu':'Open menu');
   });
-  links.addEventListener('click',function(e){
-    if(e.target.tagName==='A'){nav.classList.remove('open');burger.setAttribute('aria-expanded','false');}
-  });
+  function closeMenu(focusBurger){
+    if(!nav.classList.contains('open')) return;
+    nav.classList.remove('open');
+    burger.setAttribute('aria-expanded','false');
+    burger.setAttribute('aria-label','Open menu');
+    if(focusBurger) burger.focus();
+  }
+  links.addEventListener('click',function(e){ if(e.target.tagName==='A') closeMenu(false); });
+  /* an open menu covers the page: Escape is the key everyone reaches for */
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeMenu(true); });
   function onScroll(){nav.classList.toggle('scrolled',window.scrollY>8);}
   onScroll();window.addEventListener('scroll',onScroll,{passive:true});
 
