@@ -28,7 +28,7 @@ from Google Fonts. Vanilla JS only.
 | Join | Layout done. The form validates but posts nowhere; it needs a form service or backend. |
 | Footer | Done. Shares the closing image band (`images/closing.webp`) with Join. |
 
-## Ceremony slides (`slides.html`)
+## Ceremony slides (`installationpresentation.html`)
 
 Projection deck for **The Mad Hour**, the club's 1st Installation Ceremony
 (20 Sep 2026, Spring Banquets, Vashi). One agenda point per slide: the point
@@ -44,7 +44,7 @@ closes it. Not linked from the site and marked `noindex`.
   fullscreen. Swipe works on a phone. The controls, counter and progress line
   fade out 2.6 s after the last input and return on the next one, so the room
   sees the ceremony and not the chrome.
-- **Deep links:** `slides.html#7` opens on agenda point 7, so a reload during
+- **Deep links:** `installationpresentation.html#7` opens on agenda point 7, so a reload during
   the ceremony never loses the place.
 - **PDF for the AV desk:** print the page (landscape, background graphics on).
   Each slide is one page.
@@ -62,7 +62,7 @@ closes it. Not linked from the site and marked `noindex`.
 
 `deck/the-mad-hour.pptx` is the same 22 slides as a 16:9 PowerPoint, built by
 `python3 tools/build-pptx.py` (needs `python-pptx` and `pillow`). It reads the
-`AGENDA` array out of `slides.html`, so the two decks cannot drift apart: edit
+`AGENDA` array out of `installationpresentation.html`, so the two decks cannot drift apart: edit
 the agenda in one place, rebuild, done.
 
 - **Transitions:** a 0.7 s fade between slides, advancing on click only, written
@@ -71,7 +71,7 @@ the agenda in one place, rebuild, done.
 - **Real text, not pictures**, so a name can be fixed on the day. It asks for
   Cormorant Garamond and Jost; install both from Google Fonts on the machine
   that will present, or the deck falls back to whatever that machine has.
-  Print `slides.html` to PDF instead if you cannot install fonts — a PDF carries
+  Print `installationpresentation.html` to PDF instead if you cannot install fonts — a PDF carries
   its own.
 - The stage behind the text is baked once from `images/hero-wide.webp` with the
   page's paper wash, into `deck/assets/` (git-ignored, rebuilt on demand).

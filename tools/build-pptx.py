@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Build the PowerPoint deck for The Mad Hour from the same content as slides.html.
+"""Build the PowerPoint deck for The Mad Hour from the same content as installationpresentation.html.
 
     python3 tools/build-pptx.py
 
 Writes deck/the-mad-hour.pptx: 16:9, one agenda point per slide, the home page's
 generated hero scene as the stage, a smooth fade between slides on click.
 
-The agenda lives in slides.html and is read from there, so the two decks can never
+The agenda lives in installationpresentation.html and is read from there, so the two decks can never
 drift apart. Text is real text, not a picture, so names can be fixed in PowerPoint
 on the day; it wants Cormorant Garamond and Jost installed (fonts/install/).
 """
@@ -55,8 +55,8 @@ def js_text(s):
 
 
 def read_agenda():
-    """Pull EVENT and AGENDA out of slides.html so there is one source of truth."""
-    src = (ROOT / "slides.html").read_text(encoding="utf-8")
+    """Pull EVENT and AGENDA out of installationpresentation.html so there is one source of truth."""
+    src = (ROOT / "installationpresentation.html").read_text(encoding="utf-8")
     def field(name):
         return js_text(re.search(name + r":'((?:[^'\\]|\\.)*)'", src).group(1))
     event = {k: field(k) for k in ("title", "sub", "when", "where")}
@@ -66,7 +66,7 @@ def read_agenda():
         topic, speaker, mins = row.groups()
         agenda.append({"topic": js_text(topic), "speaker": js_text(speaker), "mins": int(mins)})
     if len(agenda) < 2:
-        sys.exit("could not read AGENDA out of slides.html")
+        sys.exit("could not read AGENDA out of installationpresentation.html")
     return event, agenda
 
 
