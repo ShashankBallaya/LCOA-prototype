@@ -32,7 +32,7 @@ from Google Fonts. Vanilla JS only.
 
 Projection deck for **The Mad Hour**, the club's 1st Installation Ceremony
 (20 Sep 2026, Spring Banquets, Vashi). One agenda point per slide: the point
-as the `h2` line, the member or guest calling it as the `h1` under it. The
+as the `h1` display line, the member or guest calling it as the `h2` under it. The
 stage behind every slide is the same generated hero render the home page uses
 (`images/hero-wide.webp`, `images/hero-tall.webp` on phones), held still while
 only the words cross-fade. A title card opens the deck and a thank-you card
@@ -51,11 +51,33 @@ closes it. Not linked from the site and marked `noindex`.
 - **Editing:** the `AGENDA` array at the bottom of the file is the only thing to
   change — `topic`, `speaker`, `mins`, in running order. Wording follows the
   printed agenda card, with its typos fixed.
-- **Names:** the honorific (`Leo`, `Lion`, `Leo Lion`, `MJF Lion`) is split off
-  and set small above the name, and the name steps down a size at 14 and 21
-  characters, so every slide lands at about the same weight. Two people on one
-  point: separate them with ` / ` and they stack with a hairline between.
+- **Sizing:** the agenda point sets in four steps by length (18, 40 and 62
+  characters), so "Leo Pledge" and a full district title fill about the same
+  block of screen. Under the rule, the honorific (`Leo`, `Lion`, `Leo Lion`,
+  `MJF Lion`) shares the name's line, told apart by colour rather than stacked
+  above it. Two people on one point: separate them with ` / `.
 - **No portraits**, by request: the slide face is the agenda point and the name.
+
+### PowerPoint version
+
+`deck/the-mad-hour.pptx` is the same 22 slides as a 16:9 PowerPoint, built by
+`python3 tools/build-pptx.py` (needs `python-pptx` and `pillow`). It reads the
+`AGENDA` array out of `slides.html`, so the two decks cannot drift apart: edit
+the agenda in one place, rebuild, done.
+
+- **Transitions:** a 0.7 s fade between slides, advancing on click only, written
+  so PowerPoint 2010+ gets the timed fade and Keynote, Google Slides and older
+  PowerPoint get a plain one. Nothing auto-advances.
+- **Real text, not pictures**, so a name can be fixed on the day. It asks for
+  Cormorant Garamond and Jost; install both from Google Fonts on the machine
+  that will present, or the deck falls back to whatever that machine has.
+  Print `slides.html` to PDF instead if you cannot install fonts — a PDF carries
+  its own.
+- The stage behind the text is baked once from `images/hero-wide.webp` with the
+  page's paper wash, into `deck/assets/` (git-ignored, rebuilt on demand).
+- Each slide's notes carry its number and its minutes from the run sheet.
+- One known difference from the web deck: PowerPoint has no control for lining
+  numerals, so "1st" and "2026-27" use Cormorant's old-style figures.
 
 ## Motion
 

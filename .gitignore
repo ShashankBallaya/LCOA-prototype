@@ -1,0 +1,3 @@
+# build products: rebuilt by tools/build-pptx.py
+deck/assets/
+__pycache__/

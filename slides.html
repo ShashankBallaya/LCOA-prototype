@@ -46,6 +46,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
+html{scrollbar-color:var(--sage-deep) var(--paper-2);caret-color:var(--ink)}
 body{overflow:hidden;background:var(--paper);color:var(--ink-2);
   font-family:var(--f-sans);font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased}
 img{display:block;max-width:100%}
@@ -100,42 +101,40 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .slide.on .mark{opacity:.9;transition:opacity .5s var(--ease-out) .1s}
 @media (max-height:460px){.mark{display:none}}
 
-/* the agenda point sits above, the member calling it below, as the run sheet reads */
-.slide h2{font-family:var(--f-sans);font-weight:300;color:var(--ink-2);
-  font-size:clamp(1.05rem,2.3vw,1.7rem);line-height:1.5;letter-spacing:.005em;
-  max-width:26ch;text-wrap:balance;text-shadow:0 1px 20px rgba(251,240,227,.75)}
+/* the agenda point is the slide; the member calling it reads under the rule.
+   The point sets in four steps by length, so "Leo Pledge" and a full district
+   title both fill about the same block of the screen. */
+.topic{font-family:var(--f-display);font-weight:300;color:var(--ink);
+  line-height:1.06;letter-spacing:-.014em;text-wrap:balance;
+  font-variant-numeric:lining-nums;font-feature-settings:"lnum";
+  text-shadow:0 2px 30px rgba(251,240,227,.65)}
+.topic-xl{font-size:clamp(2.8rem,6.6vw,5.4rem);max-width:15ch}
+.topic-lg{font-size:clamp(2.4rem,5.4vw,4.4rem);max-width:18ch}
+.topic-md{font-size:clamp(2rem,4.3vw,3.5rem);max-width:22ch}
+.topic-sm{font-size:clamp(1.75rem,3.5vw,2.8rem);max-width:26ch}
 .rule{width:clamp(76px,9vw,116px);height:1px;margin:clamp(1.3rem,3vh,2.1rem) 0;
   background:linear-gradient(90deg,rgba(220,195,163,0),var(--gold-line),rgba(220,195,163,0))}
 
-/* the name is the slide. The honorific stays with it but steps back a size, so
-   "Leo Lion Sudhanshu Maheshwari" reads as a person, not as a long line of type. */
-.name{display:flex;flex-direction:column;align-items:center;gap:clamp(1rem,2.4vh,1.6rem)}
-.unit{display:block}
-.honorific{display:block;font-family:var(--f-sans);font-weight:400;
-  font-size:clamp(.64rem,1vw,.8rem);letter-spacing:.3em;text-transform:uppercase;
-  color:var(--gold-ink);margin-bottom:clamp(.5rem,1.2vh,.85rem);text-indent:.3em}
-.given{display:block;font-family:var(--f-display);font-weight:300;color:var(--ink);
-  line-height:1.02;letter-spacing:-.012em;text-wrap:balance;
-  text-shadow:0 2px 30px rgba(251,240,227,.65)}
-/* one step down per name length, so every slide lands at about the same weight */
-.name-xl .given{font-size:clamp(2.5rem,7vw,6rem)}
-.name-lg .given{font-size:clamp(2.2rem,6vw,5.1rem)}
-.name-md .given{font-size:clamp(1.95rem,4.9vw,4.2rem)}
-.name-pair .given{font-size:clamp(1.6rem,3.8vw,3.1rem)}
-.name-pair .unit + .unit{position:relative;padding-top:clamp(1rem,2.4vh,1.6rem)}
-.name-pair .unit + .unit::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:56px;height:1px;background:linear-gradient(90deg,rgba(220,195,163,0),var(--gold-line),rgba(220,195,163,0))}
+/* honorific and name share one line, told apart by colour rather than by a label
+   stacked above them */
+.speaker{font-family:var(--f-sans);font-weight:400;color:var(--ink);
+  font-size:clamp(1.15rem,2.5vw,1.9rem);line-height:1.5;letter-spacing:.045em;
+  max-width:36ch;text-wrap:balance;text-shadow:0 1px 20px rgba(251,240,227,.8)}
+.speaker .hon{color:var(--gold-ink);font-weight:300;font-size:.8em;
+  letter-spacing:.2em;text-transform:uppercase;margin-right:.1em}
+.speaker .sep{color:var(--gold);opacity:.55;margin:0 .45em;font-weight:300}
 
 /* title and closing cards borrow the home page's display voice */
 .slide-title .crest{width:clamp(96px,9.5vw,144px);height:auto;
   margin-bottom:clamp(1.4rem,3vh,2.2rem);filter:drop-shadow(0 14px 22px rgba(30,51,36,.18))}
 .slide-title h1{font-family:var(--f-display);font-weight:300;color:var(--ink);
   font-size:clamp(2.9rem,7.8vw,6.3rem);line-height:1.02;letter-spacing:-.012em;
+  font-variant-numeric:lining-nums;font-feature-settings:"lnum";
   text-shadow:0 2px 30px rgba(251,240,227,.65)}
 .slide-title .sub{font-family:var(--f-display);font-style:italic;font-weight:300;color:var(--sage-deep);
   font-size:clamp(1.25rem,3.1vw,2.1rem);line-height:1.2;margin-top:.5rem}
-.slide-title .meta{font-size:clamp(.7rem,1.3vw,.82rem);letter-spacing:.22em;text-transform:uppercase;
-  color:var(--gold-ink);text-indent:.22em}
+.slide-title .meta{font-size:clamp(.78rem,1.45vw,.95rem);letter-spacing:.03em;
+  color:var(--gold-ink)}
 .slide-title .meta span{display:block}
 .slide-title .meta span + span{margin-top:.45rem}
 
@@ -164,7 +163,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   .arrow:not([disabled]):hover{border-color:var(--gold);background:var(--paper-2)}
 }
 .hint{position:fixed;bottom:clamp(1.25rem,3vh,2.15rem);left:50%;transform:translateX(-50%);z-index:5;
-  font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-ink);text-indent:.18em;
+  font-size:.72rem;letter-spacing:.02em;color:var(--gold-ink);
   padding:.4rem .9rem;border-radius:999px;background:rgba(251,240,227,.5);
   transition:opacity .4s ease;pointer-events:none}
 .hint.gone{opacity:0}
@@ -191,9 +190,10 @@ body.idle .controls{pointer-events:none}
 @media (hover:hover) and (pointer:fine){.jump button:hover{border-color:var(--gold)}}
 .jump .n{font-size:.72rem;letter-spacing:.14em;color:var(--gold-ink);padding-top:.3rem;
   font-variant-numeric:tabular-nums}
-.jump .t{font-size:.9rem;line-height:1.4;color:var(--ink)}
-.jump .s{display:block;font-family:var(--f-display);font-size:1.15rem;line-height:1.25;
-  color:var(--ink-2);margin-top:.2rem}
+.jump .t{font-family:var(--f-display);font-size:1.2rem;line-height:1.2;color:var(--ink);
+  font-variant-numeric:lining-nums;font-feature-settings:"lnum"}
+.jump .s{display:block;font-size:.82rem;line-height:1.4;letter-spacing:.03em;
+  color:var(--ink-2);margin-top:.35rem}
 .jump .m{display:block;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
   color:var(--gold-ink);margin-top:.35rem}
 .overview-close{position:fixed;top:clamp(1rem,3vh,1.8rem);right:clamp(1rem,3vw,1.8rem)}
@@ -273,8 +273,8 @@ body.idle .controls{pointer-events:none}
 /* The Mad Hour, 1st Installation Ceremony of Leo Club of Aurelian.
    Source: the printed agenda card, 20 September 2026 (80 minutes over 20 points).
 
-   TO UPDATE: edit AGENDA below and nothing else. `topic` is the line above the rule,
-   `speaker` the name under it, `mins` shows only in the agenda jump list (A key),
+   TO UPDATE: edit AGENDA below and nothing else. `topic` is the display line above
+   the rule, `speaker` the name under it, `mins` shows only in the jump list (A key),
    never on the slide face. Two names for one point: separate them with " / ".
    Order here is the order on the night. */
 (function(){
@@ -314,20 +314,22 @@ body.idle .controls{pointer-events:none}
   function esc(t){ var d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
   function pad(n){ return n<10 ? '0'+n : ''+n; }
 
-  /* "Leo Lion Rakhshan Khan" is an honorific and a person: set them at different
-     sizes so every slide lands on the name, whatever the title in front of it. */
-  var HONORIFIC=/^(Leo Lion|MJF Lion|Lion|Leo)\s+/;
-  function unit(full){
-    var m=full.match(HONORIFIC), hon=m?m[1]:'', given=m?full.slice(m[0].length):full;
-    return { given:given,
-      html:'<span class="unit">'+(hon?'<span class="honorific">'+esc(hon)+'</span>':'')+
-           '<span class="given">'+esc(given)+'</span></span>' };
+  /* the agenda point sets in four steps by length, so no slide is a wall of type
+     and none is a lonely two words */
+  function topicBlock(topic){
+    var n=topic.length,
+        size = n<=18 ? 'topic-xl' : n<=40 ? 'topic-lg' : n<=62 ? 'topic-md' : 'topic-sm';
+    return '<h1 class="topic '+size+'">'+esc(topic)+'</h1>';
   }
-  function nameBlock(speaker){
-    var parts=speaker.split(' / ').map(unit),
-        longest=parts.reduce(function(n,p){ return Math.max(n,p.given.length); },0),
-        size = parts.length>1 ? 'name-pair' : longest<=13 ? 'name-xl' : longest<=20 ? 'name-lg' : 'name-md';
-    return '<h1 class="name '+size+'">'+parts.map(function(p){ return p.html; }).join('')+'</h1>';
+
+  /* "Leo Lion Rakhshan Khan" is an honorific and a person: one line, told apart by
+     colour. Two people on one point are separated by a gold slash. */
+  var HONORIFIC=/^(Leo Lion|MJF Lion|Lion|Leo)\s+/;
+  function speakerBlock(speaker){
+    return '<h2 class="speaker">'+speaker.split(' / ').map(function(full){
+      var m=full.match(HONORIFIC), hon=m?m[1]:'', given=m?full.slice(m[0].length):full;
+      return (hon?'<span class="hon">'+esc(hon)+'</span> ':'')+esc(given);
+    }).join('<span class="sep">/</span>')+'</h2>';
   }
 
   var CREST='<img class="mark" src="images/logo-340.webp" width="340" height="322" alt="" decoding="async">';
@@ -348,9 +350,9 @@ body.idle .controls{pointer-events:none}
   AGENDA.forEach(function(item){
     html.push('<section class="slide" aria-roledescription="slide">'+CREST+
       '<div class="slide-in">'+
-      '<h2>'+esc(item.topic)+'</h2>'+
+      topicBlock(item.topic)+
       '<div class="rule"></div>'+
-      nameBlock(item.speaker)+
+      speakerBlock(item.speaker)+
       '</div></section>');
   });
 
