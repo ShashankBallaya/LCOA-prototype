@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Mad Hour · Agenda slides · Leo Club of Aurelian</title>
+<meta name="description" content="Projection slides for The Mad Hour, the 1st Installation Ceremony of Leo Club of Aurelian: one agenda point per slide with the member calling it.">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#FBF0E3">
+<link rel="icon" href="images/icon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="images/icon-64.png" sizes="64x64" type="image/png">
+<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+<link rel="preload" href="fonts/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/cormorant-garamond-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
+<!-- the stage behind every slide is the biggest thing on screen: fetch the right one first -->
+<link rel="preload" as="image" href="images/hero-wide.webp" media="(min-width: 761px)" fetchpriority="high">
+<link rel="preload" as="image" href="images/hero-tall.webp" media="(max-width: 760px)" fetchpriority="high">
+<style>
+/* self-hosted fonts, SIL Open Font License: see fonts/OFL-*.txt */
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 500;font-display:swap;src:url(fonts/cormorant-garamond.woff2) format('woff2')}
+@font-face{font-family:'Cormorant Garamond';font-style:italic;font-weight:300 500;font-display:swap;src:url(fonts/cormorant-garamond-italic.woff2) format('woff2')}
+@font-face{font-family:'Jost';font-style:normal;font-weight:300 500;font-display:swap;src:url(fonts/jost.woff2) format('woff2')}
+@font-face{font-family:'Cormorant Fallback';font-style:normal;src:local('Georgia');size-adjust:88.37%;ascent-override:104.11%;descent-override:32.82%;line-gap-override:0%}
+@font-face{font-family:'Cormorant Fallback';font-style:italic;src:local('Georgia Italic'),local('Georgia-Italic');size-adjust:79.1%;ascent-override:116.31%;descent-override:36.66%;line-gap-override:0%}
+@font-face{font-family:'Jost Fallback';font-style:normal;src:local('Arial'),local('ArialMT');size-adjust:92.21%;ascent-override:116.04%;descent-override:41.21%;line-gap-override:0%}
+
+:root{
+  --paper:#FBF0E3;
+  --paper-2:#F4E6D3;
+  --sage-soft:#DCE5D2;
+  --sage-deep:#7F9673;
+  --ink:#1E3324;
+  --ink-2:#4F5F4F;
+  --gold:#967349;
+  --gold-line:#DCC3A3;
+  --gold-ink:#7E5F3A;   /* gold for small text: 5.6:1 on paper */
+  --ease-out:cubic-bezier(.23,1,.32,1);
+  --f-display:'Cormorant Garamond','Cormorant Fallback',Georgia,serif;
+  --f-sans:'Jost','Jost Fallback',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{overflow:hidden;background:var(--paper);color:var(--ink-2);
+  font-family:var(--f-sans);font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+::selection{background:var(--sage-soft);color:var(--ink)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:4px}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- the stage ----------
+   One background for the whole deck, not one per slide: the scene holds still
+   and only the words cross-fade. Same generated hero render as the home page. */
+.deck{position:fixed;inset:0;overflow:hidden;
+  background:
+    radial-gradient(58% 52% at 50% 46%,rgba(251,240,227,.80) 0%,rgba(251,240,227,.34) 56%,rgba(251,240,227,0) 84%),
+    linear-gradient(180deg,rgba(251,240,227,.22) 0%,rgba(251,240,227,0) 34%),
+    url("images/hero-tall.webp") center 38% / cover no-repeat,
+    #DCE4CF}
+@media (min-width:761px){
+  .deck{background:
+    radial-gradient(56% 56% at 50% 48%,rgba(251,240,227,.78) 0%,rgba(251,240,227,.30) 58%,rgba(251,240,227,0) 84%),
+    linear-gradient(180deg,rgba(251,240,227,.18) 0%,rgba(251,240,227,0) 30%),
+    url("images/hero-wide.webp") center 28% / cover no-repeat,
+    #DCE4CF}
+}
+
+/* ---------- slides ---------- */
+.slide{position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+  padding:clamp(3rem,9vh,6rem) clamp(1.5rem,7vw,6rem);
+  opacity:0;visibility:hidden;transition:opacity .45s var(--ease-out),visibility .45s}
+.slide.on{opacity:1;visibility:visible}
+.slide-in{display:flex;flex-direction:column;align-items:center;max-width:min(1000px,92vw)}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.slide.on .slide-in > *{animation:rise .55s var(--ease-out) both}
+.slide.on .slide-in > :nth-child(2){animation-delay:.06s}
+.slide.on .slide-in > :nth-child(3){animation-delay:.12s}
+.slide.on .slide-in > :nth-child(4){animation-delay:.18s}
+
+/* the agenda point sits above, the member calling it below, as the run sheet reads */
+.slide h2{font-family:var(--f-sans);font-weight:300;color:var(--ink-2);
+  font-size:clamp(1.1rem,2.5vw,1.8rem);line-height:1.45;letter-spacing:.01em;
+  max-width:26ch;text-wrap:balance}
+.slide h1{font-family:var(--f-display);font-weight:300;color:var(--ink);
+  font-size:clamp(2.15rem,6.8vw,5.6rem);line-height:1.04;letter-spacing:-.01em;
+  text-wrap:balance;text-shadow:0 2px 30px rgba(251,240,227,.6)}
+.rule{width:clamp(92px,12vw,148px);height:1px;margin:clamp(1.4rem,3.2vh,2.4rem) 0;
+  background:linear-gradient(90deg,rgba(220,195,163,0),var(--gold-line),rgba(220,195,163,0))}
+.crest{width:clamp(96px,10vw,148px);height:auto;margin-bottom:clamp(1.4rem,3vh,2.2rem);
+  filter:drop-shadow(0 14px 22px rgba(30,51,36,.18))}
+
+/* title and closing slides borrow the home page's display voice */
+.slide-title h1{font-size:clamp(3rem,8vw,6.5rem)}
+.slide-title .sub{font-family:var(--f-display);font-style:italic;font-weight:300;color:var(--sage-deep);
+  font-size:clamp(1.3rem,3.2vw,2.2rem);line-height:1.2;margin-top:.6rem}
+.slide-title .meta{font-size:clamp(.72rem,1.4vw,.84rem);letter-spacing:.2em;text-transform:uppercase;
+  color:var(--gold-ink)}
+.slide-title .meta span{display:block}
+.slide-title .meta span + span{margin-top:.45rem}
+
+/* ---------- chrome ---------- */
+.progress{position:fixed;top:0;left:0;height:2px;background:var(--gold);width:0;
+  transition:width .45s var(--ease-out);z-index:5}
+/* the scene under the chrome is light but busy: a paper pill keeps small text readable */
+.count{position:fixed;bottom:clamp(1.1rem,3vh,2rem);left:clamp(1.1rem,3vw,2.4rem);z-index:5;
+  font-size:.74rem;letter-spacing:.2em;color:var(--gold-ink);font-variant-numeric:tabular-nums;
+  padding:.4rem .8rem;border-radius:999px;background:rgba(251,240,227,.55)}
+.count:empty{display:none}
+.controls{position:fixed;bottom:clamp(1rem,3vh,2rem);right:clamp(1rem,3vw,2.4rem);z-index:5;
+  display:flex;align-items:center;gap:.6rem}
+.arrow{width:2.6rem;height:2.6rem;border-radius:50%;border:1px solid var(--gold-line);
+  display:grid;place-items:center;color:var(--ink);background:rgba(251,240,227,.45);
+  transition:background .2s ease,border-color .2s ease,color .2s ease,transform .16s var(--ease-out)}
+.arrow svg{width:.95rem;height:.95rem}
+.arrow:active{transform:scale(.94)}
+.arrow[disabled]{opacity:.35;cursor:default}
+@media (hover:hover) and (pointer:fine){
+  .arrow:not([disabled]):hover{border-color:var(--gold);background:var(--paper-2)}
+}
+.hint{position:fixed;bottom:clamp(1.25rem,3vh,2.15rem);left:50%;transform:translateX(-50%);z-index:5;
+  font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-ink);
+  padding:.4rem .9rem;border-radius:999px;background:rgba(251,240,227,.55);
+  transition:opacity .4s ease;pointer-events:none}
+.hint.gone{opacity:0}
+@media (max-width:640px){.hint{display:none}}
+
+/* ---------- jump list ---------- */
+.overview{position:fixed;inset:0;z-index:10;background:rgba(251,240,227,.97);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  overflow-y:auto;padding:clamp(1.5rem,5vh,3rem) clamp(1.25rem,5vw,3rem) 4rem}
+.overview[hidden]{display:none}
+.overview h2{font-family:var(--f-display);font-weight:400;color:var(--ink);font-size:1.9rem;
+  margin-bottom:1.4rem;text-align:center}
+.jump{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.6rem;
+  width:min(1120px,100%);margin-inline:auto;list-style:none}
+.jump button{display:grid;grid-template-columns:2.2rem 1fr;gap:.6rem;width:100%;text-align:left;
+  padding:.85rem 1rem;border:1px solid var(--gold-line);border-radius:16px;background:var(--paper);
+  transition:border-color .2s ease,transform .2s var(--ease-out)}
+.jump button:active{transform:scale(.99)}
+@media (hover:hover) and (pointer:fine){.jump button:hover{border-color:var(--gold)}}
+.jump .n{font-size:.74rem;letter-spacing:.14em;color:var(--gold-ink);padding-top:.25rem;
+  font-variant-numeric:tabular-nums}
+.jump .t{font-size:.92rem;line-height:1.35;color:var(--ink)}
+.jump .s{display:block;font-family:var(--f-display);font-size:1.1rem;color:var(--ink-2);margin-top:.15rem}
+.jump .m{display:block;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold-ink);margin-top:.3rem}
+.overview-close{position:fixed;top:clamp(1rem,3vh,1.8rem);right:clamp(1rem,3vw,1.8rem)}
+
+@media (prefers-reduced-motion:reduce){
+  .slide.on .slide-in > *{animation:none}
+  .arrow:active,.jump button:active{transform:none}
+  *{transition-duration:.01ms !important}
+}
+
+/* ---------- print: one agenda point per page, for a PDF to hand the AV desk ---------- */
+@media print{
+  @page{size:landscape;margin:0}
+  html,body{height:auto;overflow:visible;background:#fff}
+  .deck{position:static;background:none}
+  .slide{position:relative;inset:auto;height:100vh;opacity:1;visibility:visible;
+    break-after:page;page-break-after:always;
+    background:
+      radial-gradient(56% 56% at 50% 48%,rgba(251,240,227,.80) 0%,rgba(251,240,227,.32) 58%,rgba(251,240,227,0) 84%),
+      url("images/hero-wide.webp") center 28% / cover no-repeat,#DCE4CF;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .slide:last-child{break-after:auto;page-break-after:auto}
+  .slide.on .slide-in > *{animation:none}
+  /* the screen-reader live region is a 1px box at the end of the flow: in print it
+     would spill one blank page past the last slide */
+  .progress,.count,.controls,.hint,.overview,.sr-only{display:none !important}
+}
+</style>
+</head>
+<body>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<main class="deck" id="deck" aria-label="The Mad Hour agenda slides">
+  <!-- slides are written by the script below, from the AGENDA list; this first one is
+       also the no-JavaScript fallback so the page is never blank -->
+  <section class="slide slide-title on">
+    <div class="slide-in">
+      <img class="crest" src="images/logo-340.webp" width="340" height="322" alt="Leo Club of Aurelian emblem: a dragonfly above two peonies, with the words Built on Bonds" fetchpriority="high">
+      <h1>The Mad Hour</h1>
+      <p class="sub">1st Installation Ceremony</p>
+      <div class="rule"></div>
+      <p class="meta"><span>Sunday, 20 September 2026 &middot; 2 PM</span><span>Spring Banquets, Vashi</span></p>
+    </div>
+  </section>
+</main>
+
+<p class="count" id="count" aria-hidden="true"></p>
+
+<p class="hint" id="hint">Arrow keys to move &middot; A for the agenda</p>
+
+<div class="controls">
+  <button class="arrow" id="prev" type="button" aria-label="Previous slide" disabled>
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10 2L4 8l6 6"/></svg>
+  </button>
+  <button class="arrow" id="next" type="button" aria-label="Next slide">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 2l6 6-6 6"/></svg>
+  </button>
+  <button class="arrow" id="menu" type="button" aria-label="Show the full agenda" aria-expanded="false">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 4h12M2 8h12M2 12h12"/></svg>
+  </button>
+</div>
+
+<div class="overview" id="overview" hidden role="dialog" aria-modal="true" aria-label="Full agenda">
+  <button class="arrow overview-close" id="overviewClose" type="button" aria-label="Close the agenda">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 3l10 10M13 3L3 13"/></svg>
+  </button>
+  <h2>The Mad Hour &middot; Agenda</h2>
+  <ul class="jump" id="jump"></ul>
+</div>
+
+<p class="sr-only" id="live" role="status" aria-live="polite"></p>
+
+<script>
+/* The Mad Hour, 1st Installation Ceremony of Leo Club of Aurelian.
+   Source: the printed agenda card, 20 September 2026 (80 minutes over 20 points).
+
+   TO UPDATE: edit AGENDA below and nothing else. `topic` is the h2 line, `speaker`
+   the h1 under it, `mins` shows only in the agenda jump list (A key), never on the
+   slide face. Order here is the order on the night. */
+(function(){
+  var EVENT={ title:'The Mad Hour', sub:'1st Installation Ceremony',
+    when:'Sunday, 20 September 2026 · 2 PM', where:'Spring Banquets, Vashi' };
+
+  var AGENDA=[
+    { topic:'Meeting Call to Order', speaker:'Lion Ramchandra Patil', mins:1 },
+    { topic:'Leo Pledge', speaker:'Leo Darsh Sinha', mins:1 },
+    { topic:'Flag Salutation', speaker:'Leo Dhruv Chandra', mins:1 },
+    { topic:'Roll Call by the Club Secretary', speaker:'Leo Khushboo Patel', mins:1 },
+    { topic:'Introduction of the Guest of Honor & Induction Officer, Leo Lion Rakhshan Khan', speaker:'Leo Khushboo Patel', mins:2 },
+    { topic:'Induction Ceremony', speaker:'Leo Lion Rakhshan Khan', mins:5 },
+    { topic:'Introduction of the Chief Guest & Installation Officer, Leo Lion Mukund Khaw', speaker:'Leo Drishti Sinha', mins:2 },
+    { topic:'Installation of the Board of Directors for 2026–27', speaker:'Leo Lion Mukund Khaw', mins:30 },
+    { topic:'Thanking Speech by the Vice President', speaker:'Leo Abhishek Ajit', mins:3 },
+    { topic:'Acceptance Speech by the Club President', speaker:'Leo Drishti Sinha', mins:15 },
+    { topic:'Observation by the Lions Club President', speaker:'Lion Ramchandra Patil', mins:2 },
+    { topic:'Observation by the Leo Club Advisor', speaker:'Lion Sabitri Nag / Lion Dhirendra Sinha', mins:2 },
+    { topic:'Observation by the Guest of Honor, Induction Officer', speaker:'Leo Lion Rakhshan Khan', mins:2 },
+    { topic:'Observation by the Guest of Honor, Multiple District President', speaker:'Leo Lion Sudhanshu Maheshwari', mins:2 },
+    { topic:'Observation by the Lions Guest of Honor, 1st Vice District Governor', speaker:'MJF Lion Vijay Ganatra', mins:2 },
+    { topic:'Observation by the Lions Guest of Honor, 2nd Vice District Governor', speaker:'MJF Lion Namita Mishra', mins:2 },
+    { topic:'Observation by the Chief Guest, District President', speaker:'Leo Lion Mukund Khaw', mins:2 },
+    { topic:'Concluding Remarks by the Club President', speaker:'Leo Drishti Sinha', mins:2 },
+    { topic:'Vote of Thanks & Announcements by the Club Secretary', speaker:'Leo Khushboo Patel', mins:2 },
+    { topic:'Meeting Adjourned by the Club President', speaker:'Leo Drishti Sinha', mins:1 }
+  ];
+
+  var deck=document.getElementById('deck'), jump=document.getElementById('jump'),
+      overview=document.getElementById('overview'), live=document.getElementById('live'),
+      prevBtn=document.getElementById('prev'), nextBtn=document.getElementById('next'),
+      menuBtn=document.getElementById('menu'), closeBtn=document.getElementById('overviewClose'),
+      progress=document.getElementById('progress'), count=document.getElementById('count'),
+      hint=document.getElementById('hint');
+
+  function esc(t){ var d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+  function pad(n){ return n<10 ? '0'+n : ''+n; }
+
+  var CREST='<img class="crest" src="images/logo-340.webp" width="340" height="322" alt="" fetchpriority="high">';
+
+  /* title slide, one per agenda point, then the closing card */
+  var html=['<section class="slide slide-title" aria-roledescription="slide">'+
+      '<div class="slide-in">'+CREST+
+      '<h1>'+esc(EVENT.title)+'</h1>'+
+      '<p class="sub">'+esc(EVENT.sub)+'</p>'+
+      '<div class="rule"></div>'+
+      '<p class="meta"><span>'+esc(EVENT.when)+'</span><span>'+esc(EVENT.where)+'</span></p>'+
+      '</div></section>'];
+
+  AGENDA.forEach(function(item){
+    html.push('<section class="slide" aria-roledescription="slide">'+
+      '<div class="slide-in">'+
+      '<h2>'+esc(item.topic)+'</h2>'+
+      '<div class="rule"></div>'+
+      '<h1>'+esc(item.speaker)+'</h1>'+
+      '</div></section>');
+  });
+
+  html.push('<section class="slide slide-title" aria-roledescription="slide">'+
+    '<div class="slide-in">'+CREST+
+    '<h1>Thank you</h1>'+
+    '<p class="sub">Built on bonds.</p>'+
+    '<div class="rule"></div>'+
+    '<p class="meta"><span>Leo Club of Aurelian · District 3231 A4</span></p>'+
+    '</div></section>');
+
+  deck.innerHTML=html.join('');
+
+  var slides=deck.querySelectorAll('.slide'), last=slides.length-1, at=0;
+
+  jump.innerHTML=AGENDA.map(function(item,i){
+    return '<li><button type="button" data-go="'+(i+1)+'">'+
+      '<span class="n">'+pad(i+1)+'</span>'+
+      '<span class="t">'+esc(item.topic)+
+        '<span class="s">'+esc(item.speaker)+'</span>'+
+        '<span class="m">'+item.mins+' min</span>'+
+      '</span></button></li>';
+  }).join('');
+
+  function label(i){
+    if(i===0) return EVENT.title+', '+EVENT.sub;
+    if(i===last) return 'Thank you';
+    return AGENDA[i-1].topic+' — '+AGENDA[i-1].speaker;
+  }
+
+  function show(i,push){
+    i=Math.max(0,Math.min(last,i));
+    slides[at].classList.remove('on');
+    at=i;
+    slides[at].classList.add('on');
+    prevBtn.disabled = at===0;
+    nextBtn.disabled = at===last;
+    progress.style.width=(at/last*100)+'%';
+    count.textContent = (at>0 && at<last) ? pad(at)+' / '+pad(AGENDA.length) : '';
+    live.textContent=label(at);
+    if(push!==false) history.replaceState(null,'', at===0 ? location.pathname : '#'+at);
+  }
+
+  function step(d){ hideHint(); show(at+d); }
+  function hideHint(){ if(hint) hint.classList.add('gone'); }
+
+  /* ---- jump list ---- */
+  function openList(open){
+    overview.hidden=!open;
+    menuBtn.setAttribute('aria-expanded',open?'true':'false');
+    if(open) closeBtn.focus(); else menuBtn.focus();
+  }
+
+  jump.addEventListener('click',function(e){
+    var b=e.target.closest('[data-go]'); if(!b) return;
+    openList(false); hideHint(); show(+b.dataset.go);
+  });
+  menuBtn.addEventListener('click',function(){ hideHint(); openList(overview.hidden); });
+  closeBtn.addEventListener('click',function(){ openList(false); });
+
+  prevBtn.addEventListener('click',function(){ step(-1); });
+  nextBtn.addEventListener('click',function(){ step(1); });
+
+  /* a click anywhere on the stage advances, the way a clicker does */
+  deck.addEventListener('click',function(){ step(1); });
+
+  document.addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    var k=e.key;
+    if(!overview.hidden){
+      if(k==='Escape'||k==='a'||k==='A'){ e.preventDefault(); openList(false); }
+      return;
+    }
+    if(k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='PageDown'||k==='Enter'){ e.preventDefault(); step(1); }
+    else if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'||k==='Backspace'){ e.preventDefault(); step(-1); }
+    else if(k==='Home'){ e.preventDefault(); hideHint(); show(0); }
+    else if(k==='End'){ e.preventDefault(); hideHint(); show(last); }
+    else if(k==='a'||k==='A'){ e.preventDefault(); hideHint(); openList(true); }
+    else if(k==='f'||k==='F'){ e.preventDefault(); toggleFull(); }
+  });
+
+  function toggleFull(){
+    var el=document.documentElement;
+    if(document.fullscreenElement) document.exitFullscreen();
+    else if(el.requestFullscreen) el.requestFullscreen();
+  }
+
+  /* swipe, for running the deck from a phone */
+  var x0=null,y0=null;
+  deck.addEventListener('touchstart',function(e){ x0=e.touches[0].clientX; y0=e.touches[0].clientY; },{passive:true});
+  deck.addEventListener('touchend',function(e){
+    if(x0===null) return;
+    var dx=e.changedTouches[0].clientX-x0, dy=e.changedTouches[0].clientY-y0;
+    if(Math.abs(dx)>48 && Math.abs(dx)>Math.abs(dy)) step(dx<0?1:-1);
+    x0=y0=null;
+  },{passive:true});
+
+  /* deep link: slides.html#7 opens on agenda point 7, so a reload never loses the place */
+  function fromHash(){
+    var n=parseInt((location.hash||'').slice(1),10);
+    return isNaN(n)?0:n;
+  }
+  window.addEventListener('hashchange',function(){ show(fromHash(),false); });
+
+  show(fromHash(),false);
+})();
+</script>
+</body>
+</html>

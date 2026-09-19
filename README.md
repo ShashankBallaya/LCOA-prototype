@@ -28,6 +28,28 @@ from Google Fonts. Vanilla JS only.
 | Join | Layout done. The form validates but posts nowhere; it needs a form service or backend. |
 | Footer | Done. Shares the closing image band (`images/closing.webp`) with Join. |
 
+## Ceremony slides (`slides.html`)
+
+Projection deck for **The Mad Hour**, the club's 1st Installation Ceremony
+(20 Sep 2026, Spring Banquets, Vashi). One agenda point per slide: the point
+as the `h2` line, the member or guest calling it as the `h1` under it. The
+stage behind every slide is the same generated hero render the home page uses
+(`images/hero-wide.webp`, `images/hero-tall.webp` on phones), held still while
+only the words cross-fade. A title card opens the deck and a thank-you card
+closes it. Not linked from the site and marked `noindex`.
+
+- **Running it:** arrow keys, space or a click anywhere moves on; `Home` / `End`
+  jump to the ends; `A` opens the full agenda to jump to any point (with the
+  minutes from the run sheet, which never appear on a slide); `F` goes
+  fullscreen. Swipe works on a phone.
+- **Deep links:** `slides.html#7` opens on agenda point 7, so a reload during
+  the ceremony never loses the place.
+- **PDF for the AV desk:** print the page (landscape, background graphics on).
+  Each slide is one page.
+- **Editing:** the `AGENDA` array at the bottom of the file is the only thing to
+  change — `topic`, `speaker`, `mins`, in running order. Wording follows the
+  printed agenda card, with its typos fixed.
+
 ## Motion
 
 - Hero: staged entrance on load (crest, headline, sentence, buttons, meta line).
