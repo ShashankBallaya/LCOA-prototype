@@ -7,6 +7,7 @@
 <meta name="description" content="Projection slides for The Mad Hour, the 1st Installation Ceremony of Leo Club of Aurelian: one agenda point per slide with the member calling it.">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#FBF0E3">
+<meta name="color-scheme" content="light only">
 <link rel="icon" href="images/icon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="images/icon-64.png" sizes="64x64" type="image/png">
 <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
@@ -16,6 +17,7 @@
 <!-- the stage behind every slide is the biggest thing on screen: fetch the right one first -->
 <link rel="preload" as="image" href="images/hero-wide.webp" media="(min-width: 761px)" fetchpriority="high">
 <link rel="preload" as="image" href="images/hero-tall.webp" media="(max-width: 760px)" fetchpriority="high">
+<link rel="preload" as="image" href="images/logo-340.webp" fetchpriority="high">
 <style>
 /* self-hosted fonts, SIL Open Font License: see fonts/OFL-*.txt */
 @font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:300 500;font-display:swap;src:url(fonts/cormorant-garamond.woff2) format('woff2')}
@@ -38,6 +40,9 @@
   --ease-out:cubic-bezier(.23,1,.32,1);
   --f-display:'Cormorant Garamond','Cormorant Fallback',Georgia,serif;
   --f-sans:'Jost','Jost Fallback',system-ui,sans-serif;
+  --enter:14px;          /* where a slide's words come from: below going forward, above going back */
+  --in:.42s;             /* words settling in */
+  --out:.18s;            /* words leaving: always quicker than they arrive */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -65,70 +70,114 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     url("images/hero-wide.webp") center 28% / cover no-repeat,
     #DCE4CF}
 }
+.deck.back{--enter:-14px}
 
-/* ---------- slides ---------- */
+/* ---------- slides ----------
+   Transitions, not keyframes: a held-down arrow key retargets mid-fade instead of
+   restarting each slide from zero. */
 .slide{position:absolute;inset:0;display:grid;place-items:center;text-align:center;
   padding:clamp(3rem,9vh,6rem) clamp(1.5rem,7vw,6rem);
-  opacity:0;visibility:hidden;transition:opacity .45s var(--ease-out),visibility .45s}
-.slide.on{opacity:1;visibility:visible}
-.slide-in{display:flex;flex-direction:column;align-items:center;max-width:min(1000px,92vw)}
-@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-.slide.on .slide-in > *{animation:rise .55s var(--ease-out) both}
-.slide.on .slide-in > :nth-child(2){animation-delay:.06s}
-.slide.on .slide-in > :nth-child(3){animation-delay:.12s}
-.slide.on .slide-in > :nth-child(4){animation-delay:.18s}
+  opacity:0;visibility:hidden;
+  transition:opacity .32s var(--ease-out),visibility 0s linear .32s}
+.slide.on{opacity:1;visibility:visible;transition:opacity .32s var(--ease-out),visibility 0s}
+.slide-in{display:flex;flex-direction:column;align-items:center;max-width:min(1040px,92vw)}
+
+/* the words arrive a beat after the slide, staggered, with a touch of blur so two
+   overlapping blocks read as one thought changing rather than two sets of type */
+.slide-in > *{opacity:0;transform:translateY(var(--enter));filter:blur(5px);
+  transition:opacity var(--out) ease,transform var(--out) var(--ease-out),filter var(--out) ease}
+.slide.on .slide-in > *{opacity:1;transform:none;filter:none;
+  transition:opacity var(--in) var(--ease-out),transform var(--in) var(--ease-out),filter var(--in) var(--ease-out)}
+.slide.on .slide-in > :nth-child(1){transition-delay:.05s}
+.slide.on .slide-in > :nth-child(2){transition-delay:.10s}
+.slide.on .slide-in > :nth-child(3){transition-delay:.15s}
+.slide.on .slide-in > :nth-child(4){transition-delay:.20s}
+
+/* the crest sits on the slide, not in the text column, so the words keep optical centre */
+.mark{position:absolute;top:clamp(1.4rem,4vh,2.6rem);left:50%;transform:translateX(-50%);
+  width:clamp(58px,5.2vw,88px);height:auto;opacity:0;
+  transition:opacity var(--out) ease}
+.slide.on .mark{opacity:.9;transition:opacity .5s var(--ease-out) .1s}
+@media (max-height:460px){.mark{display:none}}
 
 /* the agenda point sits above, the member calling it below, as the run sheet reads */
 .slide h2{font-family:var(--f-sans);font-weight:300;color:var(--ink-2);
-  font-size:clamp(1.1rem,2.5vw,1.8rem);line-height:1.45;letter-spacing:.01em;
-  max-width:26ch;text-wrap:balance}
-.slide h1{font-family:var(--f-display);font-weight:300;color:var(--ink);
-  font-size:clamp(2.15rem,6.8vw,5.6rem);line-height:1.04;letter-spacing:-.01em;
-  text-wrap:balance;text-shadow:0 2px 30px rgba(251,240,227,.6)}
-.rule{width:clamp(92px,12vw,148px);height:1px;margin:clamp(1.4rem,3.2vh,2.4rem) 0;
+  font-size:clamp(1.05rem,2.3vw,1.7rem);line-height:1.5;letter-spacing:.005em;
+  max-width:26ch;text-wrap:balance;text-shadow:0 1px 20px rgba(251,240,227,.75)}
+.rule{width:clamp(76px,9vw,116px);height:1px;margin:clamp(1.3rem,3vh,2.1rem) 0;
   background:linear-gradient(90deg,rgba(220,195,163,0),var(--gold-line),rgba(220,195,163,0))}
-.crest{width:clamp(96px,10vw,148px);height:auto;margin-bottom:clamp(1.4rem,3vh,2.2rem);
-  filter:drop-shadow(0 14px 22px rgba(30,51,36,.18))}
 
-/* title and closing slides borrow the home page's display voice */
-.slide-title h1{font-size:clamp(3rem,8vw,6.5rem)}
+/* the name is the slide. The honorific stays with it but steps back a size, so
+   "Leo Lion Sudhanshu Maheshwari" reads as a person, not as a long line of type. */
+.name{display:flex;flex-direction:column;align-items:center;gap:clamp(1rem,2.4vh,1.6rem)}
+.unit{display:block}
+.honorific{display:block;font-family:var(--f-sans);font-weight:400;
+  font-size:clamp(.64rem,1vw,.8rem);letter-spacing:.3em;text-transform:uppercase;
+  color:var(--gold-ink);margin-bottom:clamp(.5rem,1.2vh,.85rem);text-indent:.3em}
+.given{display:block;font-family:var(--f-display);font-weight:300;color:var(--ink);
+  line-height:1.02;letter-spacing:-.012em;text-wrap:balance;
+  text-shadow:0 2px 30px rgba(251,240,227,.65)}
+/* one step down per name length, so every slide lands at about the same weight */
+.name-xl .given{font-size:clamp(2.5rem,7vw,6rem)}
+.name-lg .given{font-size:clamp(2.2rem,6vw,5.1rem)}
+.name-md .given{font-size:clamp(1.95rem,4.9vw,4.2rem)}
+.name-pair .given{font-size:clamp(1.6rem,3.8vw,3.1rem)}
+.name-pair .unit + .unit{position:relative;padding-top:clamp(1rem,2.4vh,1.6rem)}
+.name-pair .unit + .unit::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:56px;height:1px;background:linear-gradient(90deg,rgba(220,195,163,0),var(--gold-line),rgba(220,195,163,0))}
+
+/* title and closing cards borrow the home page's display voice */
+.slide-title .crest{width:clamp(96px,9.5vw,144px);height:auto;
+  margin-bottom:clamp(1.4rem,3vh,2.2rem);filter:drop-shadow(0 14px 22px rgba(30,51,36,.18))}
+.slide-title h1{font-family:var(--f-display);font-weight:300;color:var(--ink);
+  font-size:clamp(2.9rem,7.8vw,6.3rem);line-height:1.02;letter-spacing:-.012em;
+  text-shadow:0 2px 30px rgba(251,240,227,.65)}
 .slide-title .sub{font-family:var(--f-display);font-style:italic;font-weight:300;color:var(--sage-deep);
-  font-size:clamp(1.3rem,3.2vw,2.2rem);line-height:1.2;margin-top:.6rem}
-.slide-title .meta{font-size:clamp(.72rem,1.4vw,.84rem);letter-spacing:.2em;text-transform:uppercase;
-  color:var(--gold-ink)}
+  font-size:clamp(1.25rem,3.1vw,2.1rem);line-height:1.2;margin-top:.5rem}
+.slide-title .meta{font-size:clamp(.7rem,1.3vw,.82rem);letter-spacing:.22em;text-transform:uppercase;
+  color:var(--gold-ink);text-indent:.22em}
 .slide-title .meta span{display:block}
 .slide-title .meta span + span{margin-top:.45rem}
 
-/* ---------- chrome ---------- */
-.progress{position:fixed;top:0;left:0;height:2px;background:var(--gold);width:0;
-  transition:width .45s var(--ease-out);z-index:5}
-/* the scene under the chrome is light but busy: a paper pill keeps small text readable */
+/* ---------- chrome ----------
+   Everything here is for the person driving the deck, not for the room: it fades
+   out a couple of seconds after the last input and comes back on the next one. */
+.progress{position:fixed;top:0;left:0;height:2px;width:0;border-radius:0 2px 2px 0;z-index:5;
+  background:linear-gradient(90deg,var(--gold-line),var(--gold));
+  transition:width .38s var(--ease-out),opacity .3s ease}
 .count{position:fixed;bottom:clamp(1.1rem,3vh,2rem);left:clamp(1.1rem,3vw,2.4rem);z-index:5;
-  font-size:.74rem;letter-spacing:.2em;color:var(--gold-ink);font-variant-numeric:tabular-nums;
-  padding:.4rem .8rem;border-radius:999px;background:rgba(251,240,227,.55)}
+  font-size:.72rem;letter-spacing:.2em;color:var(--gold-ink);font-variant-numeric:tabular-nums;
+  padding:.4rem .8rem;border-radius:999px;background:rgba(251,240,227,.5);
+  transition:opacity .3s ease}
 .count:empty{display:none}
+.count b{font-weight:300}
+.count i{font-style:normal;opacity:.5;margin:0 .15em}
 .controls{position:fixed;bottom:clamp(1rem,3vh,2rem);right:clamp(1rem,3vw,2.4rem);z-index:5;
-  display:flex;align-items:center;gap:.6rem}
+  display:flex;align-items:center;gap:.55rem;transition:opacity .3s ease}
 .arrow{width:2.6rem;height:2.6rem;border-radius:50%;border:1px solid var(--gold-line);
-  display:grid;place-items:center;color:var(--ink);background:rgba(251,240,227,.45);
-  transition:background .2s ease,border-color .2s ease,color .2s ease,transform .16s var(--ease-out)}
+  display:grid;place-items:center;color:var(--ink);background:rgba(251,240,227,.5);
+  transition:background .2s ease,border-color .2s ease,opacity .2s ease,transform .16s var(--ease-out)}
 .arrow svg{width:.95rem;height:.95rem}
-.arrow:active{transform:scale(.94)}
-.arrow[disabled]{opacity:.35;cursor:default}
+.arrow:active{transform:scale(.97)}
+.arrow[disabled]{opacity:.3;cursor:default}
 @media (hover:hover) and (pointer:fine){
   .arrow:not([disabled]):hover{border-color:var(--gold);background:var(--paper-2)}
 }
 .hint{position:fixed;bottom:clamp(1.25rem,3vh,2.15rem);left:50%;transform:translateX(-50%);z-index:5;
-  font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-ink);
-  padding:.4rem .9rem;border-radius:999px;background:rgba(251,240,227,.55);
+  font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-ink);text-indent:.18em;
+  padding:.4rem .9rem;border-radius:999px;background:rgba(251,240,227,.5);
   transition:opacity .4s ease;pointer-events:none}
 .hint.gone{opacity:0}
 @media (max-width:640px){.hint{display:none}}
+/* idle: the room should see the ceremony, not the controls */
+body.idle .progress,body.idle .count,body.idle .controls,body.idle .hint{opacity:0}
+body.idle .controls{pointer-events:none}
 
 /* ---------- jump list ---------- */
 .overview{position:fixed;inset:0;z-index:10;background:rgba(251,240,227,.97);
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
-  overflow-y:auto;padding:clamp(1.5rem,5vh,3rem) clamp(1.25rem,5vw,3rem) 4rem}
+  overflow-y:auto;overscroll-behavior:contain;
+  padding:clamp(1.5rem,5vh,3rem) clamp(1.25rem,5vw,3rem) 4rem}
 .overview[hidden]{display:none}
 .overview h2{font-family:var(--f-display);font-weight:400;color:var(--ink);font-size:1.9rem;
   margin-bottom:1.4rem;text-align:center}
@@ -136,21 +185,24 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   width:min(1120px,100%);margin-inline:auto;list-style:none}
 .jump button{display:grid;grid-template-columns:2.2rem 1fr;gap:.6rem;width:100%;text-align:left;
   padding:.85rem 1rem;border:1px solid var(--gold-line);border-radius:16px;background:var(--paper);
-  transition:border-color .2s ease,transform .2s var(--ease-out)}
+  transition:border-color .2s ease,background .2s ease,transform .16s var(--ease-out)}
 .jump button:active{transform:scale(.99)}
+.jump button[aria-current="true"]{border-color:var(--gold);background:var(--paper-2)}
 @media (hover:hover) and (pointer:fine){.jump button:hover{border-color:var(--gold)}}
-.jump .n{font-size:.74rem;letter-spacing:.14em;color:var(--gold-ink);padding-top:.25rem;
+.jump .n{font-size:.72rem;letter-spacing:.14em;color:var(--gold-ink);padding-top:.3rem;
   font-variant-numeric:tabular-nums}
-.jump .t{font-size:.92rem;line-height:1.35;color:var(--ink)}
-.jump .s{display:block;font-family:var(--f-display);font-size:1.1rem;color:var(--ink-2);margin-top:.15rem}
-.jump .m{display:block;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--gold-ink);margin-top:.3rem}
+.jump .t{font-size:.9rem;line-height:1.4;color:var(--ink)}
+.jump .s{display:block;font-family:var(--f-display);font-size:1.15rem;line-height:1.25;
+  color:var(--ink-2);margin-top:.2rem}
+.jump .m{display:block;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold-ink);margin-top:.35rem}
 .overview-close{position:fixed;top:clamp(1rem,3vh,1.8rem);right:clamp(1rem,3vw,1.8rem)}
 
+/* reduced motion: keep the fades that explain the change, drop the movement and blur */
 @media (prefers-reduced-motion:reduce){
-  .slide.on .slide-in > *{animation:none}
+  .slide-in > *{transform:none;filter:none}
   .arrow:active,.jump button:active{transform:none}
-  *{transition-duration:.01ms !important}
+  .progress{transition:opacity .3s ease}
 }
 
 /* ---------- print: one agenda point per page, for a PDF to hand the AV desk ---------- */
@@ -165,7 +217,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       url("images/hero-wide.webp") center 28% / cover no-repeat,#DCE4CF;
     -webkit-print-color-adjust:exact;print-color-adjust:exact}
   .slide:last-child{break-after:auto;page-break-after:auto}
-  .slide.on .slide-in > *{animation:none}
+  .slide-in > *{opacity:1;transform:none;filter:none;transition:none}
+  .mark{opacity:.9;transition:none}
   /* the screen-reader live region is a 1px box at the end of the flow: in print it
      would spill one blank page past the last slide */
   .progress,.count,.controls,.hint,.overview,.sr-only{display:none !important}
@@ -220,9 +273,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* The Mad Hour, 1st Installation Ceremony of Leo Club of Aurelian.
    Source: the printed agenda card, 20 September 2026 (80 minutes over 20 points).
 
-   TO UPDATE: edit AGENDA below and nothing else. `topic` is the h2 line, `speaker`
-   the h1 under it, `mins` shows only in the agenda jump list (A key), never on the
-   slide face. Order here is the order on the night. */
+   TO UPDATE: edit AGENDA below and nothing else. `topic` is the line above the rule,
+   `speaker` the name under it, `mins` shows only in the agenda jump list (A key),
+   never on the slide face. Two names for one point: separate them with " / ".
+   Order here is the order on the night. */
 (function(){
   var EVENT={ title:'The Mad Hour', sub:'1st Installation Ceremony',
     when:'Sunday, 20 September 2026 · 2 PM', where:'Spring Banquets, Vashi' };
@@ -260,33 +314,47 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   function esc(t){ var d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
   function pad(n){ return n<10 ? '0'+n : ''+n; }
 
-  var CREST='<img class="crest" src="images/logo-340.webp" width="340" height="322" alt="" fetchpriority="high">';
+  /* "Leo Lion Rakhshan Khan" is an honorific and a person: set them at different
+     sizes so every slide lands on the name, whatever the title in front of it. */
+  var HONORIFIC=/^(Leo Lion|MJF Lion|Lion|Leo)\s+/;
+  function unit(full){
+    var m=full.match(HONORIFIC), hon=m?m[1]:'', given=m?full.slice(m[0].length):full;
+    return { given:given,
+      html:'<span class="unit">'+(hon?'<span class="honorific">'+esc(hon)+'</span>':'')+
+           '<span class="given">'+esc(given)+'</span></span>' };
+  }
+  function nameBlock(speaker){
+    var parts=speaker.split(' / ').map(unit),
+        longest=parts.reduce(function(n,p){ return Math.max(n,p.given.length); },0),
+        size = parts.length>1 ? 'name-pair' : longest<=13 ? 'name-xl' : longest<=20 ? 'name-lg' : 'name-md';
+    return '<h1 class="name '+size+'">'+parts.map(function(p){ return p.html; }).join('')+'</h1>';
+  }
 
-  /* title slide, one per agenda point, then the closing card */
-  var html=['<section class="slide slide-title" aria-roledescription="slide">'+
-      '<div class="slide-in">'+CREST+
-      '<h1>'+esc(EVENT.title)+'</h1>'+
-      '<p class="sub">'+esc(EVENT.sub)+'</p>'+
+  var CREST='<img class="mark" src="images/logo-340.webp" width="340" height="322" alt="" decoding="async">';
+
+  function titleCard(h1,sub,meta){
+    return '<section class="slide slide-title" aria-roledescription="slide">'+
+      '<div class="slide-in">'+
+      '<img class="crest" src="images/logo-340.webp" width="340" height="322" alt="" fetchpriority="high">'+
+      '<h1>'+esc(h1)+'</h1>'+
+      '<p class="sub">'+esc(sub)+'</p>'+
       '<div class="rule"></div>'+
-      '<p class="meta"><span>'+esc(EVENT.when)+'</span><span>'+esc(EVENT.where)+'</span></p>'+
-      '</div></section>'];
+      '<p class="meta">'+meta.map(function(l){ return '<span>'+esc(l)+'</span>'; }).join('')+'</p>'+
+      '</div></section>';
+  }
+
+  var html=[ titleCard(EVENT.title,EVENT.sub,[EVENT.when,EVENT.where]) ];
 
   AGENDA.forEach(function(item){
-    html.push('<section class="slide" aria-roledescription="slide">'+
+    html.push('<section class="slide" aria-roledescription="slide">'+CREST+
       '<div class="slide-in">'+
       '<h2>'+esc(item.topic)+'</h2>'+
       '<div class="rule"></div>'+
-      '<h1>'+esc(item.speaker)+'</h1>'+
+      nameBlock(item.speaker)+
       '</div></section>');
   });
 
-  html.push('<section class="slide slide-title" aria-roledescription="slide">'+
-    '<div class="slide-in">'+CREST+
-    '<h1>Thank you</h1>'+
-    '<p class="sub">Built on bonds.</p>'+
-    '<div class="rule"></div>'+
-    '<p class="meta"><span>Leo Club of Aurelian · District 3231 A4</span></p>'+
-    '</div></section>');
+  html.push( titleCard('Thank you','Built on bonds.',['Leo Club of Aurelian · District 3231 A4']) );
 
   deck.innerHTML=html.join('');
 
@@ -300,6 +368,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         '<span class="m">'+item.mins+' min</span>'+
       '</span></button></li>';
   }).join('');
+  var jumpBtns=jump.querySelectorAll('[data-go]');
 
   function label(i){
     if(i===0) return EVENT.title+', '+EVENT.sub;
@@ -309,13 +378,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
   function show(i,push){
     i=Math.max(0,Math.min(last,i));
+    deck.classList.toggle('back', i<at);
     slides[at].classList.remove('on');
     at=i;
     slides[at].classList.add('on');
     prevBtn.disabled = at===0;
     nextBtn.disabled = at===last;
     progress.style.width=(at/last*100)+'%';
-    count.textContent = (at>0 && at<last) ? pad(at)+' / '+pad(AGENDA.length) : '';
+    count.innerHTML = (at>0 && at<last)
+      ? '<b>'+pad(at)+'</b><i>/</i>'+pad(AGENDA.length) : '';
+    [].forEach.call(jumpBtns,function(b){ b.setAttribute('aria-current', +b.dataset.go===at ? 'true':'false'); });
     live.textContent=label(at);
     if(push!==false) history.replaceState(null,'', at===0 ? location.pathname : '#'+at);
   }
@@ -327,7 +399,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   function openList(open){
     overview.hidden=!open;
     menuBtn.setAttribute('aria-expanded',open?'true':'false');
-    if(open) closeBtn.focus(); else menuBtn.focus();
+    if(open){ closeBtn.focus(); var cur=jump.querySelector('[aria-current="true"]'); if(cur) cur.scrollIntoView({block:'center'}); }
+    else menuBtn.focus();
   }
 
   jump.addEventListener('click',function(e){
@@ -359,9 +432,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   });
 
   function toggleFull(){
-    var el=document.documentElement;
     if(document.fullscreenElement) document.exitFullscreen();
-    else if(el.requestFullscreen) el.requestFullscreen();
+    else if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
   }
 
   /* swipe, for running the deck from a phone */
@@ -373,6 +445,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     if(Math.abs(dx)>48 && Math.abs(dx)>Math.abs(dy)) step(dx<0?1:-1);
     x0=y0=null;
   },{passive:true});
+
+  /* the controls belong to whoever is driving, not to the room: they step back
+     a couple of seconds after the last input and return on the next one */
+  var idle;
+  function wake(){
+    document.body.classList.remove('idle');
+    clearTimeout(idle);
+    idle=setTimeout(function(){ if(overview.hidden) document.body.classList.add('idle'); },2600);
+  }
+  ['mousemove','keydown','click','touchstart','wheel'].forEach(function(ev){
+    document.addEventListener(ev,wake,{passive:true});
+  });
+  wake();
 
   /* deep link: slides.html#7 opens on agenda point 7, so a reload never loses the place */
   function fromHash(){

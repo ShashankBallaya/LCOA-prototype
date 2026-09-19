@@ -41,7 +41,9 @@ closes it. Not linked from the site and marked `noindex`.
 - **Running it:** arrow keys, space or a click anywhere moves on; `Home` / `End`
   jump to the ends; `A` opens the full agenda to jump to any point (with the
   minutes from the run sheet, which never appear on a slide); `F` goes
-  fullscreen. Swipe works on a phone.
+  fullscreen. Swipe works on a phone. The controls, counter and progress line
+  fade out 2.6 s after the last input and return on the next one, so the room
+  sees the ceremony and not the chrome.
 - **Deep links:** `slides.html#7` opens on agenda point 7, so a reload during
   the ceremony never loses the place.
 - **PDF for the AV desk:** print the page (landscape, background graphics on).
@@ -49,6 +51,11 @@ closes it. Not linked from the site and marked `noindex`.
 - **Editing:** the `AGENDA` array at the bottom of the file is the only thing to
   change — `topic`, `speaker`, `mins`, in running order. Wording follows the
   printed agenda card, with its typos fixed.
+- **Names:** the honorific (`Leo`, `Lion`, `Leo Lion`, `MJF Lion`) is split off
+  and set small above the name, and the name steps down a size at 14 and 21
+  characters, so every slide lands at about the same weight. Two people on one
+  point: separate them with ` / ` and they stack with a hairline between.
+- **No portraits**, by request: the slide face is the agenda point and the name.
 
 ## Motion
 
