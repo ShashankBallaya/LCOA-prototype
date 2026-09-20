@@ -198,6 +198,7 @@ window.CLUB = {
   /* Main Character of the month, newest first. The section stays hidden while this list is empty.
      { name: 'Leo ...', role: '...', month: 'YYYY-MM', photo: 'images/leo-of-the-month/....webp' or null } */
   leoOfTheMonth: [
+    { name: 'Leo Vaishnavi Mainkar',  role: 'Joint Secretary',          month: '2026-09', photo: 'images/board/vaishnavi-mainkar.webp' },
     { name: 'Leo Shashank Ballaya',   role: 'Chief Innovation Officer', month: '2026-08', photo: 'images/board/shashank-ballaya.webp' },
     { name: 'Leo Rahul Dadheech',     role: 'Sponsorship & CSR Director', month: '2026-08', photo: 'images/board/rahul-dadheech.webp' },
     { name: 'Leo Mahima Pal',         role: 'Media Outreach Director',  month: '2026-07', photo: 'images/board/mahima-pal.webp' }
