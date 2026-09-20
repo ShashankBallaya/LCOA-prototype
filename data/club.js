@@ -172,7 +172,7 @@ window.CLUB = {
     { name: 'Leo Divya Ramakrishnan',  role: 'Chief Innovation Coordinator', photo: 'images/board/divya-ramakrishnan.webp' },
     { name: 'Leo Rahul Dadheech',      role: 'Sponsorship & CSR Director',   photo: 'images/board/rahul-dadheech.webp' },
     { name: 'Leo Mahima Pal',          role: 'Media Outreach Director',      photo: 'images/board/mahima-pal.webp' },
-    { name: 'Leo Aryan Lakde',         role: 'Club Merchandise Officer',     photo: 'images/board/aryan-lakde.webp?v=2' }
+    { name: 'Leo Aryan Lakde',         role: 'Marketing Coordinator',        photo: 'images/board/aryan-lakde.webp?v=2' }
   ],
 
   /* OSW, the flagship week (home page, above Upcoming events). The days come from `upcoming`
@@ -198,7 +198,6 @@ window.CLUB = {
   /* Main Character of the month, newest first. The section stays hidden while this list is empty.
      { name: 'Leo ...', role: '...', month: 'YYYY-MM', photo: 'images/leo-of-the-month/....webp' or null } */
   leoOfTheMonth: [
-    { name: 'Leo Sakshi Gawade',      role: 'Global Leadership Team',   month: '2026-09', photo: 'images/board/sakshi-gawade.webp' },
     { name: 'Leo Shashank Ballaya',   role: 'Chief Innovation Officer', month: '2026-08', photo: 'images/board/shashank-ballaya.webp' },
     { name: 'Leo Rahul Dadheech',     role: 'Sponsorship & CSR Director', month: '2026-08', photo: 'images/board/rahul-dadheech.webp' },
     { name: 'Leo Mahima Pal',         role: 'Media Outreach Director',  month: '2026-07', photo: 'images/board/mahima-pal.webp' }
