@@ -30,10 +30,10 @@ window.CLUB = {
   },
 
   /* Past events, newest first. Titles, dates and categories follow the MyLion report
-     (Service_Project and Fundraiser = service; board and club meetings = leadership;
+     (Service_Project and Fundraiser = service; board and club meetings and our own installation = leadership;
      ceremonies and the photoshoot = fellowship). */
   events: [
-    { title: '1st Club Installation', category: 'fellowship', date: '2026-09-20',
+    { title: '1st Club Installation', category: 'leadership', date: '2026-09-20',
       place: 'Spring Banquets, Vashi', cause: 'Club administration',
       text: 'The very first installation of Leo Club of Aurelian, with our Lions, our guests and the whole club in one room.',
       photo: 'images/recap/installation-1.webp',
