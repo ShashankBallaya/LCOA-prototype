@@ -116,8 +116,8 @@ window.CLUB = {
   recap: { count: 5, photosOnly: false },
 
   /* Upcoming, in date order. Events drop off both pages on their own once their date has passed.
-     Source for October and November: OSW_and_Upcoming_Events_2026.csv (tentative, 17 Sep 2026).
-     `series: 'OSW'` groups the 2 to 9 October run into one block. `focus` is a short label.
+     Source for October and November: the First Council Meet slides (26 Sep 2026).
+     `series: 'OSW'` groups the 1 to 8 October run into one block. `focus` is a short label.
      `short` is an optional shorter title for the month calendars, where a cell is narrow.
      `place` is the venue. Add it as soon as it is known: an upcoming event with a place
      is published as a schema.org Event, which can show as a search result of its own. */
@@ -126,21 +126,20 @@ window.CLUB = {
       text: 'The very first installation of Leo Club of Aurelian. Invitations are on their way.',
       photo: 'images/seal-tile.webp' },
 
-    { title: 'Pahal / Anna Daan',                  date: '2026-10-02', focus: 'Hunger relief',                   series: 'OSW', tentative: true },
-    { title: 'Aanchal: Chapter 4',                 date: '2026-10-03', focus: 'Sports event',                    series: 'OSW', tentative: true },
-    { title: 'Senior Citizen / Childhood Cancer',  date: '2026-10-04', focus: 'Community service',               series: 'OSW', tentative: true },
-    { title: 'Meter Down',                         date: '2026-10-05', focus: 'Hunger relief',                   series: 'OSW', tentative: true },
-    { title: 'Sanitary Pad Drive',                 date: '2026-10-06', focus: 'Donation and awareness session',  series: 'OSW', tentative: true },
-    { title: 'Peace Poster',                       date: '2026-10-07', focus: 'With EuroKids',                   series: 'OSW', tentative: true },
-    { title: 'Stationery Kits / Animal Feeding',   date: '2026-10-08', focus: 'Underprivileged children and stray animals', series: 'OSW', tentative: true },
-    { title: 'OSW Finale',                         date: '2026-10-09', focus: 'Closing event',                   series: 'OSW', tentative: true },
+    { title: 'Animal Feeding',                     date: '2026-10-01', focus: 'Animal welfare',                  series: 'OSW' },
+    { title: 'Pahal / Anna Daan',                  date: '2026-10-02', focus: 'Hunger relief',                   series: 'OSW' },
+    { title: 'Aanchal: Chapter 4',                 date: '2026-10-03', focus: 'Sports event',                    series: 'OSW' },
+    { title: 'Childhood Cancer',                   date: '2026-10-04', focus: 'Community service',               series: 'OSW' },
+    { title: 'Meter Down',                         date: '2026-10-05', focus: 'Community service',               series: 'OSW' },
+    { title: 'Tree Plantation',                    date: '2026-10-06', focus: 'Environment',                     series: 'OSW' },
+    { title: 'Peace Poster',                       date: '2026-10-07', focus: 'At a government school',         series: 'OSW' },
+    { title: 'Stationery Kits Donation',           date: '2026-10-08', focus: 'For underprivileged children',    series: 'OSW',
+      short: 'Stationery Kits' },
 
-    { title: 'Blood Donation: Leo Club of Kandivali Lokhandwala', date: '2026-10-18', focus: 'Blood donation',                  tentative: true,
-      short: 'Blood Donation' },
-    { title: 'After Hours',                        date: '2026-10-23', focus: 'Twinning with Vashi Virtues and Ummeed', tentative: true },
-    { title: 'Ummeed',                             date: '2026-11-01', focus: 'District service initiative',      tentative: true },
-    { title: 'Aanchal: Chapter 5',                 date: '2026-11-14', focus: 'Party and celebration',           tentative: true },
-    { title: 'Empowerment × Side Quest',           date: '2026-11-29', focus: 'Women empowerment',               tentative: true }
+    { title: 'Blood Donation',                     date: '2026-10-18', focus: 'Twinning with Leo Club of Kandivali Lokhandwala' },
+    { title: 'After Hours',                        date: '2026-10-23', focus: 'Twinning with Vashi Virtues' },
+    { title: 'Aanchal: Chapter 5',                 date: '2026-11-14', focus: 'Party and celebration' },
+    { title: 'Empowerment × Side Quest',           date: '2026-11-29', focus: 'Women empowerment' }
   ],
 
   /* Calendar art: the wide picture at the top of each month card on events.html.
@@ -186,12 +185,10 @@ window.CLUB = {
       'images/osw/pahal-anna-daan.webp',
       'images/osw/aanchal-chapter-4.webp',
       'images/osw/senior-citizen-childhood-cancer.webp',
-      'images/osw/meter-down.webp',
       'images/osw/centre-dragonfly.webp',
-      'images/osw/sanitary-pad-drive.webp',
+      'images/osw/meter-down.webp',
       'images/osw/peace-poster.webp',
-      'images/osw/stationery-animal-feeding.webp',
-      'images/osw/osw-finale.webp'
+      'images/osw/stationery-animal-feeding.webp'
     ]
   },
 
