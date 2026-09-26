@@ -33,6 +33,16 @@ window.CLUB = {
      (Service_Project and Fundraiser = service; board and club meetings = leadership;
      ceremonies and the photoshoot = fellowship). */
   events: [
+    { title: '1st Club Installation', category: 'fellowship', date: '2026-09-20',
+      place: 'Spring Banquets, Vashi', cause: 'Club administration',
+      text: 'The very first installation of Leo Club of Aurelian, with our Lions, our guests and the whole club in one room.',
+      photo: 'images/recap/installation-1.webp',
+      alt: 'The whole club with Lions and guests in a group photo at the installation ceremony' },
+    { title: 'Meter Down 2.0', category: 'service', date: '2026-09-18',
+      place: null, cause: 'Hunger',
+      text: 'Meter Down, round two: food boxes for families living on the streets.',
+      photo: 'images/recap/meter-down-2.webp',
+      alt: 'Leos handing food boxes to a grandmother and children on the street' },
     { title: 'Aanchal: Chapter 3', category: 'service', date: '2026-09-05',
       place: null, cause: 'Childhood cancer',
       text: 'A Janmashtami-special colouring activity with the kids at a cancer home, and a day filled with smiles.',
@@ -122,10 +132,6 @@ window.CLUB = {
      `place` is the venue. Add it as soon as it is known: an upcoming event with a place
      is published as a schema.org Event, which can show as a search result of its own. */
   upcoming: [
-    { title: 'Installation Ceremony', date: '2026-09-20',
-      text: 'The very first installation of Leo Club of Aurelian. Invitations are on their way.',
-      photo: 'images/seal-tile.webp' },
-
     { title: 'Animal Feeding',                     date: '2026-10-01', focus: 'Animal welfare',                  series: 'OSW' },
     { title: 'Pahal / Anna Daan',                  date: '2026-10-02', focus: 'Hunger relief',                   series: 'OSW' },
     { title: 'Aanchal: Chapter 4',                 date: '2026-10-03', focus: 'Sports event',                    series: 'OSW' },
